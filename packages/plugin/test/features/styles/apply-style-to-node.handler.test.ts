@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createApplyStyleToNodeHandler } from '../../src/handlers/apply-style-to-node.js';
+import { createApplyStyleToNodeHandler } from '../../../src/features/styles/apply-style-to-node.handler.js';
 
 const fakeFigma = (node: unknown): typeof figma =>
   ({ getNodeByIdAsync: async () => node }) as unknown as typeof figma;
@@ -36,7 +36,7 @@ describe('apply_style_to_node handler', () => {
         styleId: 'S:0',
         field: 'bogus',
       }),
-    ).rejects.toThrow(/field must be/);
+    ).rejects.toThrow(/field: Invalid option/);
     await expect(
       createApplyStyleToNodeHandler(fakeFigma(null))({
         nodeId: '9:9',

@@ -1,7 +1,7 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createUpdatePaintStyleHandler } from '../../src/handlers/update-paint-style.js';
+import { createUpdatePaintStyleHandler } from '../../../src/features/styles/update-paint-style.handler.js';
 
 const fakeFigma = (style: unknown, variables: Record<string, unknown> = {}): typeof figma =>
   ({
@@ -42,8 +42,6 @@ describe('update_paint_style handler', () => {
     await expect(createUpdatePaintStyleHandler(fakeFigma(null))({})).rejects.toThrow(/styleId/);
   });
 
-  // Re-syncing a style from code is the common case, and it is where a binding gets clobbered:
-  // paints replace wholesale, so the binding has to be re-sent — and then actually applied.
   it('re-applies a binding sent with the new paints', async () => {
     const style = { id: 'S:0', type: 'PAINT', name: 'n', paints: [] as unknown, description: '' };
     await createUpdatePaintStyleHandler(

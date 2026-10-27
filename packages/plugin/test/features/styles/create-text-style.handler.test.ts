@@ -1,12 +1,8 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateTextStyleHandler } from '../../src/handlers/create-text-style.js';
+import { createCreateTextStyleHandler } from '../../../src/features/styles/create-text-style.handler.js';
 
-/**
- * `missingFont` makes loadFontAsync reject for that family, the way Figma does for a font the user
- * has not installed — the one failure in this handler that caller input can cause.
- */
 const fakeFigma = (
   { missingFont }: { missingFont?: string } = {},
   variables: Record<string, unknown> = {},
@@ -53,9 +49,6 @@ describe('create_text_style handler', () => {
       letterSpacing: { unit: 'PIXELS', value: 0 },
     })) as StyleResult;
 
-    // Twice: hoisted before creation (a font the user may not have is the one caller-input
-    // failure here), then again as the style's own face, which every typography write below needs
-    // loaded. loadFontAsync is cached, so the repeat costs nothing.
     expect(loaded).toEqual([
       { family: 'Inter', style: 'Bold' },
       { family: 'Inter', style: 'Bold' },
@@ -97,9 +90,6 @@ describe('create_text_style handler', () => {
   });
 
   it("loads the style's own font before setting textWrapStyle (Figma rejects it otherwise)", async () => {
-    // Live Figma answers `Cannot write to node with unloaded font "Inter Regular"` here: unlike
-    // fontSize / lineHeight / letterSpacing, this writes through to the style's text runs. With
-    // fontName omitted the face is Figma's default on a fresh style, which nothing has loaded yet.
     const { figma: f, loaded, style } = fakeFigma();
     style.fontName = { family: 'Inter', style: 'Regular' };
     await createCreateTextStyleHandler(f)({ name: 'Heading/H1', textWrapStyle: 'BALANCE' });
@@ -108,9 +98,6 @@ describe('create_text_style handler', () => {
   });
 
   it('loads the requested font before creating anything, so a bad font strands no style', async () => {
-    // The failure mode this guards: createTextStyle() first, loadFontAsync() after, means an
-    // unavailable font leaves an orphan style sitting in the document's style panel that the failed
-    // call can no longer reach. Every sibling create_* handler validates before it mutates.
     const { figma: f, createTextStyle } = fakeFigma({ missingFont: 'Nonexistent Sans' });
     await expect(
       createCreateTextStyleHandler(f)({
@@ -127,8 +114,6 @@ describe('create_text_style handler', () => {
     await expect(handler({ fontSize: 12 })).rejects.toThrow(/name/);
   });
 
-  // Typography values are scalars, so a text style is the only place its bindings can live — there
-  // is no per-paint level like a fill has (issue #164).
   it('binds typography fields on the created style', async () => {
     const variable = { id: 'V:1', name: 'size/lg', resolvedType: 'FLOAT', valuesByMode: {} };
     const { figma: f, bound } = fakeFigma({}, { 'V:1': variable });
@@ -140,10 +125,6 @@ describe('create_text_style handler', () => {
     expect(bound).toEqual([['fontSize', variable]]);
   });
 
-  // The one failure that cannot be hoisted ahead of creation: a binding's target face is only
-  // computable once the style's base face is, which is after creation when fontName is omitted.
-  // So the orphan gets undone rather than prevented — a style left in the panel would still be
-  // published to the library from there.
   it('creates nothing when a binding cannot be resolved', async () => {
     const { figma: f, createTextStyle } = fakeFigma();
     await expect(
@@ -155,9 +136,6 @@ describe('create_text_style handler', () => {
     expect(createTextStyle).not.toHaveBeenCalled();
   });
 
-  // What the resolution hoist above cannot cover: the face a binding lands on is only computable
-  // once the style's base face is, i.e. after creation when fontName was omitted. A style left in
-  // the panel would still be published to the library from there, so it gets undone.
   it('removes the style it created when the binding itself fails', async () => {
     const variable = { id: 'V:1', name: 'size/lg', resolvedType: 'FLOAT', valuesByMode: {} };
     const { figma: f, style, removed } = fakeFigma({}, { 'V:1': variable });
@@ -184,14 +162,9 @@ describe('create_text_style handler', () => {
       name: 'Heading/H1',
       boundVariables: { fontFamily: 'V:f' },
     });
-    // Live Figma answers `unloaded font "Roboto Regular"` without this.
     expect(loaded).toContainEqual({ family: 'Roboto', style: 'Regular' });
   });
 
-  // Measured on a multi-mode collection: only the face the style RESOLVES to must be loadable — a
-  // non-default mode naming a font nobody has still binds. Every mode's face is loaded anyway
-  // (which mode resolves is the collection's business, not the variable's), and a face that cannot
-  // load is skipped rather than failing the write.
   it('loads every mode of a bound family, not just the first', async () => {
     const variable = {
       id: 'V:f',
@@ -229,8 +202,6 @@ describe('create_text_style handler', () => {
     });
     expect(loaded).toContainEqual({ family: 'Roboto', style: 'Regular' });
     expect(loaded).not.toContainEqual({ family: 'NoSuchFontFamilyXYZ', style: 'Regular' });
-    // Live Figma binds this: only the face the style resolves to has to exist. Letting the failed
-    // load through would reject a binding Figma accepts.
     expect(bound).toEqual([['fontFamily', variable]]);
   });
 
@@ -247,7 +218,6 @@ describe('create_text_style handler', () => {
       name: 'Heading/H1',
       boundVariables: { fontFamily: 'V:f' },
     });
-    // The style's own face (before creation writes) plus Roboto Regular — not Roboto twice.
     expect(loaded.filter(fn => fn.family === 'Roboto')).toEqual([
       { family: 'Roboto', style: 'Regular' },
     ]);
@@ -272,8 +242,6 @@ describe('create_text_style handler', () => {
       name: 'Heading/H1',
       boundVariables: { fontFamily: 'V:f', fontStyle: 'V:s' },
     });
-    // Live Figma composes these into Roboto Bold; the intermediate face has to load for the family
-    // swap to land before the style swap runs.
     expect(loaded).toContainEqual({ family: 'Roboto', style: 'Regular' });
     expect(loaded).toContainEqual({ family: 'Roboto', style: 'Bold' });
   });

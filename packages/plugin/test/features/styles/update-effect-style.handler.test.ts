@@ -1,7 +1,7 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createUpdateEffectStyleHandler } from '../../src/handlers/update-effect-style.js';
+import { createUpdateEffectStyleHandler } from '../../../src/features/styles/update-effect-style.handler.js';
 
 const fakeFigma = (style: unknown, variables: Record<string, unknown> = {}): typeof figma =>
   ({
@@ -34,7 +34,7 @@ describe('update_effect_style handler', () => {
     expect(style.effects).toEqual([
       { type: 'LAYER_BLUR', blurType: 'NORMAL', visible: true, radius: 8 },
     ]);
-    expect(style.description).toBe('keep'); // omitted → unchanged
+    expect(style.description).toBe('keep');
     expect(result).toEqual({ ok: true, styleId: 'E:0', name: 'Elevation/Card' });
   });
 

@@ -1,7 +1,7 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createCreatePaintStyleHandler } from '../../src/handlers/create-paint-style.js';
+import { createCreatePaintStyleHandler } from '../../../src/features/styles/create-paint-style.handler.js';
 
 interface FakePaintStyle {
   id: string;
@@ -61,9 +61,6 @@ describe('create_paint_style handler', () => {
     await expect(handler({ name: 'x', paints: 'nope' })).rejects.toThrow(/paints/);
   });
 
-  // A style whose paints cite a variable that no longer exists must fail before the style exists:
-  // Figma has no transaction, so a style created first would be left behind in the design-system
-  // panel — and published to the library from there (the create_text_style lesson).
   it('creates nothing when a bound variable cannot be resolved', async () => {
     const { figma: f, created } = fakeFigma();
     const handler = createCreatePaintStyleHandler(f);

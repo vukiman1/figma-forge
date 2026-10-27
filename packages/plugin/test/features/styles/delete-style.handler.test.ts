@@ -1,7 +1,7 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createDeleteStyleHandler } from '../../src/handlers/delete-style.js';
+import { createDeleteStyleHandler } from '../../../src/features/styles/delete-style.handler.js';
 
 describe('delete_style handler', () => {
   it('removes the style and returns its captured id + name', async () => {

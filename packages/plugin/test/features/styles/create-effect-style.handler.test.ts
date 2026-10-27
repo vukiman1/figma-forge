@@ -1,7 +1,7 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createCreateEffectStyleHandler } from '../../src/handlers/create-effect-style.js';
+import { createCreateEffectStyleHandler } from '../../../src/features/styles/create-effect-style.handler.js';
 
 const fakeFigma = (
   variables: Record<string, unknown> = {},
@@ -49,7 +49,6 @@ describe('create_effect_style handler', () => {
     await expect(handler({ name: 'x', effects: 'no' })).rejects.toThrow(/effects/);
   });
 
-  // Same rule as create_paint_style: resolve the bindings first, or a bad id leaves a style behind.
   it('creates nothing when a bound variable cannot be resolved', async () => {
     const { figma: f, creations } = fakeFigma();
     await expect(

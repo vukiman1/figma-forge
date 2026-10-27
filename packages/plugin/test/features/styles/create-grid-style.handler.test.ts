@@ -1,7 +1,7 @@
 import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createCreateGridStyleHandler } from '../../src/handlers/create-grid-style.js';
+import { createCreateGridStyleHandler } from '../../../src/features/styles/create-grid-style.handler.js';
 
 const fakeFigma = (
   variables: Record<string, unknown> = {},

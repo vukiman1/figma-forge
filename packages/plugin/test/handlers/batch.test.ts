@@ -10,6 +10,9 @@ import { createSetCornerRadiusHandler } from '../../src/features/paint/set-corne
 import { createSetFillsHandler } from '../../src/features/paint/set-fills.handler.js';
 import { createSetOpacityHandler } from '../../src/features/paint/set-opacity.handler.js';
 import { createSetStrokesHandler } from '../../src/features/paint/set-strokes.handler.js';
+import { createCreatePaintStyleHandler } from '../../src/features/styles/create-paint-style.handler.js';
+import { createUpdatePaintStyleHandler } from '../../src/features/styles/update-paint-style.handler.js';
+import { createUpdateTextStyleHandler } from '../../src/features/styles/update-text-style.handler.js';
 import { createSetTextPathHandler } from '../../src/features/text/set-text-path.handler.js';
 import { createSetTextPropertiesHandler } from '../../src/features/text/set-text-properties.handler.js';
 import { createSetTextHandler } from '../../src/features/text/set-text.handler.js';
@@ -28,7 +31,6 @@ import { createBatchHandler } from '../../src/handlers/batch.js';
 import { createCombineAsVariantsHandler } from '../../src/handlers/combine-as-variants.js';
 import { createCreateComponentHandler } from '../../src/handlers/create-component.js';
 import { createCreateFrameHandler } from '../../src/handlers/create-frame.js';
-import { createCreatePaintStyleHandler } from '../../src/handlers/create-paint-style.js';
 import { createDeleteNodesHandler } from '../../src/handlers/delete-nodes.js';
 import { createEditComponentPropertyHandler } from '../../src/handlers/edit-component-property.js';
 import { createFlipNodesHandler } from '../../src/handlers/flip-nodes.js';
@@ -47,8 +49,6 @@ import { createSetTimelineDurationHandler } from '../../src/handlers/set-timelin
 import { createSetVisibleHandler } from '../../src/handlers/set-visible.js';
 import { createSwapComponentHandler } from '../../src/handlers/swap-component.js';
 import { createUpdateFlowsHandler } from '../../src/handlers/update-flows.js';
-import { createUpdatePaintStyleHandler } from '../../src/handlers/update-paint-style.js';
-import { createUpdateTextStyleHandler } from '../../src/handlers/update-text-style.js';
 import {
   createCreateVectorHandler,
   createOutlineStrokeHandler,
