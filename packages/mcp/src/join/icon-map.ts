@@ -1,4 +1,4 @@
-import type { DesignContextNode, SerializedPaint } from '@figma-forge/shared';
+import type { DesignContextNode, SerializedPaint } from '@figma-forge/core';
 
 import type { RepoSvg, SvgColorContract } from '../icons/repo-icons.js';
 import type { ProjectProfile } from '../profile/profile.js';

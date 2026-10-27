@@ -1,4 +1,4 @@
-import type { GetPagesResult } from '@figma-forge/shared';
+import type { GetPagesResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

@@ -1,4 +1,4 @@
-import type { ListFilesResult } from '@figma-forge/shared';
+import type { ListFilesResult } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import type { PluginSessionInfo } from '../../src/routing/sessions.js';

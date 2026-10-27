@@ -1,4 +1,4 @@
-import type { GetDesignContextResult, DesignContextNode } from '@figma-forge/shared';
+import type { GetDesignContextResult, DesignContextNode } from '@figma-forge/core';
 
 // The design-diff core: compare two get_design_context snapshots of the same node and report what
 // changed, per node, per property. Pure over its inputs (no filesystem, no plugin) so it's fully

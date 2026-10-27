@@ -1,4 +1,4 @@
-import type { BatchResult, FlowStartingPoint } from '@figma-forge/shared';
+import type { BatchResult, FlowStartingPoint } from '@figma-forge/core';
 
 import type { SandboxHandlers, SandboxToolHandler } from '../dispatcher.js';
 import {

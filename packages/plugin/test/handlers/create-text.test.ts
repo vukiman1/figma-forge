@@ -1,4 +1,4 @@
-import type { CreateResult } from '@figma-forge/shared';
+import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCreateTextHandler } from '../../src/handlers/create-text.js';

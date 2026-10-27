@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { ErrorCode } from '@figma-forge/shared';
+import { ErrorCode } from '@figma-forge/core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { handleAnalyzeProject } from '../../src/tools/analyze-project.js';

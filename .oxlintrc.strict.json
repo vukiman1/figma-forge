@@ -22,7 +22,7 @@
   "ignorePatterns": [
     "**/dist/**",
     "**/node_modules/**",
-    "packages/shared/**",
+    "packages/core/**",
     "packages/mcp/**",
     "packages/plugin/src/**",
     "packages/plugin/ui/**",

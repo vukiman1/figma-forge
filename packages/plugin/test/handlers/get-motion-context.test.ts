@@ -2,7 +2,7 @@ import {
   DESIGN_CONTEXT_TOKEN_BUDGET,
   estimateResultTokens,
   type GetMotionContextResult,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import {

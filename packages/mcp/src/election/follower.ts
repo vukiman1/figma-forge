@@ -4,7 +4,7 @@ import {
   type RpcRequest,
   type RpcResponse,
   RpcResponseSchema,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { decode, encode } from '@msgpack/msgpack';
 
 import type { PluginSessionInfo } from '../routing/sessions.js';

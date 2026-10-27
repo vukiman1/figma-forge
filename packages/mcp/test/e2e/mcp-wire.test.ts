@@ -5,7 +5,7 @@ import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { join } from 'node:path';
 
-import { CLIENT_MESSAGE_LIMIT_BYTES, NODE_LIST_BUDGET_BYTES } from '@figma-forge/shared';
+import { CLIENT_MESSAGE_LIMIT_BYTES, NODE_LIST_BUDGET_BYTES } from '@figma-forge/core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { leaderLockPath } from '../../src/election/leader-lock.js';

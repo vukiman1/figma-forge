@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figma-forge/shared';
+import type { MutateResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { assertFigmaEditor, assertKeyframeField, isMotionNode } from './motion-shared.js';

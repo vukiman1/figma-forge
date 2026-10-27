@@ -1,4 +1,4 @@
-import { ErrorCode } from '@figma-forge/shared';
+import { ErrorCode } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { applyAnimationStyleTool } from '../../src/tools/apply-animation-style.js';

@@ -19,7 +19,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@figma-forge/shared": "workspace:*",
+    "@figma-forge/core": "workspace:*",
     "@figma/plugin-typings": "^1.142.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-vue": "^6.0.10",

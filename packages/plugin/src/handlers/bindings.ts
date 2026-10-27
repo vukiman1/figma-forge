@@ -3,7 +3,7 @@ import type {
   SerializedEffect,
   SerializedLayoutGrid,
   SerializedPaint,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 import { toFigmaEffect, toFigmaLayoutGrid } from './convert.js';
 import { toFigmaPaint } from './set-fills.js';

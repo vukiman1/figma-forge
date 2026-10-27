@@ -1,4 +1,4 @@
-import type { GetDocumentResult } from '@figma-forge/shared';
+import type { GetDocumentResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { resultCharBudget, serializeTrees, treeTooLargeError } from '../serializer.js';

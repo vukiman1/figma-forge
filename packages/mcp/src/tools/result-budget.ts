@@ -3,10 +3,10 @@ import {
   NODE_LIST_BUDGET_BYTES,
   type SearchNodesResult,
   TOOL_RESULT_LIMIT_BYTES,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import type { CallToolResult } from '@modelcontextprotocol/server';
 
-// Two nets for the client message limit (see `@figma-forge/shared`'s result-budget.ts):
+// Two nets for the client message limit (see `@figma-forge/core`'s result-budget.ts):
 //
 //   fitNodeList        — search / scan results, which can be cut cleanly: a prefix of a document-order
 //                        list is still a true answer about the nodes it holds, once a note says how

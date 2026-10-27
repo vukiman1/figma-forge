@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-import type { GetReactionsResult } from '@figma-forge/shared';
+import type { GetReactionsResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createGetReactionsHandler } from '../../src/handlers/get-reactions.js';

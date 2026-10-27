@@ -1,4 +1,4 @@
-import type { UpdateCollectionResult } from '@figma-forge/shared';
+import type { UpdateCollectionResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

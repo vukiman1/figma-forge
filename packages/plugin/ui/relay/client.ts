@@ -16,7 +16,7 @@ import {
   newId,
   PROTOCOL_VERSION,
   SystemMethod,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 import { PluginToolFailure } from '../../protocol/bridge.js';
 import { extractNodeIds } from './node-ids.js';

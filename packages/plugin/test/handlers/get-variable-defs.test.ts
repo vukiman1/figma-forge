@@ -1,4 +1,4 @@
-import type { GetVariableDefsResult } from '@figma-forge/shared';
+import type { GetVariableDefsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetVariableDefsHandler } from '../../src/handlers/get-variable-defs.js';

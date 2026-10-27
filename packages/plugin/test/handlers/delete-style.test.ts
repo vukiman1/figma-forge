@@ -1,4 +1,4 @@
-import type { StyleResult } from '@figma-forge/shared';
+import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createDeleteStyleHandler } from '../../src/handlers/delete-style.js';

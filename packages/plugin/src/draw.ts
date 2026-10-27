@@ -3,7 +3,7 @@ import type {
   SerializedComplexStroke,
   SerializedTransformModifier,
   SerializedVariableWidthStroke,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 // Figma Draw reads: repeat groups, brush / dynamic / variable-width strokes, and the box those paint
 // into. Every rule here was measured against what Figma itself draws (its SVG export spells each

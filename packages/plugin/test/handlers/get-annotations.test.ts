@@ -1,4 +1,4 @@
-import type { GetAnnotationsResult } from '@figma-forge/shared';
+import type { GetAnnotationsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetAnnotationsHandler } from '../../src/handlers/get-annotations.js';

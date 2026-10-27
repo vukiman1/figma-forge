@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { GetDesignContextResultSchema } from '@figma-forge/shared';
+import { GetDesignContextResultSchema } from '@figma-forge/core';
 import { expect, it } from 'vitest';
 import { z } from 'zod';
 

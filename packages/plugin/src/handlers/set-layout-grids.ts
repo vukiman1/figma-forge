@@ -1,4 +1,4 @@
-import type { MutateResult, SerializedLayoutGrid } from '@figma-forge/shared';
+import type { MutateResult, SerializedLayoutGrid } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaLayoutGridsBound } from './bindings.js';

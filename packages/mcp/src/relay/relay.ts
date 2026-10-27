@@ -20,7 +20,7 @@ import {
   pluginSkewSummary,
   PROTOCOL_VERSION,
   SystemMethod,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { WebSocketServer, type WebSocket } from 'ws';
 
 import { isAllowedHost, isAllowedWsOrigin } from '../local-access.js';

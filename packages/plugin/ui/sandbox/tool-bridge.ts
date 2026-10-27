@@ -3,7 +3,7 @@
  * a bridge message the sandbox can execute, and resolves once the matching reply comes back.
  */
 
-import { ErrorCode, getToolBudget, newId } from '@figma-forge/shared';
+import { ErrorCode, getToolBudget, newId } from '@figma-forge/core';
 
 import {
   createToolCall,

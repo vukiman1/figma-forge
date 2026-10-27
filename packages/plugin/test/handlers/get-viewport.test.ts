@@ -1,4 +1,4 @@
-import type { GetViewportResult } from '@figma-forge/shared';
+import type { GetViewportResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetViewportHandler } from '../../src/handlers/get-viewport.js';

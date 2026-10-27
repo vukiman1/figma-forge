@@ -1,4 +1,4 @@
-import { ErrorCode } from '@figma-forge/shared';
+import { ErrorCode } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createToolCall, isPluginBridgeMessage } from '../protocol/bridge.js';

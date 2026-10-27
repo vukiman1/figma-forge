@@ -5,7 +5,7 @@
     ".": {
       "project": ["*.{ts,js}"]
     },
-    "packages/shared": {
+    "packages/core": {
       "project": ["src/**/*.ts"]
     },
     "packages/mcp": {

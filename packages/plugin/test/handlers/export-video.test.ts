@@ -1,4 +1,4 @@
-import type { VideoExport } from '@figma-forge/shared';
+import type { VideoExport } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createExportVideoHandler } from '../../src/handlers/export-video.js';

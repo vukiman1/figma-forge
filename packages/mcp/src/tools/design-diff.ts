@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figma-forge/shared';
+import type { GetDesignContextResult } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { type DesignDiffChanges, diffDesignContext } from '../diff/design-diff.js';

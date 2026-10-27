@@ -1,4 +1,4 @@
-import type { DesignContextNode } from '@figma-forge/shared';
+import type { DesignContextNode } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import {

@@ -1,4 +1,4 @@
-import type { SearchNodesResult } from '@figma-forge/shared';
+import type { SearchNodesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createSearchNodesHandler } from '../../src/handlers/search-nodes.js';

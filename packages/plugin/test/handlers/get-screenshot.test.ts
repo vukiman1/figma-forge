@@ -1,4 +1,4 @@
-import type { GetScreenshotResult } from '@figma-forge/shared';
+import type { GetScreenshotResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetScreenshotHandler } from '../../src/handlers/get-screenshot.js';

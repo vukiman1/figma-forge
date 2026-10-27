@@ -1,4 +1,4 @@
-import type { GetStylesResult, GetVariableDefsResult } from '@figma-forge/shared';
+import type { GetStylesResult, GetVariableDefsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { resolveFigmaTokens, resolvePaintStyleTokens } from '../../src/tokens/figma-tokens.js';

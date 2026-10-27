@@ -1,4 +1,4 @@
-import type { GetComponentApiResult } from '@figma-forge/shared';
+import type { GetComponentApiResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetComponentApiHandler } from '../../src/handlers/get-component-api.js';

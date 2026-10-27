@@ -1,4 +1,4 @@
-import type { UpdateFlowsResult } from '@figma-forge/shared';
+import type { UpdateFlowsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createUpdateFlowsHandler } from '../../src/handlers/update-flows.js';

@@ -13,7 +13,7 @@ import {
   type ResolvedToken,
   type SerializedPaint,
   simplifyPaint,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { inheritRepeat, serializeCodeSyntax, serializeFlatSync } from '../serializer.js';

@@ -1,4 +1,4 @@
-import type { ResizeNodesResult } from '@figma-forge/shared';
+import type { ResizeNodesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createResizeNodesHandler } from '../../src/handlers/resize-nodes.js';

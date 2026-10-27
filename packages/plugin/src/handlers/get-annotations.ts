@@ -1,4 +1,4 @@
-import type { GetAnnotationsResult, NodeAnnotations } from '@figma-forge/shared';
+import type { GetAnnotationsResult, NodeAnnotations } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { serializeAnnotation } from '../serializer.js';

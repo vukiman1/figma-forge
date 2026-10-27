@@ -1,4 +1,4 @@
-import type { StyleResult } from '@figma-forge/shared';
+import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createCreateGridStyleHandler } from '../../src/handlers/create-grid-style.js';

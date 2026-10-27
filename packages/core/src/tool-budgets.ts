@@ -12,7 +12,7 @@
 //
 // Raising any subset in isolation does nothing: the smallest timer along the path caps the call. In
 // particular the sandbox bridge defaulted to 30s for every tool, so before this table a heavy tool
-// timed out there regardless of the relay/follower budgets. This lives in @figma-forge/shared precisely
+// timed out there regardless of the relay/follower budgets. This lives in @figma-forge/core precisely
 // so the plugin UI (which can't import the mcp package's ToolSpec) reads the same numbers.
 
 export const DEFAULT_TOOL_BUDGET_MS = 30_000;

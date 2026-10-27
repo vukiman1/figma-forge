@@ -1,4 +1,4 @@
-import type { MutateResult, SerializedLineHeight, SerializedPaint } from '@figma-forge/shared';
+import type { MutateResult, SerializedLineHeight, SerializedPaint } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaPaintsBound } from './bindings.js';

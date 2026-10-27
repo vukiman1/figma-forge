@@ -7,7 +7,7 @@ import {
   type SerializedVariableComposedColor,
   type SerializedVariableValue,
   toHex,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 // Figma token extraction — the left-hand (neutral provenance) side of the token join. Flattens
 // get_variable_defs into { name, value, type } pairs by reading each variable at its collection's

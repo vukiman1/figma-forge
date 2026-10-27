@@ -1,4 +1,4 @@
-import type { VariableResult } from '@figma-forge/shared';
+import type { VariableResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createSetVariableValueHandler } from '../../src/handlers/set-variable-value.js';

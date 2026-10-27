@@ -1,4 +1,4 @@
-import type { GetDocumentResult } from '@figma-forge/shared';
+import type { GetDocumentResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createGetDocumentHandler } from '../../src/handlers/get-document.js';

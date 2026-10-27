@@ -1,4 +1,4 @@
-import type { GetDesignContextResult } from '@figma-forge/shared';
+import type { GetDesignContextResult } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { detectIconLibraries, scanRepoSvgs } from '../icons/repo-icons.js';

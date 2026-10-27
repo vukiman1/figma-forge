@@ -1,4 +1,4 @@
-import { ErrorCode, getFollowerBudget, getRelayBudget } from '@figma-forge/shared';
+import { ErrorCode, getFollowerBudget, getRelayBudget } from '@figma-forge/core';
 
 import type { Follower } from './election/follower.js';
 import { type Node, NodeRole } from './election/node.js';

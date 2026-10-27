@@ -19,7 +19,7 @@ export default defineConfig({
   },
   fixedExtension: true,
   publint: true,
-  deps: { alwaysBundle: ['@figma-forge/shared'] },
+  deps: { alwaysBundle: ['@figma-forge/core'] },
   outputOptions: {
     banner: '#!/usr/bin/env node',
   },

@@ -1,4 +1,4 @@
-import { type SearchNodesResult, type SerializedNode } from '@figma-forge/shared';
+import { type SearchNodesResult, type SerializedNode } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { assertWithinLimit, fitNodeList } from '../../src/tools/result-budget.js';

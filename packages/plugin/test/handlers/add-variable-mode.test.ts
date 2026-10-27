@@ -1,4 +1,4 @@
-import type { ModeResult } from '@figma-forge/shared';
+import type { ModeResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createAddVariableModeHandler } from '../../src/handlers/add-variable-mode.js';

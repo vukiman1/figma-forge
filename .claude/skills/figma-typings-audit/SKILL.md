@@ -110,11 +110,11 @@ The three source trees have completely different exposure. Don't treat them alik
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
 | `packages/plugin/src/**`  | **Real.** The only tree that calls `figma.*` and loads the global types (`tsconfig.json` → `types: ["@figma/plugin-typings"]`)                                              | `tsc`               |
 | `packages/plugin/ui/**`   | None — the Vue panel never touches the Figma API                                                                                                                            | n/a, skip           |
-| `packages/shared/src/**`  | ★ **None — and that's the trap.** `serialized-node.ts`, `styles.ts`, `queries.ts` are *hand-written Zod mirrors* of Figma shapes; `shared/tsconfig.json` never loads typings | **Nobody but this audit** |
+| `packages/core/src/**`  | ★ **None — and that's the trap.** `serialized-node.ts`, `styles.ts`, `queries.ts` are *hand-written Zod mirrors* of Figma shapes; `shared/tsconfig.json` never loads typings | **Nobody but this audit** |
 
 - **Bucket 1** — grep the affected symbols under `packages/plugin/src/` (handlers, `serializer.ts`,
   `traverse.ts`, `reveal.ts`). Confirm with Stage 4 rather than reasoning about it.
-- **Bucket 3** — for each added field, check whether the Zod mirror in `packages/shared/src/` carries
+- **Bucket 3** — for each added field, check whether the Zod mirror in `packages/core/src/` carries
   it, and whether `serializer.ts` or `handlers/get-design-context.ts` projects it. A miss here is a
   real fidelity gap with every gate green.
 - **Bucket 2** — check coverage against `packages/mcp/src/tools/registry.ts` (`ALL_TOOL_SPECS` is the
@@ -213,7 +213,7 @@ Choosing where a new capability lands is the part worth thinking about:
   a sibling field, and say so in the JSDoc.
 - **Smallest change that closes the gap**: a field on an existing result < a new argument < a new
   tool. The tool count is already large; a new tool needs to earn itself.
-- A new read dimension usually touches four places: the Zod schema in `packages/shared/src/`, the
+- A new read dimension usually touches four places: the Zod schema in `packages/core/src/`, the
   sandbox handler in `packages/plugin/src/handlers/`, the tool description in
   `packages/mcp/src/tools/` (it is the LLM's only spec — fix it if it misreports the shape), and a
   test.

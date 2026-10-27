@@ -12,7 +12,7 @@ Hexagonal. Dependencies point inward only.
 
 `server` and `plugin` never import each other. Plugin handlers receive `figma` as a parameter (`createXHandler(figmaCtx)`), so the Plugin API stays the port.
 
-The migration is in progress. `packages/shared` and `packages/mcp` are being moved into `core` and `server`. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover migrated paths only; legacy paths are listed there and drop off as they move.
+The migration is in progress. `packages/core` and `packages/mcp` are being moved into `core` and `server`. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover migrated paths only; legacy paths are listed there and drop off as they move.
 
 ## Rules
 

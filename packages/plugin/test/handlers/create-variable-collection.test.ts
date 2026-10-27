@@ -1,4 +1,4 @@
-import type { CollectionResult } from '@figma-forge/shared';
+import type { CollectionResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createCreateVariableCollectionHandler } from '../../src/handlers/create-variable-collection.js';

@@ -1,4 +1,4 @@
-import type { GetFontsResult } from '@figma-forge/shared';
+import type { GetFontsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetFontsHandler } from '../../src/handlers/get-fonts.js';

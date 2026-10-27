@@ -1,4 +1,4 @@
-import type { GetNodesInfoResult, SerializedNode } from '@figma-forge/shared';
+import type { GetNodesInfoResult, SerializedNode } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { RESULT_LIMIT_LABEL, resultCharBudget, serializeTrees } from '../serializer.js';

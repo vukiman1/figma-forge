@@ -1,4 +1,4 @@
-import { DEFAULT_TOOL_BUDGET_MS, ErrorCode, HEAVY_TOOL_BUDGET_MS } from '@figma-forge/shared';
+import { DEFAULT_TOOL_BUDGET_MS, ErrorCode, HEAVY_TOOL_BUDGET_MS } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import {

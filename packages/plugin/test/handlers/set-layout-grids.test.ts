@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figma-forge/shared';
+import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createSetLayoutGridsHandler } from '../../src/handlers/set-layout-grids.js';

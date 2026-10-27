@@ -1,4 +1,4 @@
-import type { MutateResult, SerializedEffect } from '@figma-forge/shared';
+import type { MutateResult, SerializedEffect } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaEffectsBound } from './bindings.js';

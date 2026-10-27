@@ -1,4 +1,4 @@
-import type { GetNodesInfoResult } from '@figma-forge/shared';
+import type { GetNodesInfoResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetNodesInfoHandler } from '../../src/handlers/get-nodes-info.js';

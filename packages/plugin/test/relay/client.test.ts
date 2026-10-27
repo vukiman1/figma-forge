@@ -13,7 +13,7 @@ import {
   type RequestEnvelope,
   type ResponseEnvelope,
   SystemMethod,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { PluginToolFailure } from '../../protocol/bridge.js';

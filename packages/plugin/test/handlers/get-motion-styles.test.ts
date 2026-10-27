@@ -1,4 +1,4 @@
-import type { GetMotionStylesResult } from '@figma-forge/shared';
+import type { GetMotionStylesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createGetMotionStylesHandler } from '../../src/handlers/get-motion-styles.js';

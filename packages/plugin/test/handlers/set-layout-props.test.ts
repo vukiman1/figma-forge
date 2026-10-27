@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figma-forge/shared';
+import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createSetLayoutPropsHandler } from '../../src/handlers/set-layout-props.js';

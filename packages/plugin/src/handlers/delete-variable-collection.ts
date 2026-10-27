@@ -1,4 +1,4 @@
-import type { DeleteCollectionResult } from '@figma-forge/shared';
+import type { DeleteCollectionResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

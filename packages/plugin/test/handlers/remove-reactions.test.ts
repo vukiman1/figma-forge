@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figma-forge/shared';
+import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createRemoveReactionsHandler } from '../../src/handlers/remove-reactions.js';

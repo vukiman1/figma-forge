@@ -6,7 +6,7 @@ import type {
   GetScreenshotResult,
   SaveScreenshotsResult,
   ScreenshotImage,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {

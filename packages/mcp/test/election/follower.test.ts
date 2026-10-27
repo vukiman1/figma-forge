@@ -12,7 +12,7 @@ import {
   PROTOCOL_VERSION,
   type HelloParams,
   SystemMethod,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { decode } from '@msgpack/msgpack';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';

@@ -1,4 +1,4 @@
-import type { GetSelectionResult } from '@figma-forge/shared';
+import type { GetSelectionResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetSelectionHandler } from '../../src/handlers/get-selection.js';

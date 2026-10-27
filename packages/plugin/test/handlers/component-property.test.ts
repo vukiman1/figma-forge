@@ -1,4 +1,4 @@
-import type { ComponentPropertyResult, MutateResult } from '@figma-forge/shared';
+import type { ComponentPropertyResult, MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createAddComponentPropertyHandler } from '../../src/handlers/add-component-property.js';

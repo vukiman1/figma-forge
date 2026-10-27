@@ -1,4 +1,4 @@
-import { ErrorCode, type RpcResponse } from '@figma-forge/shared';
+import { ErrorCode, type RpcResponse } from '@figma-forge/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {

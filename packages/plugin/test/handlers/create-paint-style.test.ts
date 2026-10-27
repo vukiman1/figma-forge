@@ -1,4 +1,4 @@
-import type { StyleResult } from '@figma-forge/shared';
+import type { StyleResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createCreatePaintStyleHandler } from '../../src/handlers/create-paint-style.js';

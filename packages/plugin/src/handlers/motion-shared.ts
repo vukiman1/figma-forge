@@ -4,7 +4,7 @@
 // SceneNode. Authoring is gated to the Figma Design editor; reads go wherever `figma.motion` is
 // present, except FigJam, which is never asked.
 
-import type { NodeMotion } from '@figma-forge/shared';
+import type { NodeMotion } from '@figma-forge/core';
 
 /** A node that exposes the Motion API. Every SceneNode does; PAGE / DOCUMENT do not. */
 export type MotionNode = BaseNode & MotionNodeMixin;

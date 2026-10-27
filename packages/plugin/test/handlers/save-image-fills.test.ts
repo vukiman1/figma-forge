@@ -1,4 +1,4 @@
-import type { ImageFillsResult } from '@figma-forge/shared';
+import type { ImageFillsResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createSaveImageFillsHandler } from '../../src/handlers/save-image-fills.js';

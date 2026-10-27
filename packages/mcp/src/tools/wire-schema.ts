@@ -1,4 +1,4 @@
-import { ErrorCode } from '@figma-forge/shared';
+import { ErrorCode } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { BATCH_TOOL_NAME } from './batch.js';

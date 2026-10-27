@@ -1,4 +1,4 @@
-import type { VideoExport, VideoFormat } from '@figma-forge/shared';
+import type { VideoExport, VideoFormat } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

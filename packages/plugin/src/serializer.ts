@@ -21,7 +21,7 @@ import {
   type SerializedTextSegment,
   serializeNode as serializeBase,
   TOOL_RESULT_LIMIT_BYTES,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 import { TimeSlice } from './cooperative.js';
 import {

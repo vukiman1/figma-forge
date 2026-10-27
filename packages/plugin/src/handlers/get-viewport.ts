@@ -1,4 +1,4 @@
-import type { GetViewportResult } from '@figma-forge/shared';
+import type { GetViewportResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

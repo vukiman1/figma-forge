@@ -2,7 +2,7 @@ import { mkdir, mkdtemp, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figma-forge/shared';
+import type { GetDesignContextResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import {

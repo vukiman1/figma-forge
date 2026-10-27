@@ -1,4 +1,4 @@
-import type { ScanTextNodesResult } from '@figma-forge/shared';
+import type { ScanTextNodesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createScanTextNodesHandler } from '../../src/handlers/scan-text-nodes.js';

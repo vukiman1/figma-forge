@@ -1,4 +1,4 @@
-import type { ListFilesResult } from '@figma-forge/shared';
+import type { ListFilesResult } from '@figma-forge/core';
 import { z } from 'zod';
 
 import type { PluginSessionInfo } from '../routing/sessions.js';

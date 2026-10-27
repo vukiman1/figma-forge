@@ -1,4 +1,4 @@
-import type { GetMetadataResult } from '@figma-forge/shared';
+import type { GetMetadataResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetMetadataHandler } from '../../src/handlers/get-metadata.js';

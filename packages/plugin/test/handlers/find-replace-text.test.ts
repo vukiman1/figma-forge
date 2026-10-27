@@ -1,4 +1,4 @@
-import type { BatchNodeResult } from '@figma-forge/shared';
+import type { BatchNodeResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createFindReplaceTextHandler } from '../../src/handlers/find-replace-text.js';

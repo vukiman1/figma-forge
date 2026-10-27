@@ -1,7 +1,7 @@
 import { createServer, type Server as HttpServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
-import { DEFAULT_PORT } from '@figma-forge/shared';
+import { DEFAULT_PORT } from '@figma-forge/core';
 
 import { Relay } from '../relay/relay.js';
 import { type PortHolder, portConflictMessage } from './leader-lock.js';

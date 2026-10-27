@@ -2,7 +2,7 @@ import type {
   GetLocalComponentsResult,
   SerializedComponentInfo,
   SerializedComponentSetInfo,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

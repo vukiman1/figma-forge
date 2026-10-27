@@ -1,4 +1,4 @@
-import type { SerializedVariableValue, VariableResult } from '@figma-forge/shared';
+import type { SerializedVariableValue, VariableResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaVariableValue } from './convert.js';

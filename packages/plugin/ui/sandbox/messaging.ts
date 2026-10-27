@@ -3,7 +3,7 @@
  * side sends is wrapped in a `{ pluginMessage }` envelope, and this is the one module that knows
  * that.
  *
- * Two kinds of traffic share it — tool RPC (`@figma-forge/shared`) and panel control
+ * Two kinds of traffic share it — tool RPC (`@figma-forge/core`) and panel control
  * (`protocol/panel-control.ts`) — so `postToSandbox` is typed as their union: a message that
  * belongs to neither channel can't be sent by accident, which is the guarantee the old
  * `unknown`-typed post lacked.

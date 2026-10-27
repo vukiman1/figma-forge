@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { MIN_PLUGIN_VERSION } from '@figma-forge/shared';
+import { MIN_PLUGIN_VERSION } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { ALL_TOOL_SPECS } from '../src/tools/registry.js';

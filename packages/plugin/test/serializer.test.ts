@@ -1,4 +1,4 @@
-import { MIXED, type SerializedNode } from '@figma-forge/shared';
+import { MIXED, type SerializedNode } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import {

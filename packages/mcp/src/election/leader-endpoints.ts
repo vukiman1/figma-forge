@@ -6,7 +6,7 @@ import {
   type RpcRequest,
   RpcRequestSchema,
   type RpcResponse,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { decode, encode } from '@msgpack/msgpack';
 
 import { hasContentType, isAllowedHost, isAllowedHttpOrigin } from '../local-access.js';

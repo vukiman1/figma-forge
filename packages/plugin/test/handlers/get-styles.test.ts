@@ -1,4 +1,4 @@
-import type { GetStylesResult } from '@figma-forge/shared';
+import type { GetStylesResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetStylesHandler } from '../../src/handlers/get-styles.js';

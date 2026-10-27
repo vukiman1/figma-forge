@@ -6,7 +6,7 @@ import {
   newId,
   PROTOCOL_VERSION,
   type SearchNodesResult,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { McpServer } from '@modelcontextprotocol/server';
 import type { CallToolResult } from '@modelcontextprotocol/server';
 import { serveStdio, StdioServerTransport } from '@modelcontextprotocol/server/stdio';

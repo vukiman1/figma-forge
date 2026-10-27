@@ -2,7 +2,7 @@ import {
   CLIENT_MESSAGE_LIMIT_BYTES,
   type GetScreenshotResult,
   SCREENSHOT_FORMATS,
-} from '@figma-forge/shared';
+} from '@figma-forge/core';
 import { z } from 'zod';
 
 import type { ToolSpec } from './spec.js';
@@ -59,7 +59,7 @@ const RASTER_MIME: Partial<Record<string, string>> = { PNG: 'image/png', JPG: 'i
  * How many bytes of inlined payload one result may carry.
  *
  * An MCP client reads each stdio message into a bounded buffer —
- * {@linkcode CLIENT_MESSAGE_LIMIT_BYTES} (see `@figma-forge/shared`'s result-budget.ts for what
+ * {@linkcode CLIENT_MESSAGE_LIMIT_BYTES} (see `@figma-forge/core`'s result-budget.ts for what
  * crossing it costs). A client's output cap (Claude Code's MAX_MCP_OUTPUT_TOKENS) applies only
  * after a result has arrived, so it does not hold anything below the transport limit; every tool
  * result passes that limit's net in index.ts. Image blocks reach it fastest — measured at ~2.4 MB

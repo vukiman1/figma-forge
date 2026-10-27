@@ -1,4 +1,4 @@
-import type { GetPagesResult } from '@figma-forge/shared';
+import type { GetPagesResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import { createGetPagesHandler } from '../../src/handlers/get-pages.js';

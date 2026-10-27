@@ -1,4 +1,4 @@
-import { DesignContextNodeSchema, LAYOUT_TIER_FIELDS } from '@figma-forge/shared';
+import { DesignContextNodeSchema, LAYOUT_TIER_FIELDS } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 // The drift ratchet for the LAYOUT downgrade tier.

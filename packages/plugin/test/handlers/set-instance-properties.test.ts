@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figma-forge/shared';
+import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createSetInstancePropertiesHandler } from '../../src/handlers/set-instance-properties.js';

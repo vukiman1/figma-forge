@@ -1,4 +1,4 @@
-import type { CreateResult, MutateResult, SerializedPaint } from '@figma-forge/shared';
+import type { CreateResult, MutateResult, SerializedPaint } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaPaintsBound } from './bindings.js';

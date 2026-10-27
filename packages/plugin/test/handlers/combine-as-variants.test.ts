@@ -1,4 +1,4 @@
-import type { CreateResult } from '@figma-forge/shared';
+import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCombineAsVariantsHandler } from '../../src/handlers/combine-as-variants.js';
