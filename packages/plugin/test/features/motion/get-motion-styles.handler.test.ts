@@ -1,7 +1,7 @@
 import type { GetMotionStylesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createGetMotionStylesHandler } from '../../src/handlers/get-motion-styles.js';
+import { createGetMotionStylesHandler } from '../../../src/features/motion/get-motion-styles.handler.js';
 
 const PRESETS = [
   { styleId: 'Position', name: 'Position', description: 'Slide', props: { direction: 'LEFT' } },

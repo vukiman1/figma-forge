@@ -1,12 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createApplyAnimationStyleHandler } from '../../src/handlers/apply-animation-style.js';
-import { createApplyManualKeyframeTrackHandler } from '../../src/handlers/apply-manual-keyframe-track.js';
-import { createBatchHandler } from '../../src/handlers/batch.js';
-
-// Figma accepts a Motion variable binding of the wrong type, or to no variable at all, and reads it
-// back as the alias it was given. These are refused in the sandbox, the only side that can see a
-// variable's type, before any Figma mutation.
+import { createApplyAnimationStyleHandler } from '../../../src/features/motion/apply-animation-style.handler.js';
+import { createApplyManualKeyframeTrackHandler } from '../../../src/features/motion/apply-manual-keyframe-track.handler.js';
+import { createBatchHandler } from '../../../src/handlers/batch.js';
 
 const VARIABLES: Record<string, { id: string; name: string; resolvedType: string }> = {
   'V:ease': { id: 'V:ease', name: 'motion/ease', resolvedType: 'EASING' },
@@ -26,7 +22,6 @@ const makeFigma = () => {
   };
   const figmaCtx = {
     editorType: 'figma',
-    // batch snapshots every page's prototype flows before applying, so it reads root.children.
     root: { children: [] },
     getNodeByIdAsync: async (id: string) => (id === '1:1' ? node : null),
     variables: { getVariableByIdAsync: async (id: string) => VARIABLES[id] ?? null },

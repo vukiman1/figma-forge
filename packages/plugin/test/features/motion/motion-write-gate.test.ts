@@ -1,15 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { SandboxToolHandler } from '../../src/dispatcher.js';
-import { createApplyAnimationStyleHandler } from '../../src/handlers/apply-animation-style.js';
-import { createApplyManualKeyframeTrackHandler } from '../../src/handlers/apply-manual-keyframe-track.js';
-import { createRemoveAnimationStyleHandler } from '../../src/handlers/remove-animation-style.js';
-import { createRemoveManualKeyframeTrackHandler } from '../../src/handlers/remove-manual-keyframe-track.js';
-import { createSetTimelineDurationHandler } from '../../src/handlers/set-timeline-duration.js';
-
-// Motion reads are open to any editor with the API; writes must still be refused outside Figma
-// Design before any mutation reaches Figma. Dev Mode is the editor that now reads, so it is the one
-// that must prove the write gate held.
+import type { SandboxToolHandler } from '../../../src/dispatcher.js';
+import { createApplyAnimationStyleHandler } from '../../../src/features/motion/apply-animation-style.handler.js';
+import { createApplyManualKeyframeTrackHandler } from '../../../src/features/motion/apply-manual-keyframe-track.handler.js';
+import { createRemoveAnimationStyleHandler } from '../../../src/features/motion/remove-animation-style.handler.js';
+import { createRemoveManualKeyframeTrackHandler } from '../../../src/features/motion/remove-manual-keyframe-track.handler.js';
+import { createSetTimelineDurationHandler } from '../../../src/features/motion/set-timeline-duration.handler.js';
 
 const FIELD = { type: 'PROPERTY', name: 'OPACITY' };
 

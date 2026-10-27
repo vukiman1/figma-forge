@@ -1,16 +1,11 @@
 import type { GetNodeMotionResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetNodeMotionHandler } from '../../src/handlers/get-node-motion.js';
+import { createGetNodeMotionHandler } from '../../../src/features/motion/get-node-motion.handler.js';
 
-/** A node carrying the Motion mixin's state, as the Figma Design editor exposes it. */
 const motionNode = (id: string): BaseNode =>
   ({ ...readOnlyMotionNode(id), applyAnimationStyle: () => {} }) as unknown as BaseNode;
 
-/**
- * The same node as Dev Mode exposes it (measured): its Motion state reads, but the write methods
- * such as `applyAnimationStyle` are absent.
- */
 function readOnlyMotionNode(id: string): BaseNode {
   return {
     id,
@@ -21,7 +16,6 @@ function readOnlyMotionNode(id: string): BaseNode {
   } as unknown as BaseNode;
 }
 
-/** A node with no Motion mixin at all (PAGE / DOCUMENT). */
 const plainNode = (id: string): BaseNode => ({ id }) as unknown as BaseNode;
 
 const fakeFigma = (opts: {
@@ -43,7 +37,6 @@ describe('get_node_motion handler', () => {
     const result = (await handler({ nodeId: '1:2' })) as GetNodeMotionResult;
     expect(result.nodeId).toBe('1:2');
     expect(result.playheadPosition).toBe(1.25);
-    // A Timeline field a later API adds (none exists yet) is carried through, not mapped away.
     expect(result.motion?.timelines).toEqual([{ id: 'T:1', duration: 2, loopMode: 'LOOP' }]);
     expect(result.motion?.animationStyles).toEqual([{ styleId: 'S:1', name: 'Fade in' }]);
   });
@@ -54,7 +47,6 @@ describe('get_node_motion handler', () => {
     );
     const result = (await handler({ nodeId: '1:3' })) as GetNodeMotionResult;
     expect(result.motion).toBeNull();
-    // 0 is a real playhead position — it must survive, not be dropped as falsy.
     expect(result.playheadPosition).toBe(0);
   });
 
@@ -114,7 +106,6 @@ describe('get_node_motion handler', () => {
 });
 
 describe('get_node_motion handler in Dev Mode', () => {
-  /** What readOnlyMotionNode() reads back as. */
   const MOTION = {
     animationStyles: [{ styleId: 'S:1', name: 'Fade in' }],
     animations: { OPACITY: { keyframes: [] } },

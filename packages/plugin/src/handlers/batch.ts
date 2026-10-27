@@ -5,6 +5,10 @@ import {
   propertyDisplayName,
   resolveComponentOwner,
 } from '../features/components/component-owner.js';
+import { assertKeyframeField } from '../features/motion/keyframe-field.js';
+import { assertMotionAliases } from '../features/motion/motion-aliases.js';
+import { assertFigmaEditor, isMotionNode } from '../features/motion/motion-node.js';
+import { toPlainJson } from '../features/motion/node-motion.js';
 import { readFlows, sameFlows } from '../features/prototype/flows.js';
 import { findReplacePlan } from '../features/text/find-replace-text.handler.js';
 import { isTextLike, type TextLike } from '../features/text/text-like.js';
@@ -39,13 +43,6 @@ import {
   writeIfDifferent,
 } from './batch-snapshot.js';
 import { resolveSharedParent } from './boolean-nodes.js';
-import {
-  assertFigmaEditor,
-  assertKeyframeField,
-  assertMotionAliases,
-  isMotionNode,
-  toPlainJson,
-} from './motion-shared.js';
 
 /**
  * Atomic batch: apply several invertible write ops as a unit. Two phases —

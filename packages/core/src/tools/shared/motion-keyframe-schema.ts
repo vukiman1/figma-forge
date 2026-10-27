@@ -122,19 +122,27 @@ export const EFFECT_KEYFRAME_FIELDS = [
 export const keyframeFieldSchema = z
   .discriminatedUnion('type', [
     z.object({ type: z.literal('PROPERTY'), name: z.enum(KEYFRAME_PROPERTY_FIELDS) }),
-    z.object({
-      type: z.literal('INDEXED_ITEM'),
-      collection: z.enum(['fills', 'strokes', 'effects']),
-      index: z.number().int().min(0),
-      field: z
-        .enum(EFFECT_KEYFRAME_FIELDS)
-        .describe('Effect sub-field to animate; only when collection is "effects"')
-        .optional(),
-      propertyId: z
-        .string()
-        .describe('Animate a bound component-property on the paint/effect instead of a field')
-        .optional(),
-    }),
+    z
+      .object({
+        type: z.literal('INDEXED_ITEM'),
+        collection: z.enum(['fills', 'strokes', 'effects']),
+        index: z.number().int().min(0),
+        field: z
+          .enum(EFFECT_KEYFRAME_FIELDS)
+          .describe('Effect sub-field to animate; only when collection is "effects"')
+          .optional(),
+        propertyId: z
+          .string()
+          .describe('Animate a bound component-property on the paint/effect instead of a field')
+          .optional(),
+      })
+      .refine(
+        item =>
+          item.collection !== 'effects' ||
+          item.field !== undefined ||
+          item.propertyId !== undefined,
+        { message: 'an effects INDEXED_ITEM field needs "field" or "propertyId"' },
+      ),
   ])
   .describe(
     'Which field a keyframe track drives: a node PROPERTY or an INDEXED_ITEM in fills/strokes/effects',
