@@ -1,0 +1,48 @@
+{
+  "forbidden": [
+    {
+      "name": "core-is-pure",
+      "severity": "error",
+      "from": { "path": "^packages/(core|shared)/" },
+      "to": {
+        "dependencyTypesNot": ["type-only"],
+        "path": "^packages/(mcp|server|plugin)/|node_modules/(ws|vue|@vueuse|@lucide|@modelcontextprotocol|fdir|ignore|oxc-parser)/"
+      }
+    },
+    {
+      "name": "core-has-no-node-builtins",
+      "severity": "error",
+      "from": { "path": "^packages/(core|shared)/" },
+      "to": { "dependencyTypes": ["core"] }
+    },
+    {
+      "name": "plugin-does-not-import-server",
+      "severity": "error",
+      "from": { "path": "^packages/plugin/" },
+      "to": { "path": "^packages/(mcp|server)/" }
+    },
+    {
+      "name": "server-does-not-import-plugin",
+      "severity": "error",
+      "from": { "path": "^packages/(mcp|server)/" },
+      "to": { "path": "^packages/plugin/" }
+    },
+    {
+      "name": "no-circular",
+      "severity": "warn",
+      "from": {},
+      "to": { "circular": true }
+    }
+  ],
+  "options": {
+    "doNotFollow": { "path": "node_modules" },
+    "exclude": { "path": "(^|/)(dist|test|coverage)/|\\.test\\.ts$|\\.config\\.ts$" },
+    "tsPreCompilationDeps": true,
+    "tsConfig": { "fileName": "tsconfig.json" },
+    "enhancedResolveOptions": {
+      "exportsFields": ["exports"],
+      "conditionNames": ["import", "require", "node", "default", "types"],
+      "extensions": [".ts", ".vue", ".js", ".mjs", ".json"]
+    }
+  }
+}

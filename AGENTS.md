@@ -12,22 +12,23 @@ Hexagonal. Dependencies point inward only.
 
 `server` and `plugin` never import each other. Plugin handlers receive `figma` as a parameter (`createXHandler(figmaCtx)`), so the Plugin API stays the port.
 
-The migration is in progress. `packages/shared` and `packages/mcp` are being moved into `core` and `server`.
+The migration is in progress. `packages/shared` and `packages/mcp` are being moved into `core` and `server`. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover migrated paths only; legacy paths are listed there and drop off as they move.
 
 ## Rules
 
-- No comments. The only exceptions are a lint suppression with its reason (`// oxlint-disable-next-line rule -- reason`) and `@ts-expect-error`. Record Figma quirks in test names instead.
-- Files stay under 150 lines, functions under 40 lines, nesting under 3 levels.
+- No comments. The only exceptions are a lint suppression with its reason (`// oxlint-disable-next-line rule -- reason`) and `@ts-expect-error`. Record Figma quirks in test names instead. Enforced by `pnpm comments:check`.
+- Files stay under 150 lines, functions under 40 lines, nesting under 3 levels. Enforced by oxlint.
 - No `any`. `as` is allowed only to narrow `unknown` coming from JSON or the Figma API.
 - Plugin handlers parse their params with the tool's schema from `core`. Don't check types by hand.
 - Name files by role: `*.schema.ts` (tool params), `*.spec.ts` (tool description for agents), `*.handler.ts` (plugin), `*.adapter.ts`, `*.test.ts`.
 - A tool description in `*.spec.ts` is a prompt that agents read, not a comment. Keep it short and exact.
 - Tests live in `test/`, mirroring `src/`. A test name states the behaviour.
+- Layer boundaries are enforced by `pnpm deps:check` (dependency-cruiser).
 
 ## Commands
 
 ```bash
-pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm build && pnpm test
+pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm deps:check && pnpm comments:check && pnpm build && pnpm test
 ```
 
 `packages/mcp/test/e2e` runs against the built `dist`, so run `pnpm build` before `pnpm test`.
