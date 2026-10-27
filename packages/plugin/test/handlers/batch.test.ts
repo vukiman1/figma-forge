@@ -16,6 +16,9 @@ import { createSetCornerRadiusHandler } from '../../src/features/paint/set-corne
 import { createSetFillsHandler } from '../../src/features/paint/set-fills.handler.js';
 import { createSetOpacityHandler } from '../../src/features/paint/set-opacity.handler.js';
 import { createSetStrokesHandler } from '../../src/features/paint/set-strokes.handler.js';
+import { createRemoveReactionsHandler } from '../../src/features/prototype/remove-reactions.handler.js';
+import { createSetReactionsHandler } from '../../src/features/prototype/set-reactions.handler.js';
+import { createUpdateFlowsHandler } from '../../src/features/prototype/update-flows.handler.js';
 import { createCreatePaintStyleHandler } from '../../src/features/styles/create-paint-style.handler.js';
 import { createUpdatePaintStyleHandler } from '../../src/features/styles/update-paint-style.handler.js';
 import { createUpdateTextStyleHandler } from '../../src/features/styles/update-text-style.handler.js';
@@ -39,23 +42,20 @@ import { createFlipNodesHandler } from '../../src/handlers/flip-nodes.js';
 import { createGroupNodesHandler } from '../../src/handlers/group-nodes.js';
 import { createMoveNodesHandler } from '../../src/handlers/move-nodes.js';
 import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
-import { createRemoveReactionsHandler } from '../../src/handlers/remove-reactions.js';
 import { createRenameNodeHandler } from '../../src/handlers/rename-node.js';
 import { createReorderNodesHandler } from '../../src/handlers/reorder-nodes.js';
 import { createReparentNodesHandler } from '../../src/handlers/reparent-nodes.js';
 import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/handlers/repeat.js';
 import { createSetPositionHandler } from '../../src/handlers/set-position.js';
-import { createSetReactionsHandler } from '../../src/handlers/set-reactions.js';
 import { createSetTimelineDurationHandler } from '../../src/handlers/set-timeline-duration.js';
 import { createSetVisibleHandler } from '../../src/handlers/set-visible.js';
-import { createUpdateFlowsHandler } from '../../src/handlers/update-flows.js';
 import {
   createCreateVectorHandler,
   createOutlineStrokeHandler,
   createSetVectorHandler,
 } from '../../src/handlers/vector.js';
 import { createIdempotencyCache, idempotent } from '../../src/idempotency.js';
-import { makeFlowsFigma } from './flows-fake.js';
+import { makeFlowsFigma } from '../features/prototype/flows-fake.js';
 
 /** A mutable node store backing a fake figma whose getNodeByIdAsync / createFrame share one map. */
 const MIXED = Symbol('mixed');

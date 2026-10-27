@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSetReactionsHandler } from '../../src/handlers/set-reactions.js';
+import { createSetReactionsHandler } from '../../../src/features/prototype/set-reactions.handler.js';
 
 const withNode = (node: unknown): typeof figma =>
   ({ getNodeByIdAsync: async () => node }) as unknown as typeof figma;

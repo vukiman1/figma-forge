@@ -1,20 +1,3 @@
-/**
- * A page whose `flowStartingPoints` behaves the way Figma's was measured to (2026-10-01), for the
- * update_flows and batch tests. What a plain array would get wrong, and these tests are about:
- *
- * - The list is assigned whole and refused whole — one bad entry and nothing is written;
- * - A hidden frame is not refused: its entry is dropped from the list read back, yet kept;
- * - A flow whose frame stops qualifying (hidden, nested) is kept out of sight, not deleted, and comes
- *   back when the frame qualifies again — but a write made meanwhile loses its place, so it comes
- *   back at the end (in Figma it lands somewhere a plugin cannot choose; the end stands in for
- *   that);
- * - An entry removed by a write while its frame qualifies is gone for good;
- * - A connection landing on a page with no flows makes the connection's top-level frame a flow named
- *   "Flow 1", which taking the connection away again does not undo. (Figma's rule for when it does
- *   this also depends on the page's history; this models the case it was seen to fire in, a page
- *   that never had a flow.)
- */
-
 export interface FakeNode {
   id: string;
   type: string;
@@ -30,12 +13,9 @@ export interface FakeFlow {
 }
 
 interface FlowsPage extends FakeNode {
-  /** Figma's own "Flow 1", added behind the list's back — not a write, so `writes` stays put. */
   autoFlow(nodeId: string): void;
   flowStartingPoints: FakeFlow[];
-  /** Every stored entry, visible or not — the tests' view of what Figma keeps out of sight. */
   stored: FakeFlow[];
-  /** How many times the list was assigned. */
   writes: number;
 }
 
@@ -119,7 +99,6 @@ export const makeFlowsFigma = () => {
               'in set_flowStartingPoints: Can only set flow starting point on associated page',
             );
           }
-          // A hidden frame passes: that is the whole point of modelling it.
           const topLevel = node.parent === page || node.parent?.type === 'SECTION';
           if (!topLevel || !FLOW_TYPES.has(node.type)) {
             throw new Error(

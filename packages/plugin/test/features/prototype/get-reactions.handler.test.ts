@@ -1,7 +1,7 @@
 import type { GetReactionsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetReactionsHandler } from '../../src/handlers/get-reactions.js';
+import { createGetReactionsHandler } from '../../../src/features/prototype/get-reactions.handler.js';
 
 const fakeFigma = (lookup: Record<string, BaseNode | null>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => lookup[id] ?? null }) as unknown as typeof figma;

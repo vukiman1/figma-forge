@@ -5,6 +5,7 @@ import {
   propertyDisplayName,
   resolveComponentOwner,
 } from '../features/components/component-owner.js';
+import { readFlows, sameFlows } from '../features/prototype/flows.js';
 import { findReplacePlan } from '../features/text/find-replace-text.handler.js';
 import { isTextLike, type TextLike } from '../features/text/text-like.js';
 import {
@@ -45,7 +46,6 @@ import {
   isMotionNode,
   toPlainJson,
 } from './motion-shared.js';
-import { readFlows, sameFlows } from './update-flows.js';
 
 /**
  * Atomic batch: apply several invertible write ops as a unit. Two phases —

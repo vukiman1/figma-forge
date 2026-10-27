@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createRemoveReactionsHandler } from '../../src/handlers/remove-reactions.js';
+import { createRemoveReactionsHandler } from '../../../src/features/prototype/remove-reactions.handler.js';
 
 const withNode = (node: unknown): typeof figma =>
   ({ getNodeByIdAsync: async () => node }) as unknown as typeof figma;

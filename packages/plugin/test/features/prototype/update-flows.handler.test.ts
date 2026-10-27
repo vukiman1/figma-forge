@@ -1,13 +1,9 @@
 import type { UpdateFlowsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createUpdateFlowsHandler } from '../../src/handlers/update-flows.js';
+import { createUpdateFlowsHandler } from '../../../src/features/prototype/update-flows.handler.js';
 import { type FakeNode, makeFlowsFigma } from './flows-fake.js';
 
-/**
- * A page "P" with four top-level frames A–D, flows on A, B and C, plus the things a flow cannot
- * start on: a frame nested in A, a rectangle, a frame on another page, and a frame in a section.
- */
 const setup = () => {
   const fake = makeFlowsFigma();
   const page = fake.makePage('P', 'Screens');
@@ -115,10 +111,6 @@ describe('update_flows handler', () => {
   });
 
   describe('refusals, which leave the page as it was', () => {
-    /**
-     * Run a call that must be refused on a fresh page, and report what it left behind: the error it
-     * raised, and whether the page is untouched — not written to at all, not merely equal after.
-     */
     const refusal = async (
       args: Record<string, unknown>,
     ): Promise<{ message: string; untouched: boolean }> => {
@@ -178,20 +170,17 @@ describe('update_flows handler', () => {
 
     it('an empty name, naming the entry', async () => {
       const r = await refusal({ flows: [{ nodeId: 'A', name: '' }] });
-      expect(r.message).toMatch(/flows\[0\]\.name must be a non-empty/);
+      expect(r.message).toMatch(/flows\.0\.name: Too small/);
       expect(r.untouched).toBe(true);
     });
 
     it('a page id that is missing or not a page', async () => {
       const { figmaCtx } = setup();
       const handler = createUpdateFlowsHandler(figmaCtx);
-      await expect(handler({ pageId: 'NOPE' })).rejects.toThrow(/page NOPE not found/);
+      await expect(handler({ pageId: 'NOPE' })).rejects.toThrow(/node NOPE not found/);
       await expect(handler({ pageId: 'A' })).rejects.toThrow(/A is a FRAME, not a page/);
     });
 
-    // Figma takes a hidden frame without an error and keeps its entry out of sight, where it turns
-    // into a flow once the frame is shown — a write afterwards cannot remove it. Refusing before the
-    // write is the only way to leave nothing behind.
     it('a hidden frame — before anything is written, so nothing is left out of sight', async () => {
       const { page, nodes, run } = setup();
       nodes.get('D')!.visible = false;
@@ -241,14 +230,11 @@ describe('update_flows handler', () => {
       expect(message).toContain('NESTED (FRAME) sits inside a FRAME');
       expect(message).toContain('ELSEWHERE is on page "Archive", not "Screens"');
       expect(message).toContain('Q is a PAGE');
-      // The frame that was fine is not blamed.
       expect(message).not.toMatch(/\bD\b/);
       expect(page.flowStartingPoints).toEqual(before);
     });
   });
 
-  // A flow whose frame is grouped or nested is out of sight: it cannot be addressed until the
-  // frame is top-level again, and then it is back under its old name.
   it('cannot reach a flow whose frame is nested, and finds it again once it is not', async () => {
     const { page, nodes, run } = setup();
     const b = nodes.get('B')!;
@@ -263,9 +249,6 @@ describe('update_flows handler', () => {
     expect((await run({})).flows).toContainEqual({ nodeId: 'B', name: 'Checkout' });
   });
 
-  // The handler awaits node lookups before it writes, and the editor keeps running meanwhile: a flow
-  // the user adds in Figma during those awaits must survive the write, not be overwritten by a list
-  // computed from what the page held before.
   it('keeps a flow added in the editor while the call was looking nodes up', async () => {
     const { page, figmaCtx } = setup();
     const lookup = figmaCtx.getNodeByIdAsync.bind(figmaCtx);
@@ -289,8 +272,6 @@ describe('update_flows handler', () => {
     expect(result.flows.map(f => f.nodeId)).toEqual(['A', 'B', 'C', 'IN_SECTION', 'D']);
   });
 
-  // The safety net for whatever else Figma might take without taking: read back, put the visible
-  // list back, and never claim success.
   it('puts the list back and says so when Figma reads back something other than was written', async () => {
     const { page, run } = setup();
     const before = page.flowStartingPoints;
@@ -300,7 +281,6 @@ describe('update_flows handler', () => {
       get: store.get!,
       set: (next: { nodeId: string; name: string }[]) => {
         writes += 1;
-        // The first write loses its last entry; the restore goes through untouched.
         store.set!(writes === 1 ? next.slice(0, -1) : next);
       },
     });

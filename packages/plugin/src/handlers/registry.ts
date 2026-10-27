@@ -23,6 +23,10 @@ import { createSetFillsHandler } from '../features/paint/set-fills.handler.js';
 import { createSetImageFillHandler } from '../features/paint/set-image-fill.handler.js';
 import { createSetOpacityHandler } from '../features/paint/set-opacity.handler.js';
 import { createSetStrokesHandler } from '../features/paint/set-strokes.handler.js';
+import { createGetReactionsHandler } from '../features/prototype/get-reactions.handler.js';
+import { createRemoveReactionsHandler } from '../features/prototype/remove-reactions.handler.js';
+import { createSetReactionsHandler } from '../features/prototype/set-reactions.handler.js';
+import { createUpdateFlowsHandler } from '../features/prototype/update-flows.handler.js';
 import { createApplyStyleToNodeHandler } from '../features/styles/apply-style-to-node.handler.js';
 import { createCreateEffectStyleHandler } from '../features/styles/create-effect-style.handler.js';
 import { createCreateGridStyleHandler } from '../features/styles/create-grid-style.handler.js';
@@ -88,7 +92,6 @@ import { createGetNodeMotionHandler } from './get-node-motion.js';
 import { createGetNodeHandler } from './get-node.js';
 import { createGetNodesInfoHandler } from './get-nodes-info.js';
 import { createGetPagesHandler } from './get-pages.js';
-import { createGetReactionsHandler } from './get-reactions.js';
 import { createGetScreenshotHandler } from './get-screenshot.js';
 import { createGetSelectionHandler } from './get-selection.js';
 import { createGetViewportHandler } from './get-viewport.js';
@@ -102,7 +105,6 @@ import { createNavigateToPageHandler } from './navigate-to-page.js';
 import { createPingHandler } from './ping.js';
 import { createRemoveAnimationStyleHandler } from './remove-animation-style.js';
 import { createRemoveManualKeyframeTrackHandler } from './remove-manual-keyframe-track.js';
-import { createRemoveReactionsHandler } from './remove-reactions.js';
 import { createRenameNodeHandler } from './rename-node.js';
 import { createRenamePageHandler } from './rename-page.js';
 import { createReorderNodesHandler } from './reorder-nodes.js';
@@ -117,11 +119,9 @@ import { createSearchNodesHandler } from './search-nodes.js';
 import { createSetArcHandler } from './set-arc.js';
 import { createSetMaskHandler } from './set-mask.js';
 import { createSetPositionHandler } from './set-position.js';
-import { createSetReactionsHandler } from './set-reactions.js';
 import { createSetTimelineDurationHandler } from './set-timeline-duration.js';
 import { createSetVisibleHandler } from './set-visible.js';
 import { createUngroupNodesHandler } from './ungroup-nodes.js';
-import { createUpdateFlowsHandler } from './update-flows.js';
 import {
   createCreateVectorHandler,
   createGetVectorHandler,
