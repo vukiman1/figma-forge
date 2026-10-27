@@ -1,6 +1,10 @@
 import type { BatchResult, FlowStartingPoint } from '@figma-forge/core';
 
 import type { SandboxHandlers, SandboxToolHandler } from '../dispatcher.js';
+import {
+  propertyDisplayName,
+  resolveComponentOwner,
+} from '../features/components/component-owner.js';
 import { findReplacePlan } from '../features/text/find-replace-text.handler.js';
 import { isTextLike, type TextLike } from '../features/text/text-like.js';
 import {
@@ -34,7 +38,6 @@ import {
   writeIfDifferent,
 } from './batch-snapshot.js';
 import { resolveSharedParent } from './boolean-nodes.js';
-import { propertyDisplayName, resolveComponentOwner } from './component-property.js';
 import {
   assertFigmaEditor,
   assertKeyframeField,

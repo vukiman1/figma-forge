@@ -1,7 +1,7 @@
 import type { GetComponentApiResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetComponentApiHandler } from '../../src/handlers/get-component-api.js';
+import { createGetComponentApiHandler } from '../../../src/features/components/get-component-api.handler.js';
 
 const defs = {
   Size: { type: 'VARIANT', defaultValue: 'md', variantOptions: ['sm', 'md', 'lg'] },
@@ -21,7 +21,6 @@ const set = {
   parent: { id: 'P:0', type: 'PAGE' },
   componentPropertyDefinitions: defs,
 };
-// A variant component lives inside the set; the resolver climbs to the set for complete options.
 const variant = { id: 'C:1', name: 'Size=md', type: 'COMPONENT', parent: set };
 const standalone = {
   id: 'C:9',

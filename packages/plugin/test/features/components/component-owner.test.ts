@@ -1,12 +1,11 @@
 import type { ComponentPropertyResult, MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createAddComponentPropertyHandler } from '../../src/handlers/add-component-property.js';
-import { createBindComponentPropertyHandler } from '../../src/handlers/bind-component-property.js';
-import { createDeleteComponentPropertyHandler } from '../../src/handlers/delete-component-property.js';
-import { createEditComponentPropertyHandler } from '../../src/handlers/edit-component-property.js';
+import { createAddComponentPropertyHandler } from '../../../src/features/components/add-component-property.handler.js';
+import { createBindComponentPropertyHandler } from '../../../src/features/components/bind-component-property.handler.js';
+import { createDeleteComponentPropertyHandler } from '../../../src/features/components/delete-component-property.handler.js';
+import { createEditComponentPropertyHandler } from '../../../src/features/components/edit-component-property.handler.js';
 
-/** A figma stub whose getNodeByIdAsync resolves from a fixed id → node map. */
 const fakeFigma = (nodes: Record<string, unknown>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => nodes[id] ?? null }) as unknown as typeof figma;
 
@@ -90,7 +89,7 @@ describe('add_component_property handler', () => {
       type: 'BOOLEAN',
       defaultValue: false,
     })) as ComponentPropertyResult;
-    expect(r.componentId).toBe('S:1'); // authored on the set, not the variant
+    expect(r.componentId).toBe('S:1');
     expect(set.addComponentProperty).toHaveBeenCalled();
     await expect(
       handler({ componentId: 'I:1', name: 'P', type: 'BOOLEAN', defaultValue: false }),
@@ -121,7 +120,6 @@ describe('bind_component_property handler', () => {
 
   it('finds a property defined on the variant set above the layer', async () => {
     const set = { id: 'S:1', type: 'COMPONENT_SET', componentPropertyDefinitions: boolDef };
-    // Figma throws when componentPropertyDefinitions is read on a variant, so the fake does too.
     const variant = {
       id: 'C:1',
       type: 'COMPONENT',
@@ -162,7 +160,6 @@ describe('bind_component_property handler', () => {
     };
     const layer = { id: 'L:1', type: 'FRAME', parent: comp, componentPropertyReferences: null };
     const handler = createBindComponentPropertyHandler(fakeFigma({ 'L:1': layer }));
-    // INSTANCE_SWAP binds to mainComponent, so binding it to visible must fail.
     await expect(
       handler({ nodeId: 'L:1', field: 'visible', propertyId: 'Icon#4:5' }),
     ).rejects.toThrow(/binds to "mainComponent", not "visible"/);

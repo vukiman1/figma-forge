@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createDetachInstanceHandler } from '../../src/handlers/detach-instance.js';
+import { createDetachInstanceHandler } from '../../../src/features/components/detach-instance.handler.js';
 
 const withNode = (node: unknown): typeof figma =>
   ({ getNodeByIdAsync: async () => node }) as unknown as typeof figma;

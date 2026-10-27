@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSetInstancePropertiesHandler } from '../../src/handlers/set-instance-properties.js';
+import { createSetInstancePropertiesHandler } from '../../../src/features/components/set-instance-properties.handler.js';
 
 const fakeFigma = (lookup: Record<string, unknown>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => lookup[id] ?? null }) as unknown as typeof figma;
@@ -44,6 +44,6 @@ describe('set_instance_properties handler', () => {
     ).rejects.toThrow(/at least one property/);
     await expect(
       createSetInstancePropertiesHandler(fakeFigma({}))({ instanceId: 'I:1' }),
-    ).rejects.toThrow(/must be an object map/);
+    ).rejects.toThrow(/properties: Invalid input/);
   });
 });

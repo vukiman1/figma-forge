@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSwapComponentHandler } from '../../src/handlers/swap-component.js';
+import { createSwapComponentHandler } from '../../../src/features/components/swap-component.handler.js';
 
 const withNode = (node: unknown): typeof figma =>
   ({ getNodeByIdAsync: async () => node }) as unknown as typeof figma;

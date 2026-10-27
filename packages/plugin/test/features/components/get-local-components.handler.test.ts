@@ -1,9 +1,8 @@
 import type { GetLocalComponentsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetLocalComponentsHandler } from '../../src/handlers/get-local-components.js';
+import { createGetLocalComponentsHandler } from '../../../src/features/components/get-local-components.handler.js';
 
-// A container node (frame) whose findAllWithCriteria returns the components/sets in its subtree.
 const frame = (id: string, found: unknown[]): unknown => ({
   id,
   type: 'FRAME',

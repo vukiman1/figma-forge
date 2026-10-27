@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateComponentHandler } from '../../src/handlers/create-component.js';
+import { createCreateComponentHandler } from '../../../src/features/components/create-component.handler.js';
 
 const makeComponent = (id = '2:1') => {
   const node = {
@@ -69,7 +69,7 @@ describe('create_component handler', () => {
     const result = (await handler({ fromNodeId: 'SRC:1', name: 'Logo' })) as CreateResult;
 
     expect(createComponentFromNode).toHaveBeenCalledWith(source);
-    expect(appendChild).not.toHaveBeenCalled(); // stays where the source node was
+    expect(appendChild).not.toHaveBeenCalled();
     expect(result).toEqual({ ok: true, nodeId: 'C:9', name: 'Logo', type: 'COMPONENT' });
   });
 

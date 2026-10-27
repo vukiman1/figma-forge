@@ -6,7 +6,7 @@ export const ADD_COMPONENT_PROPERTY_TOOL_NAME = 'add_component_property';
 
 export const addComponentPropertyParams = z.object({
   componentId: z.string().describe('Component or component-set id (a variant resolves to its set)'),
-  name: z.string().describe('Property name, e.g. "Show Icon"'),
+  name: z.string().min(1).describe('Property name, e.g. "Show Icon"'),
   type: z.enum(['BOOLEAN', 'TEXT', 'INSTANCE_SWAP']).describe('Property type'),
   defaultValue: z
     .union([z.boolean(), z.string()])

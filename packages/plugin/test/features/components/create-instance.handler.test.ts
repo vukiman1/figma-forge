@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateInstanceHandler } from '../../src/handlers/create-instance.js';
+import { createCreateInstanceHandler } from '../../../src/features/components/create-instance.handler.js';
 
 const makeInstance = () => ({ id: 'I:1', name: 'Inst', type: 'INSTANCE', x: 0, y: 0 });
 

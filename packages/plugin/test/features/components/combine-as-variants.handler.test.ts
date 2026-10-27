@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCombineAsVariantsHandler } from '../../src/handlers/combine-as-variants.js';
+import { createCombineAsVariantsHandler } from '../../../src/features/components/combine-as-variants.handler.js';
 
 const component = (id: string, parent: unknown = { id: 'PAGE', appendChild() {} }) => ({
   id,
@@ -59,7 +59,7 @@ describe('combine_as_variants handler', () => {
   it('throws on <2 ids, a non-COMPONENT node, a missing node, or a bad parent', async () => {
     await expect(
       createCombineAsVariantsHandler(fakeFigma({}))({ nodeIds: ['1:1'] }),
-    ).rejects.toThrow(/at least 2/);
+    ).rejects.toThrow(/nodeIds: Too small/);
     await expect(
       createCombineAsVariantsHandler(
         fakeFigma({ '1:1': component('1:1'), '1:2': { id: '1:2', type: 'FRAME' } }),
