@@ -1,4 +1,4 @@
-import type { VariableResult } from '@figwright/shared';
+import type { VariableResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createDeleteVariableHandler } from '../../src/handlers/delete-variable.js';

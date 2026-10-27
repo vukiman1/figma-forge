@@ -7,7 +7,7 @@ import type {
   SaveImageFillsResult,
   SavedImageFill,
   SavedNodeImageFills,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';

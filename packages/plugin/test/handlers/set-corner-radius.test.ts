@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figwright/shared';
+import type { MutateResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createSetCornerRadiusHandler } from '../../src/handlers/set-corner-radius.js';

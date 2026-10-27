@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figwright/shared';
+import type { MutateResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBindVariableToPaintHandler } from '../../src/handlers/bind-variable-to-paint.js';

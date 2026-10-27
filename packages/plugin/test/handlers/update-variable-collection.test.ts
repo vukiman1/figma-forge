@@ -1,4 +1,4 @@
-import type { UpdateCollectionResult } from '@figwright/shared';
+import type { UpdateCollectionResult } from '@figma-forge/shared';
 import { describe, expect, it, type Mock, vi } from 'vitest';
 
 import { createUpdateVariableCollectionHandler } from '../../src/handlers/update-variable-collection.js';

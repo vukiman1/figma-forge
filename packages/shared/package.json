@@ -1,8 +1,8 @@
 {
-  "name": "@figwright/shared",
+  "name": "@figma-forge/shared",
   "version": "0.0.0",
   "private": true,
-  "description": "Shared types, schemas, and protocol codec for Figwright.",
+  "description": "Shared types, schemas, and protocol codec for Figma Forge.",
   "license": "MIT",
   "type": "module",
   "exports": {

@@ -1,4 +1,4 @@
-import type { GetSelectionResult } from '@figwright/shared';
+import type { GetSelectionResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { RESULT_LIMIT_LABEL, resultCharBudget, serializeFlatNodes } from '../serializer.js';

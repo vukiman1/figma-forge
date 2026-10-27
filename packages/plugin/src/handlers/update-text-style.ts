@@ -1,4 +1,8 @@
-import type { SerializedLetterSpacing, SerializedLineHeight, StyleResult } from '@figwright/shared';
+import type {
+  SerializedLetterSpacing,
+  SerializedLineHeight,
+  StyleResult,
+} from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import {

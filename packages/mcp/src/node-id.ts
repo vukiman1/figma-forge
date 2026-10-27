@@ -1,6 +1,6 @@
 // Normalize node-id arguments so a user can paste a Figma URL or the URL's dash-form node id
 // straight into any tool. Figma deep links carry the node id as `?node-id=17248-32218` (dashes),
-// while the Plugin API — and therefore every figwright tool — wants the canonical colon form
+// while the Plugin API — and therefore every figma-forge tool — wants the canonical colon form
 // `17248:32218`. We resolve this once, server-side, before the call reaches the plugin, so callers
 // never have to hand-convert (the official Figma skills document this conversion as a manual step;
 // we just do it).

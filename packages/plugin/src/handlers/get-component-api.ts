@@ -1,4 +1,4 @@
-import type { ComponentPropertyApiEntry, GetComponentApiResult } from '@figwright/shared';
+import type { ComponentPropertyApiEntry, GetComponentApiResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

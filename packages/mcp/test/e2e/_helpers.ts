@@ -14,7 +14,7 @@ import {
   newId,
   PROTOCOL_VERSION,
   SystemMethod,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { WebSocket } from 'ws';
 
 import { Follower } from '../../src/election/follower.js';

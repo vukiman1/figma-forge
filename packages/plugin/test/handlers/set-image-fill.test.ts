@@ -1,4 +1,4 @@
-import type { ImageFillResult } from '@figwright/shared';
+import type { ImageFillResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createBatchHandler } from '../../src/handlers/batch.js';

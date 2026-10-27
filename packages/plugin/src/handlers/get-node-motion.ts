@@ -1,4 +1,4 @@
-import type { GetNodeMotionResult } from '@figwright/shared';
+import type { GetNodeMotionResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { hasMotionState, readNodeMotion, readPlayheadPosition } from './motion-shared.js';

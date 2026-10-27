@@ -1,4 +1,4 @@
-import type { MutateResult, SerializedPaint } from '@figwright/shared';
+import type { MutateResult, SerializedPaint } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaPaintsBound } from './bindings.js';

@@ -1,4 +1,4 @@
-import type { SerializedPaint, StyleResult } from '@figwright/shared';
+import type { SerializedPaint, StyleResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaPaintsBound } from './bindings.js';

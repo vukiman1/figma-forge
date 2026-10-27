@@ -15,7 +15,7 @@ import {
   type RpcResponse,
   RpcResponseSchema,
   SystemMethod,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { decode, encode } from '@msgpack/msgpack';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';

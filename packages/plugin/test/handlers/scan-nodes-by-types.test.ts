@@ -1,4 +1,4 @@
-import type { ScanNodesByTypesResult } from '@figwright/shared';
+import type { ScanNodesByTypesResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createScanNodesByTypesHandler } from '../../src/handlers/scan-nodes-by-types.js';

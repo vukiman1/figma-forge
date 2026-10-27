@@ -10,7 +10,7 @@ import type { PluginContextEvent } from '../../protocol/bridge.js';
 import type { ActivityPayload } from './payload.js';
 import type { RelayClientState } from './state.js';
 
-export const DIAGNOSTIC_SCHEMA = 'figwright-diagnostic@1';
+export const DIAGNOSTIC_SCHEMA = 'figma-forge-diagnostic@1';
 
 export interface DiagnosticMeta {
   pluginVersion: string;

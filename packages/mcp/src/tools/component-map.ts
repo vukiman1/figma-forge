@@ -1,7 +1,7 @@
 import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figwright/shared';
+import type { GetDesignContextResult } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import {

@@ -1,4 +1,4 @@
-import type { ListFilesResult } from '@figwright/shared';
+import type { ListFilesResult } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import type { PluginSessionInfo } from '../routing/sessions.js';
@@ -10,7 +10,7 @@ export const LIST_FILES_TOOL_NAME = 'list_files';
 export const listFilesTool: ToolSpec = {
   name: LIST_FILES_TOOL_NAME,
   description:
-    'Return every Figma file that currently has the Figwright plugin open, as { files: [{ sessionId, ' +
+    'Return every Figma file that currently has the Figma Forge plugin open, as { files: [{ sessionId, ' +
     'fileName, currentPage, pluginVersion, routed, bound, duplicateName?, error? }] }. More than one ' +
     'entry means more than one file is reachable, and calls follow whichever one the user last ' +
     'touched (routed: true) — which changes under you when they switch tabs. Claim one with ' +

@@ -3,7 +3,7 @@ import type {
   SerializedAction,
   SerializedReaction,
   SerializedTrigger,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

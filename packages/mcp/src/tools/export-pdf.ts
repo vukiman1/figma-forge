@@ -1,7 +1,7 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-import type { ExportPdfResult, PdfExport } from '@figwright/shared';
+import type { ExportPdfResult, PdfExport } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';

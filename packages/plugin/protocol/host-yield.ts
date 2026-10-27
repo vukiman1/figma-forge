@@ -1,5 +1,5 @@
 /** The sandbox hands a host turn to the panel, which replies from a message task, not a timer. */
-export const HOST_YIELD_TAG = '@figwright/yield';
+export const HOST_YIELD_TAG = '@figma-forge/yield';
 
 interface HostYieldBase {
   tag: typeof HOST_YIELD_TAG;

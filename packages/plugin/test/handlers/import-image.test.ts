@@ -1,4 +1,4 @@
-import type { CreateResult } from '@figwright/shared';
+import type { CreateResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createImportImageHandler } from '../../src/handlers/import-image.js';

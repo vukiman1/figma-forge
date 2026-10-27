@@ -1,4 +1,4 @@
-import type { ResizeNodesResult } from '@figwright/shared';
+import type { ResizeNodesResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

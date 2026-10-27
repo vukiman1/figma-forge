@@ -1,4 +1,4 @@
-import type { StyleResult } from '@figwright/shared';
+import type { StyleResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createUpdatePaintStyleHandler } from '../../src/handlers/update-paint-style.js';

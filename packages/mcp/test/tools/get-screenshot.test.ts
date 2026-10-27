@@ -1,4 +1,4 @@
-import type { GetScreenshotResult } from '@figwright/shared';
+import type { GetScreenshotResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { INLINE_IMAGE_BUDGET_BYTES, screenshotContent } from '../../src/tools/get-screenshot.js';

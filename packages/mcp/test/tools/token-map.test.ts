@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { GetStylesResult, GetVariableDefsResult } from '@figwright/shared';
+import type { GetStylesResult, GetVariableDefsResult } from '@figma-forge/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { GET_STYLES_TOOL_NAME } from '../../src/tools/get-styles.js';

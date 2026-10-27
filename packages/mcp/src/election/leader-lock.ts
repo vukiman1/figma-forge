@@ -22,11 +22,11 @@ import { join } from 'node:path';
  *
  * **The note is not trusted on its face.** Naming the wrong pid would be worse than naming none:
  * the whole point is to tell the user which process to kill, and a stale note plus a recycled pid
- * would point at an innocent — plausibly at a _healthy_ Figwright server. So the reader re-derives
- * identity from the OS: the pid must still exist, and its start time must match the one the note
- * recorded (`ps -o lstart=`, whole-second resolution, hence the tolerance). Pid reuse cannot
- * survive that check, because it would have to reproduce the same start second too. Anything that
- * fails to line up degrades to the anonymous message, never a guess.
+ * would point at an innocent — plausibly at a _healthy_ Figma Forge server. So the reader
+ * re-derives identity from the OS: the pid must still exist, and its start time must match the one
+ * the note recorded (`ps -o lstart=`, whole-second resolution, hence the tolerance). Pid reuse
+ * cannot survive that check, because it would have to reproduce the same start second too. Anything
+ * that fails to line up degrades to the anonymous message, never a guess.
  */
 export interface LeaderLock {
   pid: number;
@@ -118,9 +118,9 @@ export const osProcessProbe: ProcessProbe = {
   },
 };
 
-const lockDir = (): string => join(tmpdir(), 'figwright');
+const lockDir = (): string => join(tmpdir(), 'figma-forge');
 
-/** One note per port, so the `FIGWRIGHT_PORT` test seam can't have two servers share one. */
+/** One note per port, so the `FIGMA_FORGE_PORT` test seam can't have two servers share one. */
 export const leaderLockPath = (port: number): string => join(lockDir(), `leader-${port}.json`);
 
 /**
@@ -197,7 +197,8 @@ export const readLeaderLock = (port: number): LeaderLock | undefined => {
 
 /**
  * Who holds :port, if it can be _proved_. Undefined whenever the note is missing, the pid is gone,
- * or its start time doesn't match — all of which mean "we don't know", never "it isn't Figwright".
+ * or its start time doesn't match — all of which mean "we don't know", never "it isn't Figma
+ * Forge".
  */
 export const identifyPortHolder = (
   port: number,
@@ -222,8 +223,8 @@ export const identifyPortHolder = (
 /**
  * Resume a holder that is suspended, and report whether the signal went out.
  *
- * This is the one place Figwright acts on another process, so the conditions are exact rather than
- * probable: the pid was re-identified against its recorded start time, and its state is `T`.
+ * This is the one place Figma Forge acts on another process, so the conditions are exact rather
+ * than probable: the pid was re-identified against its recorded start time, and its state is `T`.
  * SIGCONT to a process that is _not_ stopped is a no-op (verified), so the failure mode of a wrong
  * guess here would be nothing happening — but the guard makes even that unreachable. Killing is
  * deliberately not automated: it destroys work, so it stays the user's call and the message names
@@ -238,10 +239,10 @@ export const resumeStoppedHolder = (
 };
 
 /**
- * The single user-facing explanation of a port Figwright can't use — shared by `dispatch` (which
+ * The single user-facing explanation of a port Figma Forge can't use — shared by `dispatch` (which
  * fails a tool call with it) and `ping` (which reports it), so the two can't drift.
  *
- * The anonymous form no longer claims the holder is "a non-Figwright process": that was an
+ * The anonymous form no longer claims the holder is "a non-Figma Forge process": that was an
  * assertion we could not make, and it is exactly wrong for the case this file exists for.
  */
 /**
@@ -260,9 +261,9 @@ const findPortHolderHint = (port: number): string =>
 export const portConflictMessage = (port: number, holder?: PortHolder): string => {
   if (holder === undefined) {
     return (
-      `port ${port} is held by a process that isn't answering as a Figwright leader, so Figwright ` +
+      `port ${port} is held by a process that isn't answering as a Figma Forge leader, so Figma Forge ` +
       `can't reach your plugin. Free that port (e.g. ${findPortHolderHint(port)}) and ` +
-      `Figwright takes it over automatically.`
+      `Figma Forge takes it over automatically.`
     );
   }
   const suspended = holder.stopped
@@ -272,9 +273,9 @@ export const portConflictMessage = (port: number, holder?: PortHolder): string =
       : ' It is suspended (Ctrl-Z or kill -STOP) and could not be resumed automatically.'
     : '';
   return (
-    `port ${port} is held by a Figwright server (pid ${holder.pid}, v${holder.serverVersion}) that ` +
+    `port ${port} is held by a Figma Forge server (pid ${holder.pid}, v${holder.serverVersion}) that ` +
     `has stopped answering — it still owns the relay, so no plugin is reachable and no other ` +
-    `server can take over.${suspended} If it doesn't recover, kill ${holder.pid} and Figwright ` +
+    `server can take over.${suspended} If it doesn't recover, kill ${holder.pid} and Figma Forge ` +
     `takes the port over automatically.`
   );
 };

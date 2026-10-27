@@ -5,7 +5,7 @@ import {
   type SerializedVariableComposedColor,
   type SerializedVariableValue,
   toHex,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { serializeCodeSyntax } from '../serializer.js';

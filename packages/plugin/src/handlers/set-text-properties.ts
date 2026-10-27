@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figwright/shared';
+import type { MutateResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaFontName } from './convert.js';

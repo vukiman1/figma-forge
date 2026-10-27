@@ -10,7 +10,7 @@
  * never claims to be newer than a real build, and two 0s never trigger an abdication.
  */
 // eslint-disable-next-line no-underscore-dangle -- dunder marks a compile-time define, per convention
-declare const __FIGWRIGHT_BUILD_ID__: string | undefined;
+declare const __FIGMA_FORGE_BUILD_ID__: string | undefined;
 
 export const BUILD_ID: number =
-  typeof __FIGWRIGHT_BUILD_ID__ === 'string' ? Number(__FIGWRIGHT_BUILD_ID__) : 0;
+  typeof __FIGMA_FORGE_BUILD_ID__ === 'string' ? Number(__FIGMA_FORGE_BUILD_ID__) : 0;

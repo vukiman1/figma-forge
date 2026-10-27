@@ -107,25 +107,25 @@ export class Election {
   async determineRole(): Promise<void> {
     if (await this.tryLeadOrFollow()) return;
 
-    // The port is taken but its holder didn't answer a Figwright /ping. It could be a Figwright leader
+    // The port is taken but its holder didn't answer a Figma Forge /ping. It could be a Figma Forge leader
     // still mid-startup (its /ping endpoint not attached the instant we raced it), so retry once after a
-    // short delay. If it's STILL unbindable and STILL not a Figwright leader, a foreign process is
+    // short delay. If it's STILL unbindable and STILL not a Figma Forge leader, a foreign process is
     // squatting the port — do NOT attach as its follower (every forwarded RPC would fail silently).
     // Enter a conflict state that keeps contending and surfaces the clash (see tick / dispatch / ping).
-    this.log('[election] port taken but not a Figwright leader — race retry');
+    this.log('[election] port taken but not a Figma Forge leader — race retry');
     await new Promise<void>(resolve => setTimeout(resolve, RACE_RETRY_DELAY_MS));
     if (await this.tryLeadOrFollow()) return;
 
-    // Reached by a foreign squatter and by a wedged Figwright leader alike — a process starting up
+    // Reached by a foreign squatter and by a wedged Figma Forge leader alike — a process starting up
     // behind one cannot tell them apart from the outside, so it asks the same question the tick
     // asks: is there a leader note for this port whose process is still the one that wrote it?
     this.enterConflicted();
   }
 
   /**
-   * Settle into a definitive role: bind the port (→ leader), or confirm a Figwright leader already
-   * holds it (→ follower). Returns false when the port is taken by something that is NOT a
-   * Figwright leader, so the caller decides whether to retry or declare a conflict. Rethrows a
+   * Settle into a definitive role: bind the port (→ leader), or confirm a Figma Forge leader
+   * already holds it (→ follower). Returns false when the port is taken by something that is NOT a
+   * Figma Forge leader, so the caller decides whether to retry or declare a conflict. Rethrows a
    * non-EADDRINUSE bind error.
    */
   private async tryLeadOrFollow(): Promise<boolean> {
@@ -180,7 +180,7 @@ export class Election {
 
   private async tickBody(): Promise<void> {
     if (this.node.role === NodeRole.Conflicted) {
-      // Keep contending: the squatter may release the port, or a real Figwright leader may appear.
+      // Keep contending: the squatter may release the port, or a real Figma Forge leader may appear.
       // tryLeadOrFollow promotes us the moment either happens; otherwise we stay conflicted.
       await this.tryLeadOrFollow();
       return;

@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figwright/shared';
+import type { MutateResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createDeletePageHandler } from '../../src/handlers/delete-page.js';

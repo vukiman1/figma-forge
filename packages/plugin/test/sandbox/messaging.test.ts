@@ -129,7 +129,7 @@ describe('onSandboxContext', () => {
     const listener = listen();
 
     deliver(createToolResult({ id: 'req-1', result: { ok: true } }));
-    deliver({ tag: '@figwright/bridge', kind: 'context' });
+    deliver({ tag: '@figma-forge/bridge', kind: 'context' });
     deliver('not an object');
 
     expect(listener).not.toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { ErrorCode } from '@figwright/shared';
+import { ErrorCode } from '@figma-forge/shared';
 
 import {
   createToolError,

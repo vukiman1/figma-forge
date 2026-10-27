@@ -1,8 +1,8 @@
 // Server ↔ plugin compatibility.
 //
-// The two halves of Figwright ship on one version (the `vX.Y.Z` tag; `packages/plugin/vite.config.ts`
+// The two halves of Figma Forge ship on one version (the `vX.Y.Z` tag; `packages/plugin/vite.config.ts`
 // bakes `packages/mcp/package.json`'s version into the plugin bundle) but through different channels:
-// the server updates itself via `npx @figwright/mcp@latest`, while the plugin is a zip the user
+// the server updates itself via `npx @figma-forge/mcp@latest`, while the plugin is a zip the user
 // imports by hand and then never thinks about again. Skew is therefore the *default* state, not an
 // edge case.
 //
@@ -126,7 +126,7 @@ export const pluginSkewNotice = (pluginVersion: string, serverVersion: string): 
   `${pluginSkewSummary(pluginVersion, serverVersion)} ` +
   'Arguments added after it was built are silently ignored, which is why nothing in the result ' +
   'itself looks wrong. Update the plugin: download the latest release from ' +
-  'https://github.com/awdr74100/figwright/releases/latest, copy its manifest.json and dist into ' +
+  'https://github.com/vukiman1/figma-forge/releases/latest, copy its manifest.json and dist into ' +
   'the folder the plugin was imported from, and run the plugin again.';
 
 /**
@@ -145,7 +145,7 @@ export const pluginSkewNotice = (pluginVersion: string, serverVersion: string): 
 export const pluginSkewSummary = (pluginVersion: string, serverVersion: string): string =>
   // `v`-prefixed only when it is really a version. Whatever the peer claimed is echoed as-is
   // otherwise, because an unreadable one dressed up as a version reads as `vnightly`.
-  `Figwright plugin ${parse(pluginVersion) === null ? `"${pluginVersion}"` : `v${pluginVersion}`} ` +
+  `Figma Forge plugin ${parse(pluginVersion) === null ? `"${pluginVersion}"` : `v${pluginVersion}`} ` +
   `is older than this server (v${serverVersion}), so this result is unverified — an edit may have ` +
   'applied only part of what was asked, and reads can be incomplete.';
 

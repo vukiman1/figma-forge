@@ -1,4 +1,4 @@
-import { newId } from '@figwright/shared';
+import { newId } from '@figma-forge/shared';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 

@@ -18,7 +18,7 @@ export const RpcRequestSchema = z.object({
    * arguments would be checked against schemas that predate them. A caller declaring a strictly
    * newer build has already validated against better ones.
    *
-   * Absent means 0 — an unbundled process, or something that is not a Figwright follower at all.
+   * Absent means 0 — an unbundled process, or something that is not a Figma Forge follower at all.
    * Both are the oldest thing in the room by that rule, which is the safe direction: their
    * arguments are the ones worth checking.
    */

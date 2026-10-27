@@ -7,7 +7,7 @@ import type {
   SerializedTrigger,
   SerializedVariableComposedColor,
   SerializedVariableValue,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import { documentColorProfile } from './color-profile.js';
 

@@ -1,4 +1,4 @@
-import type { GetNodeMotionResult } from '@figwright/shared';
+import type { GetNodeMotionResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createGetNodeMotionHandler } from '../../src/handlers/get-node-motion.js';

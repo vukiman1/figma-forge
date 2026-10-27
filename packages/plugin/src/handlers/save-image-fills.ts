@@ -1,4 +1,4 @@
-import type { ImageFillBytes, ImageFillsResult, NodeImageFills } from '@figwright/shared';
+import type { ImageFillBytes, ImageFillsResult, NodeImageFills } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

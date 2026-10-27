@@ -30,7 +30,7 @@ const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]']);
  * Deliberately does not lift the host gate: that set is our own bind address, not something an
  * outside party influences, so there is nothing for it to break.
  */
-const allowAnyOrigin = (): boolean => process.env.FIGWRIGHT_ALLOW_ANY_ORIGIN === '1';
+const allowAnyOrigin = (): boolean => process.env.FIGMA_FORGE_ALLOW_ANY_ORIGIN === '1';
 
 /** Strip the port, keeping an IPv6 literal's brackets intact. */
 const hostnameFromHostHeader = (host: string): string => {

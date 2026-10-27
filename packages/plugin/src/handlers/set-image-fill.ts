@@ -1,4 +1,4 @@
-import type { ImageFillResult } from '@figwright/shared';
+import type { ImageFillResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { writePaints } from './paints.js';

@@ -7,7 +7,7 @@ import {
   LAYOUT_FIELDS,
   LAYOUT_TIER_FIELDS,
   planRootFrom,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import { annotateProjectTokens, loadTokenValueIndex } from '../tokens/token-index.js';
 import { getDesignContextTool } from './get-design-context.js';

@@ -1,4 +1,4 @@
-import { DEFAULT_PORT, PROTOCOL_VERSION } from '@figwright/shared';
+import { DEFAULT_PORT, PROTOCOL_VERSION } from '@figma-forge/shared';
 import { tryOnScopeDispose, useDocumentVisibility } from '@vueuse/core';
 import { computed, type ComputedRef, onMounted, type Ref, ref, watch } from 'vue';
 

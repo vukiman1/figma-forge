@@ -6,7 +6,7 @@ import {
   newId,
   PROTOCOL_VERSION,
   type SearchNodesResult,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { McpServer } from '@modelcontextprotocol/server';
 import type { CallToolResult } from '@modelcontextprotocol/server';
 import { serveStdio, StdioServerTransport } from '@modelcontextprotocol/server/stdio';
@@ -60,17 +60,17 @@ import { handleTokenMap, TOKEN_MAP_TOOL_NAME } from './tools/token-map.js';
 import { handleUseFile, USE_FILE_TOOL_NAME } from './tools/use-file.js';
 import { checkBatchOps } from './tools/wire-schema.js';
 
-const SERVER_NAME = 'figwright';
+const SERVER_NAME = 'figma-forge';
 const SERVER_VERSION = pkg.version;
 
 const log = (msg: string): void => {
   process.stderr.write(`${msg}\n`);
 };
 
-// FIGWRIGHT_PORT is a test/debug seam (the process-lifecycle e2e spawns real servers on a random
+// FIGMA_FORGE_PORT is a test/debug seam (the process-lifecycle e2e spawns real servers on a random
 // port). The plugin always connects to DEFAULT_PORT, so overriding this in normal use just makes
 // the server unreachable — hence undocumented.
-const envPort = Number(process.env.FIGWRIGHT_PORT);
+const envPort = Number(process.env.FIGMA_FORGE_PORT);
 const PORT = Number.isInteger(envPort) && envPort > 0 && envPort < 65_536 ? envPort : DEFAULT_PORT;
 
 const node = new Node({ serverVersion: SERVER_VERSION, port: PORT, log });
@@ -334,7 +334,7 @@ const stdio = serveStdio(createMcpServer, {
   // Unset, serveStdio discards transport errors outright, so the one message naming the cause
   // (e.g. "ReadBuffer exceeded maximum size of 10485760 bytes") never reaches the user's stderr.
   onerror: (error: Error): void => {
-    log(`[figwright] stdio transport error: ${error.message}`);
+    log(`[figma-forge] stdio transport error: ${error.message}`);
   },
 });
 
@@ -344,7 +344,7 @@ const roleDetail = node.isLeader()
     ? `:${PORT} held by an unresponsive owner — contending for it`
     : `follower → ${node.leaderUrl}`;
 log(
-  `[figwright] server ${SERVER_VERSION} (protocol ${PROTOCOL_VERSION}) ready as ${node.role}, ${roleDetail}`,
+  `[figma-forge] server ${SERVER_VERSION} (protocol ${PROTOCOL_VERSION}) ready as ${node.role}, ${roleDetail}`,
 );
 
 const shutdown = async (): Promise<void> => {
@@ -368,7 +368,7 @@ triggerShutdown = wireShutdown({
   stdin: process.stdin,
   shutdown,
   hardExit: () => {
-    log('[figwright] graceful shutdown stalled — forcing exit');
+    log('[figma-forge] graceful shutdown stalled — forcing exit');
     process.exit(1);
   },
 });

@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figwright/shared';
+import type { GetDesignContextResult } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import { type DesignDiffChanges, diffDesignContext } from '../diff/design-diff.js';
@@ -13,7 +13,7 @@ export const DESIGN_DIFF_TOOL_NAME = 'design_diff';
 // design_diff turns the one-shot Figma→code flow into an incremental one: snapshot a node's
 // get_design_context now, and on a later run report exactly what changed in the design (per node,
 // per property) so an agent edits the affected code instead of regenerating the screen. The baseline
-// is written to a file under the project (.figwright/snapshots/) — the tool never mutates Figma and
+// is written to a file under the project (.figma-forge/snapshots/) — the tool never mutates Figma and
 // never touches an existing code path; it's a local consumer of get_design_context, like token_map.
 
 /**
@@ -40,7 +40,7 @@ export const DESIGN_DIFF_TOOL_NAME = 'design_diff';
  * as an empty shape.
  */
 export const SNAPSHOT_FORMAT_VERSION = 9;
-const SNAPSHOT_SUBDIR = join('.figwright', 'snapshots');
+const SNAPSHOT_SUBDIR = join('.figma-forge', 'snapshots');
 
 const inputSchema = z.object({
   nodeId: z
@@ -59,7 +59,7 @@ export const designDiffTool: ToolSpec = {
   description:
     'Diff a Figma node against a saved baseline of itself, so after a design changes you edit only ' +
     'the affected code instead of regenerating. First call on a node saves a baseline (its ' +
-    'get_design_context, full detail) under .figwright/snapshots/ and returns status ' +
+    'get_design_context, full detail) under .figma-forge/snapshots/ and returns status ' +
     "'baseline-created'; a later call returns status 'diff' with the per-node, per-property changes " +
     '(added / removed / changed nodes; fills, layout/padding, text, token bindings — resolved to ' +
     "readable values, not opaque ids) or 'no-changes'. Pass update:true to accept the current design " +
@@ -80,7 +80,7 @@ export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknow
  * (re-diffable).
  */
 interface SnapshotFile {
-  figwrightSnapshot: number;
+  figmaForgeSnapshot: number;
   nodeId: string;
   capturedAt: string;
   context: GetDesignContextResult;
@@ -128,7 +128,7 @@ const writeSnapshot = async (
 ): Promise<SnapshotFile> => {
   await mkdir(dirname(absPath), { recursive: true });
   const snap: SnapshotFile = {
-    figwrightSnapshot: SNAPSHOT_FORMAT_VERSION,
+    figmaForgeSnapshot: SNAPSHOT_FORMAT_VERSION,
     nodeId,
     capturedAt: new Date().toISOString(),
     context,
@@ -148,7 +148,7 @@ const readSnapshot = async (absPath: string): Promise<SnapshotFile | null> => {
   try {
     const parsed = JSON.parse(raw) as Partial<SnapshotFile>;
     if (
-      parsed.figwrightSnapshot !== SNAPSHOT_FORMAT_VERSION ||
+      parsed.figmaForgeSnapshot !== SNAPSHOT_FORMAT_VERSION ||
       typeof parsed.context !== 'object' ||
       parsed.context === null
     ) {

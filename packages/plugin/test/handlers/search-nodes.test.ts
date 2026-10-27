@@ -1,4 +1,4 @@
-import type { SearchNodesResult } from '@figwright/shared';
+import type { SearchNodesResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createSearchNodesHandler } from '../../src/handlers/search-nodes.js';

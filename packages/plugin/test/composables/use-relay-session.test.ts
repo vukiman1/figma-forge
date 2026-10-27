@@ -224,7 +224,7 @@ describe('useRelaySession', () => {
         globalThis.dispatchEvent(new MessageEvent('message', { data: { pluginMessage } }));
       };
       deliver(createHostYield(1, 'yield-resume'));
-      deliver({ tag: '@figwright/yield', kind: 'yield-request', id: -1 });
+      deliver({ tag: '@figma-forge/yield', kind: 'yield-request', id: -1 });
       expect(postMessage).not.toHaveBeenCalled();
       deliver(createHostYield(1, 'yield-request'));
       expect(postMessage).toHaveBeenCalledExactlyOnceWith(

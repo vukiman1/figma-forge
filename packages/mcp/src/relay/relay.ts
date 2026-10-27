@@ -20,7 +20,7 @@ import {
   pluginSkewSummary,
   PROTOCOL_VERSION,
   SystemMethod,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { WebSocketServer, type WebSocket } from 'ws';
 
 import { isAllowedHost, isAllowedWsOrigin } from '../local-access.js';
@@ -465,7 +465,7 @@ export class Relay {
     if (parsed.data.protocolVersion !== PROTOCOL_VERSION) {
       const message =
         `protocol mismatch: server speaks ${PROTOCOL_VERSION}, plugin speaks ${parsed.data.protocolVersion} — ` +
-        'update the older Figwright half so both match (server: @figwright/mcp, plugin: copy ' +
+        'update the older Figma Forge half so both match (server: @figma-forge/mcp, plugin: copy ' +
         // The reopen matters: a refused plugin stops retrying (retrying cannot fix it, and a plugin
         // old enough to be refused is old enough to lack any graceful handling of the refusal), so
         // fixing the *server* side leaves the panel sitting on this message until it is reopened.

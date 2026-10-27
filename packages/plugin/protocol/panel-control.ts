@@ -2,7 +2,7 @@
  * The panel's own control channel: messages the UI iframe sends up to the sandbox to drive the
  * plugin _window_ itself — resize it, hide it, or jump the canvas to a node.
  *
- * It is a channel of its own, separate from the tool bridge (`@figwright/shared`'s
+ * It is a channel of its own, separate from the tool bridge (`@figma-forge/shared`'s
  * `PluginBridgeMessage`), because direction and shape differ: tool traffic is a two-way
  * request/response RPC that originates with the agent, while these are one-way commands the human's
  * own clicks produce. Its own tag lets `figma.ui.onmessage` split the two with a single string
@@ -16,9 +16,9 @@
  * enforces it: one tsconfig covers all three trees, so a stray `document` in here would typecheck
  * and then fail at runtime inside the sandbox.
  *
- * That placement also keeps it clear of `@figwright/shared`, which binds a different pair — plugin
- * and server. Two names for two boundaries; filing this there would erode `shared` into "things
- * more than one file happens to need".
+ * That placement also keeps it clear of `@figma-forge/shared`, which binds a different pair —
+ * plugin and server. Two names for two boundaries; filing this there would erode `shared` into
+ * "things more than one file happens to need".
  *
  * Both ends of the plugin import this module, which is what makes the window's floor and its
  * clamping rule a single fact rather than two implementations that drift apart.
@@ -31,7 +31,7 @@
  * of a package that has three.
  */
 
-export const PANEL_CONTROL_TAG = '@figwright/panel';
+export const PANEL_CONTROL_TAG = '@figma-forge/panel';
 
 /**
  * Floor for the plugin window. Below this the header (status + tabs) and the footer stop fitting,

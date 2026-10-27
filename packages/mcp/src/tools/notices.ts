@@ -33,7 +33,7 @@ const store = new AsyncLocalStorage<NoticeBox>();
  * and reads as part of it. One definition for both the success and the failure path — they carry
  * the same words, and having written it twice is how a heading drifts between them.
  */
-const asBlock = (notice: string): string => `\n\n⚠️ FIGWRIGHT PLUGIN OUT OF DATE\n${notice}`;
+const asBlock = (notice: string): string => `\n\n⚠️ FIGMA_FORGE PLUGIN OUT OF DATE\n${notice}`;
 
 const asRoutingBlock = (notice: string): string =>
   `\n\n⚠️ MORE THAN ONE FIGMA FILE IS OPEN\n${notice}`;

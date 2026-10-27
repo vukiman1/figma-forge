@@ -58,7 +58,9 @@ describe('parsePanelControl', () => {
   // Tool traffic shares this channel and is by far the more frequent of the two; it has to fall
   // through untouched so the caller can dispatch it.
   it('passes over anything that is not tagged as panel control', () => {
-    expect(parsePanelControl({ tag: '@figwright/bridge', kind: 'tool-call', id: 'x' })).toBeNull();
+    expect(
+      parsePanelControl({ tag: '@figma-forge/bridge', kind: 'tool-call', id: 'x' }),
+    ).toBeNull();
     expect(parsePanelControl({ kind: 'panel-hide' })).toBeNull();
     expect(parsePanelControl(null)).toBeNull();
     expect(parsePanelControl('panel-hide')).toBeNull();

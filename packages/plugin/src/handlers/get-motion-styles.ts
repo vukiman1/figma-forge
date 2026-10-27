@@ -1,4 +1,4 @@
-import type { GetMotionStylesResult, MotionStyle } from '@figwright/shared';
+import type { GetMotionStylesResult, MotionStyle } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { motionApi } from './motion-shared.js';

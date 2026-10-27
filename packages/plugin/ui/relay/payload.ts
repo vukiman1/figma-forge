@@ -1,6 +1,6 @@
 // Turns a tool result — the exact object the relay sends back to the MCP server, i.e. what the LLM
 // receives — into a display-ready snapshot for the Activity tab. Captured at the boundary so the
-// human can see precisely what figwright fed the model. Long strings (base64 images) and raw export
+// human can see precisely what figma-forge fed the model. Long strings (base64 images) and raw export
 // bytes are elided and the whole thing is capped so a huge tree can't lock up the panel; the digest
 // still reports the real size that crossed the wire.
 

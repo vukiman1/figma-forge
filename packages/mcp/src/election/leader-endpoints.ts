@@ -6,7 +6,7 @@ import {
   type RpcRequest,
   RpcRequestSchema,
   type RpcResponse,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { decode, encode } from '@msgpack/msgpack';
 
 import { hasContentType, isAllowedHost, isAllowedHttpOrigin } from '../local-access.js';
@@ -49,7 +49,7 @@ export interface LeaderEndpointDeps {
  * process was validated against the tool's input schema before it got here; a call that arrives
  * over HTTP was validated by whoever sent it, and the sandbox does not re-check — `dispatchSandbox
  * Message` hands `params` to the handler as `unknown`, and handlers read fields off a loose cast.
- * So for anything that is not a Figwright follower, the arguments reaching `figma.*` had been
+ * So for anything that is not a Figma Forge follower, the arguments reaching `figma.*` had been
  * checked exactly zero times. Everything else about this request is already validated: the Host,
  * the Origin, the content type, the envelope. This is the part that actually reaches the file.
  *

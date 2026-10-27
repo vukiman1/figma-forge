@@ -4,7 +4,7 @@
  * one-way context event the sandbox pushes back up so the panel can show what the plugin sees.
  *
  * This binds the panel and the sandbox — the same two parties as `panel-control.ts`, which is why
- * both live here rather than in `@figwright/shared`. The relay carries these calls, but the MCP
+ * both live here rather than in `@figma-forge/shared`. The relay carries these calls, but the MCP
  * server never constructs or reads one: it addresses tools by name over the wire protocol in
  * `shared`, and what crosses this boundary afterwards is the plugin's own business.
  *
@@ -16,7 +16,7 @@
 
 import { z } from 'zod';
 
-export const PLUGIN_BRIDGE_TAG = '@figwright/bridge';
+export const PLUGIN_BRIDGE_TAG = '@figma-forge/bridge';
 
 const baseFields = {
   tag: z.literal(PLUGIN_BRIDGE_TAG),

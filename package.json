@@ -1,17 +1,17 @@
 {
-  "name": "figwright",
+  "name": "figma-forge",
   "version": "0.0.0",
   "private": true,
   "description": "Free, two-way Figma MCP server. Turn designs into framework-aware code, and push code back to the canvas. Works with Claude Code, Cursor, Codex, and any MCP client.",
-  "homepage": "https://github.com/awdr74100/figwright",
+  "homepage": "https://github.com/vukiman1/figma-forge",
   "bugs": {
-    "url": "https://github.com/awdr74100/figwright/issues"
+    "url": "https://github.com/vukiman1/figma-forge/issues"
   },
   "license": "MIT",
-  "author": "Roya <a78945612385238@gmail.com>",
+  "author": "vukiman1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awdr74100/figwright.git"
+    "url": "https://github.com/vukiman1/figma-forge.git"
   },
   "type": "module",
   "scripts": {
@@ -24,8 +24,6 @@
     "knip:fix": "knip --fix",
     "lint": "oxlint --deny-warnings .",
     "lint:fix": "oxlint --fix .",
-    "postinstall": "node scripts/sync-skills.mjs",
-    "release": "node scripts/release.mjs",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
@@ -34,7 +32,6 @@
   "devDependencies": {
     "@types/node": "^24.19.2",
     "@vitest/coverage-v8": "^5.0.5",
-    "changelogen": "^0.6.2",
     "knip": "^6.43.0",
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",

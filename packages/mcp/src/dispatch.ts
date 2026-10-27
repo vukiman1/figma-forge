@@ -1,4 +1,4 @@
-import { ErrorCode, getFollowerBudget, getRelayBudget } from '@figwright/shared';
+import { ErrorCode, getFollowerBudget, getRelayBudget } from '@figma-forge/shared';
 
 import type { Follower } from './election/follower.js';
 import { type Node, NodeRole } from './election/node.js';
@@ -61,7 +61,7 @@ export const dispatchTool = async (
   try {
     /* eslint-disable no-await-in-loop -- retry/backoff loop is intentionally sequential */
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-      // The relay port is held by something that isn't answering as a Figwright leader, so there is
+      // The relay port is held by something that isn't answering as a Figma Forge leader, so there is
       // no leader to reach and no point forwarding to it. Fail with the diagnosis the election
       // already made (see node.conflictMessage) rather than retrying into a wall.
       if (ctx.node.isConflicted()) {
@@ -222,7 +222,7 @@ const noteAmbiguousRouting = async (ctx: DispatchContext): Promise<void> => {
   if (sessions.length < 2) return;
   const names = sessions.map(s => s.fileName ?? `(unnamed, session ${s.id})`);
   reportRouting(
-    `${sessions.length} Figma files have Figwright open: ${names.join(', ')}. This call went to ` +
+    `${sessions.length} Figma files have Figma Forge open: ${names.join(', ')}. This call went to ` +
       `whichever one was last touched in Figma, and that changes when the user switches tabs — so ` +
       `a later call in this same task can land in a different file, silently. If you are working ` +
       `in one specific file, claim it now with use_file({ fileName: "…" }) (list_files shows the ` +

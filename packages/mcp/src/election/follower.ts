@@ -4,7 +4,7 @@ import {
   type RpcRequest,
   type RpcResponse,
   RpcResponseSchema,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { decode, encode } from '@msgpack/msgpack';
 
 import type { PluginSessionInfo } from '../routing/sessions.js';
@@ -27,7 +27,7 @@ const releaseBody = (res: Response): void => {
 export const DEFAULT_FOLLOWER_RPC_TIMEOUT_MS = 35_000;
 export const DEFAULT_PING_TIMEOUT_MS = 2_000;
 
-/** What a confirmed Figwright leader reports about itself over /ping (see leader-endpoints). */
+/** What a confirmed Figma Forge leader reports about itself over /ping (see leader-endpoints). */
 export interface LeaderInfo {
   serverVersion: string;
   /** Build stamp of the leader's bundle; undefined on leaders that predate build ids. */
@@ -102,7 +102,7 @@ export class Follower {
   }
 
   async ping(): Promise<boolean> {
-    // Confirm the responder is actually a figwright leader, not some unrelated process that happens
+    // Confirm the responder is actually a figma-forge leader, not some unrelated process that happens
     // to hold the port and answer 200 — otherwise this node would attach as a follower and every
     // RPC it forwards would fail. The leader's /ping returns { ok: true, serverVersion, … }.
     const body = await this.fetchPing();

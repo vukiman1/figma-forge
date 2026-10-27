@@ -1,4 +1,4 @@
-import type { GetVectorResult } from '@figwright/shared';
+import type { GetVectorResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import {

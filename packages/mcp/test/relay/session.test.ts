@@ -1,4 +1,4 @@
-import { HeartbeatMonitor } from '@figwright/shared';
+import { HeartbeatMonitor } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 import type { WebSocket } from 'ws';
 

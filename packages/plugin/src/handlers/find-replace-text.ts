@@ -1,4 +1,4 @@
-import type { BatchNodeResult } from '@figwright/shared';
+import type { BatchNodeResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { replaceRange } from './text-edit.js';

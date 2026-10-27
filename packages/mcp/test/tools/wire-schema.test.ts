@@ -2,7 +2,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { ErrorCode } from '@figwright/shared';
+import { ErrorCode } from '@figma-forge/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { handleAnalyzeProject } from '../../src/tools/analyze-project.js';
@@ -23,7 +23,7 @@ import { checkBatchOps, WIRE_TOOL_SCHEMAS, wireToolSchema } from '../../src/tool
 let root: string;
 
 beforeAll(async () => {
-  root = await mkdtemp(join(tmpdir(), 'figwright-wire-schema-'));
+  root = await mkdtemp(join(tmpdir(), 'figma-forge-wire-schema-'));
   await writeFile(join(root, 'package.json'), JSON.stringify({ name: 'fixture' }), 'utf8');
 });
 

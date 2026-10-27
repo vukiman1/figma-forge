@@ -26,7 +26,7 @@ const tab = ref<Tab>('activity');
  *
  * - The resize grip does nothing at all — `figma.ui.resize` has no window to move.
  * - "run in background" is worse than inert. `figma.ui.hide()` empties the panel and leaves a
- *   "running Figwright" strip behind with no way back: the `run` listener that re-shows a hidden
+ *   "running Figma Forge" strip behind with no way back: the `run` listener that re-shows a hidden
  *   window is a plugin-window mechanism, so the only exit is closing the plugin — which drops the
  *   relay socket, the exact thing this button exists to preserve.
  *

@@ -102,7 +102,7 @@ describe('resolveImagePath', () => {
 
   it('surfaces a missing file as an error', async () => {
     await expect(
-      resolveImagePath({ path: join(tmpdir(), 'figwright-does-not-exist.png') }),
+      resolveImagePath({ path: join(tmpdir(), 'figma-forge-does-not-exist.png') }),
     ).rejects.toThrow(/ENOENT/);
   });
 });

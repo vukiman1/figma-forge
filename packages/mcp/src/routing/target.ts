@@ -99,7 +99,7 @@ export const bindFileTarget = async (
   const sessions = await probeSessions();
   if (sessions.length === 0) {
     throw new FileTargetError(
-      'no Figma file is connected — open the Figwright plugin in the file you want to work on, ' +
+      'no Figma file is connected — open the Figma Forge plugin in the file you want to work on, ' +
         'then call use_file again',
     );
   }
@@ -183,7 +183,7 @@ export const resolveFileTarget = async (
 
   throw new FileTargetError(
     matches.length === 0
-      ? `"${bound}" is no longer connected — its Figwright panel was closed, or Figma was. ` +
+      ? `"${bound}" is no longer connected — its Figma Forge panel was closed, or Figma was. ` +
           `Connected now: ${describeSessions(sessions)}. Reopen the plugin in "${bound}", ` +
           `or call use_file to switch, or use_file({ release: true }) to follow the foreground file.`
       : `"${bound}" now matches ${matches.length} open files, so the reopened panel cannot be ` +

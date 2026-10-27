@@ -1,4 +1,4 @@
-import { ErrorCode } from '@figwright/shared';
+import { ErrorCode } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createToolCall, isPluginBridgeMessage } from '../protocol/bridge.js';
@@ -108,7 +108,7 @@ describe('dispatchSandboxMessage', () => {
   });
 
   it('ignores result/error messages (only acts on tool-call)', async () => {
-    const result = { tag: '@figwright/bridge', kind: 'tool-result', id: 'x', result: {} };
+    const result = { tag: '@figma-forge/bridge', kind: 'tool-result', id: 'x', result: {} };
     expect(isPluginBridgeMessage(result)).toBe(true);
     const outcome = await dispatchSandboxMessage({
       raw: result,

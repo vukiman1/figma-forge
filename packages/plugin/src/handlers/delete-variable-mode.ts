@@ -1,4 +1,4 @@
-import type { DeleteModeResult } from '@figwright/shared';
+import type { DeleteModeResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

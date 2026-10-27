@@ -1,4 +1,4 @@
-import { SerializedReactionSchema } from '@figwright/shared';
+import { SerializedReactionSchema } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import type { ToolSpec } from './spec.js';

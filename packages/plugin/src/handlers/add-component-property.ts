@@ -1,4 +1,4 @@
-import type { ComponentPropertyResult } from '@figwright/shared';
+import type { ComponentPropertyResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import {

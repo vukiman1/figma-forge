@@ -5,7 +5,7 @@ import type {
   GetDesignContextResult,
   ProjectTokenAnnotation,
   ProjectTokenMatch,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import { analyzeProject, isUtilityFirst } from '../profile/profile.js';
 import { normHex } from './hex.js';

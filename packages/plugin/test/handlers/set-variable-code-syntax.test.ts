@@ -1,4 +1,4 @@
-import type { VariableResult } from '@figwright/shared';
+import type { VariableResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createSetVariableCodeSyntaxHandler } from '../../src/handlers/set-variable-code-syntax.js';

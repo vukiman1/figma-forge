@@ -1,4 +1,4 @@
-import type { GetDesignContextResult } from '@figwright/shared';
+import type { GetDesignContextResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { deepEqual, diffDesignContext } from '../../src/diff/design-diff.js';

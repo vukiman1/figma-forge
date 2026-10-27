@@ -1,4 +1,4 @@
-import type { FontUsage, GetFontsResult } from '@figwright/shared';
+import type { FontUsage, GetFontsResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { serializeFontName } from '../serializer.js';

@@ -7,7 +7,7 @@ import {
   type SaveScreenshotsResult,
   SCREENSHOT_FORMATS,
   type ScreenshotImage,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';

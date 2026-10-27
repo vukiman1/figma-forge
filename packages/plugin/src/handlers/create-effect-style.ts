@@ -1,4 +1,4 @@
-import type { SerializedEffect, StyleResult } from '@figwright/shared';
+import type { SerializedEffect, StyleResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaEffectsBound } from './bindings.js';

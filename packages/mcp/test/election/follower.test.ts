@@ -12,7 +12,7 @@ import {
   PROTOCOL_VERSION,
   type HelloParams,
   SystemMethod,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { decode } from '@msgpack/msgpack';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';
@@ -131,10 +131,10 @@ describe('Follower HTTP client', () => {
     expect(await f.ping()).toBe(false);
   });
 
-  it('ping returns false when the port is held by a non-figwright server', async () => {
+  it('ping returns false when the port is held by a non-figma-forge server', async () => {
     const http = createServer((_req, res) => {
       res.writeHead(200, { 'content-type': 'text/plain' });
-      res.end('not a figwright leader');
+      res.end('not a figma-forge leader');
     });
     await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
     const port = (http.address() as AddressInfo).port;
@@ -278,7 +278,7 @@ describe('Follower HTTP client', () => {
     expect(await f.leaderInfo()).toEqual({ serverVersion: 'test-2.0.0', buildId: 777 });
   });
 
-  it('leaderInfo is undefined for a non-figwright responder and an unreachable leader', async () => {
+  it('leaderInfo is undefined for a non-figma-forge responder and an unreachable leader', async () => {
     const http = createServer((_req, res) => {
       res.writeHead(200, { 'content-type': 'application/json' });
       res.end(JSON.stringify({ hello: 'world' }));

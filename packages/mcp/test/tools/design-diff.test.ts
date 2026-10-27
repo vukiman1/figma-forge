@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figwright/shared';
+import type { GetDesignContextResult } from '@figma-forge/shared';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
@@ -12,7 +12,7 @@ import {
 } from '../../src/tools/design-diff.js';
 import { GET_DESIGN_CONTEXT_TOOL_NAME } from '../../src/tools/get-design-context.js';
 
-const SNAP_REL = join('.figwright', 'snapshots', '1-1.json');
+const SNAP_REL = join('.figma-forge', 'snapshots', '1-1.json');
 
 const ctx = (over: Partial<GetDesignContextResult> = {}): GetDesignContextResult => ({
   nodes: [
@@ -66,7 +66,7 @@ describe('handleDesignDiff', () => {
 
     // The file exists, is format-tagged, and stores the raw context.
     const saved = JSON.parse(await readFile(join(dir, SNAP_REL), 'utf8'));
-    expect(saved.figwrightSnapshot).toBe(SNAPSHOT_FORMAT_VERSION);
+    expect(saved.figmaForgeSnapshot).toBe(SNAPSHOT_FORMAT_VERSION);
     expect(saved.nodeId).toBe('1:1');
     expect(saved.context.nodes[0].id).toBe('1:1');
   });
@@ -115,15 +115,15 @@ describe('handleDesignDiff', () => {
   });
 
   it('re-baselines (never mis-diffs) when the on-disk format version is stale', async () => {
-    await mkdir(join(dir, '.figwright', 'snapshots'), { recursive: true });
+    await mkdir(join(dir, '.figma-forge', 'snapshots'), { recursive: true });
     await writeFile(
       join(dir, SNAP_REL),
-      JSON.stringify({ figwrightSnapshot: 999, nodeId: '1:1', capturedAt: 'x', context: ctx() }),
+      JSON.stringify({ figmaForgeSnapshot: 999, nodeId: '1:1', capturedAt: 'x', context: ctx() }),
     );
     const r = await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
     expect(r.status).toBe('baseline-created');
     const saved = JSON.parse(await readFile(join(dir, SNAP_REL), 'utf8'));
-    expect(saved.figwrightSnapshot).toBe(SNAPSHOT_FORMAT_VERSION); // rewritten to the current format
+    expect(saved.figmaForgeSnapshot).toBe(SNAPSHOT_FORMAT_VERSION); // rewritten to the current format
   });
 
   it('warns (but still diffs) when the baseline root looks like a different node', async () => {

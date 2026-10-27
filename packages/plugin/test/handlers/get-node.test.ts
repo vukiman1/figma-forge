@@ -1,4 +1,4 @@
-import type { GetNodeResult } from '@figwright/shared';
+import type { GetNodeResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createGetNodeHandler } from '../../src/handlers/get-node.js';

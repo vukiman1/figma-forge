@@ -1,4 +1,4 @@
-import type { ListFilesResult } from '@figwright/shared';
+import type { ListFilesResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

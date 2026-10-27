@@ -1,4 +1,4 @@
-import type { PdfExport } from '@figwright/shared';
+import type { PdfExport } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createExportPdfHandler } from '../../src/handlers/export-pdf.js';

@@ -8,7 +8,7 @@ import {
 } from '../src/local-access.js';
 
 afterEach(() => {
-  delete process.env.FIGWRIGHT_ALLOW_ANY_ORIGIN;
+  delete process.env.FIGMA_FORGE_ALLOW_ANY_ORIGIN;
 });
 
 describe('isAllowedHost', () => {
@@ -37,7 +37,7 @@ describe('isAllowedHost', () => {
   });
 
   it('stays enforced under the origin escape hatch, which does not cover it', () => {
-    process.env.FIGWRIGHT_ALLOW_ANY_ORIGIN = '1';
+    process.env.FIGMA_FORGE_ALLOW_ANY_ORIGIN = '1';
     expect(isAllowedHost('evil.example:3055')).toBe(false);
   });
 });
@@ -69,7 +69,7 @@ describe('isAllowedWsOrigin', () => {
   });
 
   it('opens up under the escape hatch', () => {
-    process.env.FIGWRIGHT_ALLOW_ANY_ORIGIN = '1';
+    process.env.FIGMA_FORGE_ALLOW_ANY_ORIGIN = '1';
     expect(isAllowedWsOrigin('https://evil.example')).toBe(true);
   });
 });
@@ -87,7 +87,7 @@ describe('isAllowedHttpOrigin', () => {
   });
 
   it('opens up under the escape hatch', () => {
-    process.env.FIGWRIGHT_ALLOW_ANY_ORIGIN = '1';
+    process.env.FIGMA_FORGE_ALLOW_ANY_ORIGIN = '1';
     expect(isAllowedHttpOrigin('https://evil.example')).toBe(true);
   });
 });

@@ -1,8 +1,8 @@
-# @figwright/mcp
+# @figma-forge/mcp
 
-> The MCP server for **[Figwright](https://github.com/awdr74100/figwright)**: a two-way Figma agent for Claude Code, Cursor, Codex, and other MCP clients.
+> The MCP server for **[Figma Forge](https://github.com/vukiman1/figma-forge)**: a two-way Figma agent for Claude Code, Cursor, Codex, and other MCP clients.
 
-Figwright bridges MCP clients to a Figma plugin over a local WebSocket relay, so an AI agent can both **read** your designs with high-fidelity grounding and **write** back to the canvas. No Figma paid tier required. The server exposes **135 tools** spanning reads, writes, and codebase-grounded context.
+Figma Forge bridges MCP clients to a Figma plugin over a local WebSocket relay, so an AI agent can both **read** your designs with high-fidelity grounding and **write** back to the canvas. No Figma paid tier required. The server exposes **135 tools** spanning reads, writes, and codebase-grounded context.
 
 ## Usage
 
@@ -11,15 +11,15 @@ Add it to your MCP client config (e.g. Claude Code's `.mcp.json`):
 ```json
 {
   "mcpServers": {
-    "figwright": {
+    "figma-forge": {
       "command": "npx",
-      "args": ["-y", "@figwright/mcp@latest"]
+      "args": ["-y", "@figma-forge/mcp@latest"]
     }
   }
 }
 ```
 
-The server talks to the Figwright Figma plugin running in your Figma app. See the [main repository](https://github.com/awdr74100/figwright) for the full setup (installing the plugin, connecting, and the available skills).
+The server talks to the Figma Forge Figma plugin running in your Figma app. See the [main repository](https://github.com/vukiman1/figma-forge) for the full setup (installing the plugin, connecting, and the available skills).
 
 ## Requirements
 
@@ -27,9 +27,9 @@ The server talks to the Figwright Figma plugin running in your Figma app. See th
 
 ## Links
 
-- Repository & docs: https://github.com/awdr74100/figwright
-- Issues: https://github.com/awdr74100/figwright/issues
+- Repository & docs: https://github.com/vukiman1/figma-forge
+- Issues: https://github.com/vukiman1/figma-forge/issues
 
 ## License
 
-[MIT](https://github.com/awdr74100/figwright/blob/main/LICENSE)
+[MIT](https://github.com/vukiman1/figma-forge/blob/main/LICENSE)

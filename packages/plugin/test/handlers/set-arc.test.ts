@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figwright/shared';
+import type { MutateResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createSetArcHandler } from '../../src/handlers/set-arc.js';

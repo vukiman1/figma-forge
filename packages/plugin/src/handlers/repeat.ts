@@ -1,4 +1,4 @@
-import type { CreateResult, MutateResult } from '@figwright/shared';
+import type { CreateResult, MutateResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { resolveSharedParent } from './boolean-nodes.js';

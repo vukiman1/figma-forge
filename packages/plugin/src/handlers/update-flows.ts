@@ -1,4 +1,4 @@
-import type { FlowStartingPoint, UpdateFlowsResult } from '@figwright/shared';
+import type { FlowStartingPoint, UpdateFlowsResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

@@ -1,4 +1,4 @@
-import { SerializedVariableAliasSchema } from '@figwright/shared';
+import { SerializedVariableAliasSchema } from '@figma-forge/shared';
 import { z } from 'zod';
 
 // Shared, grounded Zod schemas for Figma's Motion API (beta). Reused by every apply_* / set_* Motion

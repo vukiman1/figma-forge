@@ -1,4 +1,4 @@
-import type { BatchNodeResult } from '@figwright/shared';
+import type { BatchNodeResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createBatchRenameNodesHandler } from '../../src/handlers/batch-rename-nodes.js';

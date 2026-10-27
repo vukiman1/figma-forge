@@ -1,4 +1,4 @@
-import type { MutateResult } from '@figwright/shared';
+import type { MutateResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createSetEffectsHandler } from '../../src/handlers/set-effects.js';

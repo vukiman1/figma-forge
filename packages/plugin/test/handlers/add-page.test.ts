@@ -1,4 +1,4 @@
-import type { CreateResult } from '@figwright/shared';
+import type { CreateResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createAddPageHandler } from '../../src/handlers/add-page.js';

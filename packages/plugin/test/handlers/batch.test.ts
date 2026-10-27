@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 
-import type { BatchResult } from '@figwright/shared';
+import type { BatchResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { SandboxHandlers } from '../../src/dispatcher.js';

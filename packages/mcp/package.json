@@ -1,5 +1,5 @@
 {
-  "name": "@figwright/mcp",
+  "name": "@figma-forge/mcp",
   "version": "0.7.0",
   "description": "Free, two-way Figma MCP server. Turn designs into framework-aware code, and push code back to the canvas. Works with Claude Code, Cursor, Codex, and any MCP client.",
   "keywords": [
@@ -17,17 +17,17 @@
     "mcp",
     "model-context-protocol"
   ],
-  "homepage": "https://github.com/awdr74100/figwright#readme",
-  "bugs": "https://github.com/awdr74100/figwright/issues",
+  "homepage": "https://github.com/vukiman1/figma-forge#readme",
+  "bugs": "https://github.com/vukiman1/figma-forge/issues",
   "license": "MIT",
   "author": "Roya <a78945612385238@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/awdr74100/figwright.git",
+    "url": "git+https://github.com/vukiman1/figma-forge.git",
     "directory": "packages/mcp"
   },
   "bin": {
-    "figwright-mcp": "./dist/index.mjs"
+    "figma-forge-mcp": "./dist/index.mjs"
   },
   "files": [
     "dist",
@@ -50,7 +50,7 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@figwright/shared": "workspace:*",
+    "@figma-forge/shared": "workspace:*",
     "@types/ws": "^8.18.2",
     "publint": "^0.3.25",
     "tsdown": "^0.23.2"

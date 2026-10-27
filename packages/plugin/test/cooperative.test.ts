@@ -68,7 +68,7 @@ describe('TimeSlice', () => {
       // Timers deliberately never run: hidden Figma files can strand a read here even while
       // tool messages still arrive. A panel round-trip must be the host-turn boundary instead.
       expect(postMessage).toHaveBeenCalledWith({
-        tag: '@figwright/yield',
+        tag: '@figma-forge/yield',
         kind: 'yield-request',
         id: expect.any(Number),
       });
@@ -97,7 +97,9 @@ describe('TimeSlice', () => {
       expect(resumeHostYield(a)).toBe(false);
       expect(resumeHostYield(null)).toBe(false);
       expect(resumeHostYield({ ...a, id: '1', kind: 'yield-resume' })).toBe(false);
-      expect(resumeHostYield({ ...a, tag: '@figwright/bridge', kind: 'yield-resume' })).toBe(false);
+      expect(resumeHostYield({ ...a, tag: '@figma-forge/bridge', kind: 'yield-resume' })).toBe(
+        false,
+      );
       expect(resumeHostYield({ ...b, id: b.id + 1, kind: 'yield-resume', background: true })).toBe(
         true,
       );

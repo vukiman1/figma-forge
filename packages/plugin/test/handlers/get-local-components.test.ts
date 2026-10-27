@@ -1,4 +1,4 @@
-import type { GetLocalComponentsResult } from '@figwright/shared';
+import type { GetLocalComponentsResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createGetLocalComponentsHandler } from '../../src/handlers/get-local-components.js';

@@ -1,4 +1,4 @@
-import { DETAIL_LEVELS } from '@figwright/shared';
+import { DETAIL_LEVELS } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import type { ToolSpec } from './spec.js';

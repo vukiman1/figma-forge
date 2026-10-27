@@ -18,7 +18,7 @@ import { ALL_TOOL_SPECS } from '../packages/mcp/src/tools/registry.js';
 // the JSON-schema test each said a number once, drifted, and now describe the set instead
 // ("every tool"). Guard what earns a number; reword what doesn't.
 
-const COUNTED_DOC_PATHS = ['README.md', 'packages/mcp/README.md'];
+const COUNTED_DOC_PATHS = ['packages/mcp/README.md'];
 const TOOL_COUNT_CLAIM = /\*{0,2}(\d+)\*{0,2} (?:MCP )?tools\b/g;
 
 describe('README tool counts', () => {

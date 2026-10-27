@@ -164,7 +164,7 @@ describe('leader lock: identifying the holder', () => {
     writeLock(port);
     const lock = readLeaderLock(port)!;
     // Just outside the tolerance — the pid exists, but it is not the process that wrote the lock.
-    // Naming it would tell the user to kill an innocent (plausibly a healthy Figwright server).
+    // Naming it would tell the user to kill an innocent (plausibly a healthy Figma Forge server).
     const probe = fakeProbe(process.pid, {
       state: 'S',
       startedAt: lock.processStartedAt + PID_IDENTITY_TOLERANCE_MS + 1,
@@ -240,15 +240,15 @@ describe('leader lock: resuming a suspended holder', () => {
 });
 
 describe('leader lock: the message', () => {
-  it('does not claim the holder is non-Figwright when it could not be identified', () => {
+  it('does not claim the holder is non-Figma Forge when it could not be identified', () => {
     const msg = portConflictMessage(3055);
     expect(msg).toContain('3055');
     // Platform-neutral: which shell command the remedy names is asserted per platform below.
     expect(msg).toContain('Free that port');
-    // The old wording asserted the holder was "a non-Figwright process" — an assertion nothing
-    // could support, and exactly wrong for the case this whole file exists for (a Figwright leader
+    // The old wording asserted the holder was "a non-Figma Forge process" — an assertion nothing
+    // could support, and exactly wrong for the case this whole file exists for (a Figma Forge leader
     // that stopped answering). Unidentified must read as unidentified.
-    expect(msg).not.toContain('non-Figwright');
+    expect(msg).not.toContain('non-Figma Forge');
     expect(msg).not.toContain('pid');
   });
 

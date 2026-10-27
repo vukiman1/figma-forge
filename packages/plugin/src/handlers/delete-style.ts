@@ -1,4 +1,4 @@
-import type { StyleResult } from '@figwright/shared';
+import type { StyleResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

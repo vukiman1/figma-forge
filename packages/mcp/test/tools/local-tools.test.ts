@@ -15,7 +15,7 @@ import { handleScanComponents } from '../../src/tools/scan-components.js';
 let root: string;
 
 beforeAll(async () => {
-  root = await mkdtemp(join(tmpdir(), 'figwright-local-tools-'));
+  root = await mkdtemp(join(tmpdir(), 'figma-forge-local-tools-'));
   await writeFile(
     join(root, 'package.json'),
     JSON.stringify({ dependencies: { vue: '^3.5.0' } }),

@@ -1,4 +1,4 @@
-import type { CreateResult } from '@figwright/shared';
+import type { CreateResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCreateInstanceHandler } from '../../src/handlers/create-instance.js';

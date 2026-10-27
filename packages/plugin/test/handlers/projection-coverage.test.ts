@@ -4,7 +4,7 @@ import {
   DesignContextNodeSchema,
   SerializedNodeSchema,
   SerializedTextSegmentSchema,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { project, VISUAL_OVERRIDE_FIELDS } from '../../src/handlers/get-design-context.js';

@@ -48,7 +48,7 @@ const usedPorts = new Set<number>();
 const spawnServer = (port: number): Server => {
   usedPorts.add(port);
   const child = spawn(process.execPath, [DIST_ENTRY], {
-    env: { ...process.env, FIGWRIGHT_PORT: String(port) },
+    env: { ...process.env, FIGMA_FORGE_PORT: String(port) },
     stdio: ['pipe', 'pipe', 'pipe'],
   });
   let stderr = '';

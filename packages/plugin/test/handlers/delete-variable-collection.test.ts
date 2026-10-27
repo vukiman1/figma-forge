@@ -1,4 +1,4 @@
-import type { DeleteCollectionResult } from '@figwright/shared';
+import type { DeleteCollectionResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createDeleteVariableCollectionHandler } from '../../src/handlers/delete-variable-collection.js';

@@ -16,7 +16,7 @@ import {
   newId,
   PROTOCOL_VERSION,
   SystemMethod,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import { PluginToolFailure } from '../../protocol/bridge.js';
 import { extractNodeIds } from './node-ids.js';
@@ -214,7 +214,7 @@ export class RelayClient {
       // server starts, and if it never does, a foreign process on that port is the likely culprit.
       lastError:
         this.state.lastError ??
-        `no Figwright server on :${this.opts.ports.join(', ')} yet — it connects automatically once ` +
+        `no Figma Forge server on :${this.opts.ports.join(', ')} yet — it connects automatically once ` +
           `the MCP server starts; if it never does, another process may be holding that port`,
     });
     // A refusal is terminal: the way out is replacing the plugin and reopening it, which builds a
@@ -224,7 +224,7 @@ export class RelayClient {
 
   /**
    * Probe the candidate port(s) in order; resolve true on the first successful hello, false if all
-   * fail. In production `ports` is just [DEFAULT_PORT]: figwright's leader always binds that one
+   * fail. In production `ports` is just [DEFAULT_PORT]: figma-forge's leader always binds that one
    * fixed port (the server never hops to a fallback), so there's no range to sweep — a miss simply
    * means the server isn't up yet and the caller retries. Probing that single port is a
    * sub-millisecond refused connection when nothing is listening, which is what lets the reconnect

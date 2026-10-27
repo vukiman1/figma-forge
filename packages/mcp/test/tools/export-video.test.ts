@@ -2,7 +2,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { ExportVideoResult, VideoExport } from '@figwright/shared';
+import type { ExportVideoResult, VideoExport } from '@figma-forge/shared';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {

@@ -17,7 +17,7 @@ import {
   PROTOCOL_VERSION,
   type ResponseEnvelope,
   SystemMethod,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { afterEach, describe, expect, it } from 'vitest';
 import { WebSocket } from 'ws';
 

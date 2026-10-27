@@ -6,7 +6,7 @@ import {
   type MotionCoverage,
   type MotionDiagnostic,
   type NodeMotion,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { hasKeyframe, hasMotionState, type MotionNode, readNodeMotion } from './motion-shared.js';

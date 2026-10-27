@@ -3,7 +3,7 @@ import {
   estimateResultTokens,
   type DesignContextNode,
   type GetDesignContextResult,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import {

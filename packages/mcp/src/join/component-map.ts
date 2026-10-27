@@ -1,4 +1,4 @@
-import type { DesignContextNode } from '@figwright/shared';
+import type { DesignContextNode } from '@figma-forge/shared';
 
 import type { ScannedComponent } from '../scan/scan.js';
 import { casefold } from './casefold.js';

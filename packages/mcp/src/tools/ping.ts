@@ -51,8 +51,8 @@ export interface PingServerInfo {
   versionSkew?: string;
   /**
    * Present only in the `conflicted` role: :port is held by something that isn't answering as a
-   * Figwright leader, so Figwright can neither lead nor reach the plugin. Human-readable and
-   * actionable — it names the holding process's pid when that could be proved (a wedged Figwright
+   * Figma Forge leader, so Figma Forge can neither lead nor reach the plugin. Human-readable and
+   * actionable — it names the holding process's pid when that could be proved (a wedged Figma Forge
    * leader), and how to free the port when it could not.
    */
   portConflict?: string;
@@ -125,7 +125,7 @@ export const handlePing = async (ctx: PingContext): Promise<PingResult> => {
   const server = serverInfo(ctx);
   const target = getFileTarget();
 
-  // Port conflict: :port is held by something that isn't answering as a Figwright leader. There's no
+  // Port conflict: :port is held by something that isn't answering as a Figma Forge leader. There's no
   // relay and no leader to reach, so report the clash directly instead of trying (and failing) to
   // dispatch to the plugin. The text is the election's own diagnosis, shared with dispatch so the
   // two can't drift.

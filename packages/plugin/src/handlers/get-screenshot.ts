@@ -3,7 +3,7 @@ import {
   SCREENSHOT_FORMATS,
   type ScreenshotFormat,
   type ScreenshotImage,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

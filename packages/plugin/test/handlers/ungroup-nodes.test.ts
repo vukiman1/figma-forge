@@ -1,4 +1,4 @@
-import type { BatchNodeResult } from '@figwright/shared';
+import type { BatchNodeResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createUngroupNodesHandler } from '../../src/handlers/ungroup-nodes.js';

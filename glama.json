@@ -1,7 +1,0 @@
-{
-  "$schema": "https://glama.ai/mcp/schemas/server.json",
-  "maintainers": ["awdr74100"],
-  "name": "figwright",
-  "description": "Free, two-way Figma MCP server. Turn designs into framework-aware code, and push code back to the canvas. Works with Claude Code, Cursor, Codex, and any MCP client. No API token, no paid Figma seat.",
-  "license": "MIT"
-}

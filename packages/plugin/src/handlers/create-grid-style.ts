@@ -1,4 +1,4 @@
-import type { SerializedLayoutGrid, StyleResult } from '@figwright/shared';
+import type { SerializedLayoutGrid, StyleResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { toFigmaLayoutGridsBound } from './bindings.js';

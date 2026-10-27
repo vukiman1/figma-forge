@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { GetStylesResult, GetVariableDefsResult } from '@figwright/shared';
+import type { GetStylesResult, GetVariableDefsResult } from '@figma-forge/shared';
 import { z } from 'zod';
 
 import { joinTokens, parseTokenMapFile, type TokenMapping } from '../join/token-map.js';

@@ -3,7 +3,7 @@ name: figma-typings-audit
 description: 'Upgrade @figma/plugin-typings and absorb what the new version exposes. Diffs the .d.ts between the installed and the target version (that package ships no changelog), sorts the changes into breakage / new API / silently-added fields, maps each onto the sandbox handlers, the hand-written Zod mirrors in shared, and the tool registry — then bumps the package and builds whatever the user picks. Use whenever the user wants @figma/plugin-typings updated or audited, or asks what a new plugin-typings version would break or newly enable — including a Renovate bump PR for that package.'
 ---
 
-Absorbing a `@figma/plugin-typings` release into Figwright, end to end: audit → upgrade →
+Absorbing a `@figma/plugin-typings` release into Figma Forge, end to end: audit → upgrade →
 implement what's worth having.
 
 **One hard ordering constraint: diff before upgrading.** The audit compares the *installed* version
@@ -96,7 +96,7 @@ Sort the rest into three buckets:
    changed signature, or a newly-added `@deprecated`. Look at `-` lines first.
 2. **New API** — a new method, node type, enum member, or namespace. A new *capability*, so a
    candidate for a new tool or a new argument on an existing one.
-3. **New field on an existing type** — an added property on something Figwright already reads
+3. **New field on an existing type** — an added property on something Figma Forge already reads
    (`Paint`, `Effect`, `TextStyle`, a node interface…). ⚠️ **The dangerous bucket.** No compiler will
    ever flag it and the read path will keep silently omitting the dimension. It is this repo's
    recurring bug class: a multi-dimensional Figma property collapsed to one field or dropped on the

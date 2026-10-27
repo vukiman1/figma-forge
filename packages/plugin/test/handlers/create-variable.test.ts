@@ -1,4 +1,4 @@
-import type { VariableResult } from '@figwright/shared';
+import type { VariableResult } from '@figma-forge/shared';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createCreateVariableHandler } from '../../src/handlers/create-variable.js';

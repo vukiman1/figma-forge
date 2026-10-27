@@ -1,4 +1,4 @@
-import type { VariableModeResult } from '@figwright/shared';
+import type { VariableModeResult } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

@@ -50,7 +50,7 @@ export const guardProcess = (proc: ProcessLike, write: (text: string) => void): 
     reporting = true;
     try {
       const tail = reports === MAX_REPORTS ? ' (further reports suppressed)' : '';
-      write(`[figwright] ${kind} — kept running${tail}: ${describe(error)}\n`);
+      write(`[figma-forge] ${kind} — kept running${tail}: ${describe(error)}\n`);
     } catch {
       // stderr is not writable; there is nowhere left to report to.
     } finally {

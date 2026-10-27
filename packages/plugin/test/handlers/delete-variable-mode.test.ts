@@ -1,4 +1,4 @@
-import type { DeleteModeResult } from '@figwright/shared';
+import type { DeleteModeResult } from '@figma-forge/shared';
 import { describe, expect, it, type Mock, vi } from 'vitest';
 
 import { createDeleteVariableModeHandler } from '../../src/handlers/delete-variable-mode.js';

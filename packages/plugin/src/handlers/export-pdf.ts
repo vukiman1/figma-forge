@@ -1,4 +1,4 @@
-import type { PdfExport } from '@figwright/shared';
+import type { PdfExport } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 

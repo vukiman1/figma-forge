@@ -1,4 +1,4 @@
-import type { BatchNodeResult } from '@figwright/shared';
+import type { BatchNodeResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createSetLockedHandler } from '../../src/handlers/lock-nodes.js';

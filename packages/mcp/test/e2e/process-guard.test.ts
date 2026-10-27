@@ -29,7 +29,7 @@ describe.skipIf(!existsSync(DIST_ENTRY))('process guard (built dist)', () => {
   it('keeps serving through an uncaught exception, an unhandled rejection and a stray console write', async () => {
     const port = await freePort();
     const child = spawn(process.execPath, ['--import', MISBEHAVE, DIST_ENTRY], {
-      env: { ...process.env, FIGWRIGHT_PORT: String(port) },
+      env: { ...process.env, FIGMA_FORGE_PORT: String(port) },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     let stdout = '';

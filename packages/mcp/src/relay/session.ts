@@ -1,4 +1,4 @@
-import type { HeartbeatMonitor } from '@figwright/shared';
+import type { HeartbeatMonitor } from '@figma-forge/shared';
 import type { WebSocket } from 'ws';
 
 export type SessionState = 'connected' | 'disconnected';

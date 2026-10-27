@@ -1,4 +1,4 @@
-import { ErrorCode, type RpcResponse } from '@figwright/shared';
+import { ErrorCode, type RpcResponse } from '@figma-forge/shared';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
@@ -75,7 +75,7 @@ describe('dispatchTool', () => {
     // The election's own diagnosis is what the caller gets — dispatch never writes its own, so the
     // pid of a wedged leader reaches the agent instead of a bare timeout minutes later.
     await expect(dispatchTool({ node, follower }, 'get_document', {})).rejects.toThrow(
-      /port 3055 is held by a Figwright server \(pid 4242/,
+      /port 3055 is held by a Figma Forge server \(pid 4242/,
     );
     // Must NOT forward to whoever is holding the port.
     expect(forwarded).toBe(false);
@@ -272,7 +272,7 @@ describe('dispatchTool', () => {
         kind: 'ok',
         requestId: 'r',
         result: { ok: true },
-        notice: 'Figwright plugin v0.3.0 is older than this server (v0.4.0).',
+        notice: 'Figma Forge plugin v0.3.0 is older than this server (v0.4.0).',
       }),
     });
     let seen: string | null = null;

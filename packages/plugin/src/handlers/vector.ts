@@ -3,7 +3,7 @@ import type {
   GetVectorResult,
   MutateResult,
   SerializedPaint,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { type Affine, compose, invert } from '../draw.js';

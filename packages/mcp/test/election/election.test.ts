@@ -183,14 +183,14 @@ describe('Election', () => {
     expect(node.role).toBe(NodeRole.Follower);
   });
 
-  it('determineRole: port held by a non-Figwright process → conflicted, not follower', async () => {
+  it('determineRole: port held by a non-Figma Forge process → conflicted, not follower', async () => {
     const port = await freePort();
     const blocker = createServer();
     await new Promise<void>(resolve => blocker.listen(port, '127.0.0.1', () => resolve()));
     blockers.push(blocker);
     const { node, election } = buildElection(port, 100);
     await election.determineRole();
-    // The squatter answers no Figwright /ping, so we must NOT attach as its follower (that would
+    // The squatter answers no Figma Forge /ping, so we must NOT attach as its follower (that would
     // forward every RPC into a wall). Stay conflicted and keep contending.
     expect(node.role).toBe(NodeRole.Conflicted);
   });
@@ -229,7 +229,7 @@ describe('Election', () => {
     expect(node.role).toBe(NodeRole.Leader);
   });
 
-  it('tick: conflicted node follows once a real Figwright leader takes the port', async () => {
+  it('tick: conflicted node follows once a real Figma Forge leader takes the port', async () => {
     const port = await freePort();
     const blocker = createServer();
     await new Promise<void>(resolve => blocker.listen(port, '127.0.0.1', () => resolve()));
@@ -237,7 +237,7 @@ describe('Election', () => {
     await election.determineRole();
     expect(node.role).toBe(NodeRole.Conflicted);
 
-    // Squatter leaves and a real Figwright leader takes the port → next tick resolves to follower.
+    // Squatter leaves and a real Figma Forge leader takes the port → next tick resolves to follower.
     await new Promise<void>(resolve => blocker.close(() => resolve()));
     await startLeaderHarness(port);
     await election.tickOnce();

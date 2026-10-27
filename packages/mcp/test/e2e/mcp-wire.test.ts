@@ -5,7 +5,7 @@ import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { join } from 'node:path';
 
-import { CLIENT_MESSAGE_LIMIT_BYTES, NODE_LIST_BUDGET_BYTES } from '@figwright/shared';
+import { CLIENT_MESSAGE_LIMIT_BYTES, NODE_LIST_BUDGET_BYTES } from '@figma-forge/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { leaderLockPath } from '../../src/election/leader-lock.js';
@@ -64,7 +64,7 @@ class WireClient {
     const port = await freePort();
     this.port = port;
     const child = spawn(process.execPath, [DIST_ENTRY], {
-      env: { ...process.env, FIGWRIGHT_PORT: String(port) },
+      env: { ...process.env, FIGMA_FORGE_PORT: String(port) },
       stdio: ['pipe', 'pipe', 'pipe'],
     });
     this.child = child;
@@ -116,7 +116,7 @@ class WireClient {
     const res = await this.send('initialize', {
       protocolVersion,
       capabilities: {},
-      clientInfo: { name: 'figwright-wire-gate', version: '0' },
+      clientInfo: { name: 'figma-forge-wire-gate', version: '0' },
     });
     if (res.result === undefined) {
       throw new Error(`initialize failed: ${JSON.stringify(res.error)}`);
@@ -195,8 +195,8 @@ describe.skipIf(!existsSync(DIST_ENTRY))('MCP wire contract (built dist)', () =>
 
   it('negotiates the protocol version and advertises its capabilities', () => {
     expect(initResult.protocolVersion).toBe(LATEST_CLIENT_PROTOCOL);
-    expect(initResult.serverInfo).toMatchObject({ name: 'figwright' });
-    // Both primitives Figwright serves must be advertised, or a client never lists them.
+    expect(initResult.serverInfo).toMatchObject({ name: 'figma-forge' });
+    // Both primitives Figma Forge serves must be advertised, or a client never lists them.
     expect(initResult.capabilities).toMatchObject({ tools: {}, prompts: {} });
   });
 

@@ -1,4 +1,4 @@
-import type { GetNodeMotionResult, MutateResult } from '@figwright/shared';
+import type { GetNodeMotionResult, MutateResult } from '@figma-forge/shared';
 import { describe, expect, it } from 'vitest';
 
 import { createSandboxHandlers } from '../src/handlers/registry.js';

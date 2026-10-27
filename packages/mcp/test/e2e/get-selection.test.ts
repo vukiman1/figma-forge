@@ -2,7 +2,7 @@ import {
   type GetSelectionResult,
   GetSelectionResultSchema,
   serializeNode,
-} from '@figwright/shared';
+} from '@figma-forge/shared';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 

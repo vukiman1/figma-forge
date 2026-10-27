@@ -1,7 +1,7 @@
 import { createServer, type Server as HttpServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 
-import { DEFAULT_PORT } from '@figwright/shared';
+import { DEFAULT_PORT } from '@figma-forge/shared';
 
 import { Relay } from '../relay/relay.js';
 import { type PortHolder, portConflictMessage } from './leader-lock.js';
@@ -10,10 +10,10 @@ export const NodeRole = {
   Unknown: 'unknown',
   Leader: 'leader',
   Follower: 'follower',
-  // The port is held by something that isn't answering as a Figwright leader, so this node can
+  // The port is held by something that isn't answering as a Figma Forge leader, so this node can
   // neither lead nor safely follow it. It keeps contending for the port instead of attaching as a
   // follower of a process that would silently fail every forwarded RPC. Two ways in, one state: a
-  // foreign process squatting the port (found at startup), and a Figwright leader that is still
+  // foreign process squatting the port (found at startup), and a Figma Forge leader that is still
   // alive and still holding the port but has stopped answering (found by the tick). See
   // Election.determineRole / tick, and leader-lock.ts for how the two are told apart.
   Conflicted: 'conflicted',
@@ -134,7 +134,7 @@ export class Node {
   }
 
   /**
-   * Enter the port-conflict state: :port is held by something that isn't answering as a Figwright
+   * Enter the port-conflict state: :port is held by something that isn't answering as a Figma Forge
    * leader. Unlike becomeFollower this never points RPC at the holder — dispatch fails fast with
    * `conflictMessage` while the election keeps contending for the port (see Election.tick), so the
    * moment the port frees we take over.

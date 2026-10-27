@@ -1,4 +1,4 @@
-import type { GetNodeResult, SerializedNode } from '@figwright/shared';
+import type { GetNodeResult, SerializedNode } from '@figma-forge/shared';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { resultCharBudget, serializeTrees, treeTooLargeError } from '../serializer.js';
