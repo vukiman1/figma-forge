@@ -2760,7 +2760,7 @@ const handleRequest = async (request: ServerRequest): Promise<PluginResponse> =>
 };
 
 const UI_WIDTH = 320;
-const UI_EXPANDED_HEIGHT = 180;
+const UI_EXPANDED_HEIGHT = 300;
 /** Just the status bar: the collapsed ("minimized") window. */
 const UI_COLLAPSED_HEIGHT = 36;
 const UI_COLLAPSED_KEY = "ui-collapsed";
@@ -2777,7 +2777,12 @@ const postUiCollapseState = () => {
 
 // Start hidden so the window never flashes at full height before the stored
 // collapsed state is restored. The iframe still loads and runs while hidden.
-figma.showUI(__html__, { width: UI_WIDTH, height: UI_EXPANDED_HEIGHT, visible: false });
+figma.showUI(__html__, {
+  width: UI_WIDTH,
+  height: UI_EXPANDED_HEIGHT,
+  visible: false,
+  themeColors: true,
+});
 
 figma.clientStorage
   .getAsync(UI_COLLAPSED_KEY)
