@@ -1,22 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
-import {
-  type GetDesignContextResult,
-  GET_DESIGN_CONTEXT_TOOL_NAME,
-  type ToolSpec,
-} from '@figma-forge/core';
-import { z } from 'zod';
+import { designDiffParams } from '@figma-forge/core';
+import { GET_DESIGN_CONTEXT_TOOL_NAME, type GetDesignContextResult } from '@figma-forge/core';
 
 import { type DesignDiffChanges, diffDesignContext } from '../diff/design-diff.js';
-
-export const DESIGN_DIFF_TOOL_NAME = 'design_diff';
-
-// design_diff turns the one-shot Figma→code flow into an incremental one: snapshot a node's
-// get_design_context now, and on a later run report exactly what changed in the design (per node,
-// per property) so an agent edits the affected code instead of regenerating the screen. The baseline
-// is written to a file under the project (.figma-forge/snapshots/) — the tool never mutates Figma and
-// never touches an existing code path; it's a local consumer of get_design_context, like token_map.
 
 /**
  * Bumped only when the on-disk snapshot shape changes; an older file is re-baselined, never
@@ -42,38 +30,8 @@ export const DESIGN_DIFF_TOOL_NAME = 'design_diff';
  * as an empty shape.
  */
 export const SNAPSHOT_FORMAT_VERSION = 9;
+
 const SNAPSHOT_SUBDIR = join('.figma-forge', 'snapshots');
-
-const inputSchema = z.object({
-  nodeId: z
-    .string()
-    .describe('Node to snapshot / diff (a pasted Figma URL also works); omit to use the selection')
-    .optional(),
-  rootDir: z.string().describe('Project root; defaults to the server cwd').optional(),
-  update: z
-    .boolean()
-    .describe('After diffing, overwrite the baseline with the current design (accept the changes)')
-    .optional(),
-});
-
-export const designDiffTool: ToolSpec = {
-  name: DESIGN_DIFF_TOOL_NAME,
-  description:
-    'Diff a Figma node against a saved baseline of itself, so after a design changes you edit only ' +
-    'the affected code instead of regenerating. First call on a node saves a baseline (its ' +
-    'get_design_context, full detail) under .figma-forge/snapshots/ and returns status ' +
-    "'baseline-created'; a later call returns status 'diff' with the per-node, per-property changes " +
-    '(added / removed / changed nodes; fills, layout/padding, text, token bindings — resolved to ' +
-    "readable values, not opaque ids) or 'no-changes'. Pass update:true to accept the current design " +
-    'as the new baseline (re-snapshot). nodeId defaults to the selection; rootDir defaults to the ' +
-    'server cwd. The baseline is a plain file the tool writes under the project — committing it (so ' +
-    'teammates share the baseline) or gitignoring it is your call; the tool never changes git. It ' +
-    'never mutates Figma. Scope by a component / section nodeId, the same unit codegen works on.',
-  inputSchema,
-  kind: 'local',
-  // No sandbox handler of its own; its plugin arguments are recorded under the tool it reuses.
-  serverOnlyArgs: null,
-};
 
 export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknown>;
 
@@ -172,7 +130,7 @@ export const handleDesignDiff = async (
   dispatch: ToolDispatcher,
   rawArgs: unknown,
 ): Promise<DesignDiffResult> => {
-  const args = inputSchema.parse(rawArgs);
+  const args = designDiffParams.parse(rawArgs);
   const rootDir = args.rootDir ?? process.cwd();
 
   const current = (await dispatch(GET_DESIGN_CONTEXT_TOOL_NAME, {

@@ -2,16 +2,15 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { EXPORT_PDF_TOOL_NAME, exportPdfTool } from '@figma-forge/core';
 import type { ExportPdfResult, PdfExport } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
-  EXPORT_PDF_TOOL_NAME,
-  exportPdfTool,
   handleExportPdf,
   type ToolDispatcher,
   writeExportedPdf,
-} from '../../src/tools/export-pdf.js';
+} from '../../src/tools/export-pdf.handler.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const exportPdfToolDefinition = toToolDefinition(exportPdfTool);

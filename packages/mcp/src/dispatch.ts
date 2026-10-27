@@ -4,7 +4,7 @@ import type { Follower } from './election/follower.js';
 import { type Node, NodeRole } from './election/node.js';
 import type { PluginSessionInfo } from './routing/sessions.js';
 import { getFileTarget, resolveFileTarget } from './routing/target.js';
-import { namedSessions, type SessionDispatch } from './tools/list-files.js';
+import { namedSessions, type SessionDispatch } from './tools/list-files.handler.js';
 import { reportRouting, reportSkew } from './tools/notices.js';
 
 export const DEFAULT_DISPATCH_MAX_ATTEMPTS = 3;

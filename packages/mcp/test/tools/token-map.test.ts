@@ -1,16 +1,16 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import {
-  type GetStylesResult,
-  type GetVariableDefsResult,
   GET_STYLES_TOOL_NAME,
   GET_VARIABLE_DEFS_TOOL_NAME,
+  type GetStylesResult,
+  type GetVariableDefsResult,
 } from '@figma-forge/core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { handleTokenMap, type ToolDispatcher } from '../../src/tools/token-map.js';
+import { handleTokenMap, type ToolDispatcher } from '../../src/tools/token-map.handler.js';
 
 const defs: GetVariableDefsResult = {
   collections: [

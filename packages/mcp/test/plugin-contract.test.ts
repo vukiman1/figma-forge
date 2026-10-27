@@ -180,7 +180,7 @@ describe('plugin argument contract', () => {
         spec.serverOnlyArgs === null
       )
         continue;
-      const file = join(toolsRoot, `${spec.name.replaceAll('_', '-')}.ts`);
+      const file = join(toolsRoot, `${spec.name.replaceAll('_', '-')}.handler.ts`);
       const seen = [...scanInjectedArgs(readFileSync(file, 'utf8'))].toSorted();
       const recordedArgs = new Set(derived[spec.name] ?? []);
       expect({ tool: spec.name, missing: seen.filter(arg => !recordedArgs.has(arg)) }).toEqual({

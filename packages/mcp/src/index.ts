@@ -1,21 +1,35 @@
 // Must stay the first import: the crash guard has to be in place before any other module runs.
-import './process-guard-install.js';
 import {
-  DEFAULT_PORT,
-  type GetScreenshotResult,
-  newId,
-  PROTOCOL_VERSION,
-  type SearchNodesResult,
+  ANALYZE_PROJECT_TOOL_NAME,
   BATCH_TOOL_NAME,
+  COMPONENT_MAP_TOOL_NAME,
+  DEFAULT_PORT,
+  DESIGN_DIFF_TOOL_NAME,
+  EXPORT_PDF_TOOL_NAME,
+  EXPORT_VIDEO_TOOL_NAME,
   GET_DESIGN_CONTEXT_TOOL_NAME,
+  GET_SCREENSHOT_TOOL_NAME,
+  type GetScreenshotResult,
+  ICON_MAP_TOOL_NAME,
+  LIST_FILES_TOOL_NAME,
+  newId,
+  pingTool,
+  PROTOCOL_VERSION,
+  SAVE_IMAGE_FILLS_TOOL_NAME,
+  SAVE_SCREENSHOTS_TOOL_NAME,
+  SCAN_COMPONENTS_TOOL_NAME,
   SCAN_NODES_BY_TYPES_TOOL_NAME,
   SCAN_TEXT_NODES_TOOL_NAME,
   SEARCH_NODES_TOOL_NAME,
+  type SearchNodesResult,
+  TOKEN_MAP_TOOL_NAME,
+  USE_FILE_TOOL_NAME,
 } from '@figma-forge/core';
-import { McpServer } from '@modelcontextprotocol/server';
 import type { CallToolResult } from '@modelcontextprotocol/server';
+import { McpServer } from '@modelcontextprotocol/server';
 import { serveStdio, StdioServerTransport } from '@modelcontextprotocol/server/stdio';
 
+import './process-guard-install.js';
 import pkg from '../package.json' with { type: 'json' };
 import { BUILD_ID } from './build-id.js';
 import {
@@ -33,31 +47,31 @@ import { SERVER_INSTRUCTIONS } from './instructions.js';
 import { wireShutdown } from './lifecycle.js';
 import { normalizeIdArgs } from './node-id.js';
 import { PROMPTS } from './prompts/registry.js';
-import { ANALYZE_PROJECT_TOOL_NAME, handleAnalyzeProject } from './tools/analyze-project.js';
+import { handleAnalyzeProject } from './tools/analyze-project.handler.js';
 import { annotationsFor } from './tools/annotations.js';
-import { COMPONENT_MAP_TOOL_NAME, handleComponentMap } from './tools/component-map.js';
+import { handleComponentMap } from './tools/component-map.handler.js';
 import { handleDesignContext } from './tools/design-context-guard.js';
-import { DESIGN_DIFF_TOOL_NAME, handleDesignDiff } from './tools/design-diff.js';
-import { EXPORT_PDF_TOOL_NAME, handleExportPdf } from './tools/export-pdf.js';
-import { EXPORT_VIDEO_TOOL_NAME, handleExportVideo } from './tools/export-video.js';
-import { GET_SCREENSHOT_TOOL_NAME, screenshotContent } from './tools/get-screenshot.js';
-import { handleIconMap, ICON_MAP_TOOL_NAME } from './tools/icon-map.js';
+import { handleDesignDiff } from './tools/design-diff.handler.js';
+import { handleExportPdf } from './tools/export-pdf.handler.js';
+import { handleExportVideo } from './tools/export-video.handler.js';
+import { screenshotContent } from './tools/get-screenshot.handler.js';
+import { handleIconMap } from './tools/icon-map.handler.js';
 import {
   IMAGE_PATH_TOOLS,
   importImageError,
   resolveBatchImagePaths,
   resolveImagePath,
-} from './tools/import-image.js';
-import { handleListFiles, LIST_FILES_TOOL_NAME } from './tools/list-files.js';
+} from './tools/import-image.handler.js';
+import { handleListFiles } from './tools/list-files.handler.js';
 import { captureNotices, withRoutingNotice, withSkewNotice } from './tools/notices.js';
-import { formatPingResult, handlePing, pingTool } from './tools/ping.js';
+import { formatPingResult, handlePing } from './tools/ping.handler.js';
 import { ALL_TOOL_SPECS } from './tools/registry.js';
 import { assertWithinLimit, fitNodeList } from './tools/result-budget.js';
-import { handleSaveImageFills, SAVE_IMAGE_FILLS_TOOL_NAME } from './tools/save-image-fills.js';
-import { handleSaveScreenshots, SAVE_SCREENSHOTS_TOOL_NAME } from './tools/save-screenshots.js';
-import { handleScanComponents, SCAN_COMPONENTS_TOOL_NAME } from './tools/scan-components.js';
-import { handleTokenMap, TOKEN_MAP_TOOL_NAME } from './tools/token-map.js';
-import { handleUseFile, USE_FILE_TOOL_NAME } from './tools/use-file.js';
+import { handleSaveImageFills } from './tools/save-image-fills.handler.js';
+import { handleSaveScreenshots } from './tools/save-screenshots.handler.js';
+import { handleScanComponents } from './tools/scan-components.handler.js';
+import { handleTokenMap } from './tools/token-map.handler.js';
+import { handleUseFile } from './tools/use-file.handler.js';
 import { checkBatchOps } from './tools/wire-schema.js';
 
 const SERVER_NAME = 'figma-forge';

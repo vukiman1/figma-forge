@@ -1,9 +1,8 @@
 import {
-  type GetDesignContextResult,
   GET_DESIGN_CONTEXT_TOOL_NAME,
-  type ToolSpec,
+  type GetDesignContextResult,
+  iconMapParams,
 } from '@figma-forge/core';
-import { z } from 'zod';
 
 import { detectIconLibraries, scanRepoSvgs } from '../icons/repo-icons.js';
 import { collectFigmaIcons, type IconMapping, joinIcons } from '../join/icon-map.js';
@@ -15,20 +14,7 @@ import {
 } from '../profile/profile.js';
 import { truncationNote } from '../repo-walk.js';
 
-export const ICON_MAP_TOOL_NAME = 'icon_map';
-
 const DEFAULT_THRESHOLD = 0.7;
-
-const inputSchema = z.object({
-  nodeId: z.string().describe('Root node id; omit to use the selection or current page').optional(),
-  threshold: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe('Confidence at/above which a match counts as a reliable reuse (default 0.7)')
-    .optional(),
-  rootDir: z.string().describe('Project root to scan; defaults to the server cwd').optional(),
-});
 
 export interface IconMapResult {
   mappings: IconMapping[];
@@ -52,26 +38,6 @@ export interface IconMapResult {
   truncationNote?: string;
 }
 
-export const iconMapTool: ToolSpec = {
-  name: ICON_MAP_TOOL_NAME,
-  description:
-    "Map the Figma icon nodes in a selection/subtree to the project's existing `.svg` files, so codegen " +
-    'reuses the designer-curated asset instead of re-exporting a duplicate. Joins the grounded Figma icon ' +
-    'names against the repo svg files (gitignore-aware scan), name-based and near-exact (a wrong icon is a ' +
-    'silent visual bug, so unsure matches fall through to a fresh export rather than mis-reuse). Each match ' +
-    'reports the file path, the color contract read from the file (currentColor / fixed / multi-color), and ' +
-    'how to recolor it in this project (currentColor → text-{token}, gated on the svg mode since currentColor ' +
-    'dies through an <img>). It does not fabricate the import line — compose it from the file path and ' +
-    'profile.svg (importHint gives the loader form: svgr `?react` / vite-svg-loader `?component` / ' +
-    "`{ ReactComponent }` / url `<img>`), mirroring the project's existing imports for the alias/relative " +
-    'path. Unmatched icons are returned in `unmapped`; `iconLibraries` lists any installed icon component ' +
-    'library (lucide / heroicons / iconify) as the alternative to a fresh export. rootDir defaults to the ' +
-    'server cwd. Returns { mappings, unmapped, iconLibraries, profile }.',
-  inputSchema,
-  kind: 'local',
-  // No sandbox handler of its own; its plugin arguments are recorded under the tool it reuses.
-  serverOnlyArgs: null,
-};
 export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknown>;
 
 /**
@@ -83,7 +49,7 @@ export const handleIconMap = async (
   dispatch: ToolDispatcher,
   rawArgs: unknown,
 ): Promise<IconMapResult> => {
-  const args = inputSchema.parse(rawArgs);
+  const args = iconMapParams.parse(rawArgs);
   const rootDir = args.rootDir ?? process.cwd();
   const threshold = args.threshold ?? DEFAULT_THRESHOLD;
 

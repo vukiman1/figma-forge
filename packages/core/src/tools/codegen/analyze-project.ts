@@ -1,11 +1,10 @@
-import type { ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
-import { analyzeProject, type ProjectProfile } from '../profile/profile.js';
+import type { ToolSpec } from '../tool-spec.js';
 
 export const ANALYZE_PROJECT_TOOL_NAME = 'analyze_project';
 
-const inputSchema = z.object({
+export const analyzeProjectParams = z.object({
   rootDir: z.string().describe('Project root to analyze; defaults to the server cwd').optional(),
 });
 
@@ -29,12 +28,7 @@ export const analyzeProjectTool: ToolSpec = {
     'compilation. Never "flatten" by nesting the full name (.card { .card__title {} }): that ' +
     'compiles to the descendant selector .card .card__title, adding specificity and breaking the ' +
     'moment the element is not a DOM descendant.',
-  inputSchema,
+  inputSchema: analyzeProjectParams,
   kind: 'local',
-  // No sandbox handler of its own; its plugin arguments are recorded under the tool it reuses.
   serverOnlyArgs: null,
-};
-export const handleAnalyzeProject = async (rawArgs: unknown): Promise<ProjectProfile> => {
-  const args = inputSchema.parse(rawArgs);
-  return analyzeProject(args.rootDir ?? process.cwd());
 };

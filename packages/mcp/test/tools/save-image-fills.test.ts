@@ -2,17 +2,16 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { SAVE_IMAGE_FILLS_TOOL_NAME, saveImageFillsTool } from '@figma-forge/core';
 import type { ImageFillsResult, NodeImageFills, SaveImageFillsResult } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   detectImageFormat,
   handleSaveImageFills,
-  SAVE_IMAGE_FILLS_TOOL_NAME,
-  saveImageFillsTool,
   type ToolDispatcher,
   writeImageFills,
-} from '../../src/tools/save-image-fills.js';
+} from '../../src/tools/save-image-fills.handler.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const saveImageFillsToolDefinition = toToolDefinition(saveImageFillsTool);

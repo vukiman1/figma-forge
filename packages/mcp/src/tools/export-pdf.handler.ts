@@ -1,38 +1,10 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-import { type ExportPdfResult, type PdfExport, type ToolSpec } from '@figma-forge/core';
-import { z } from 'zod';
+import { EXPORT_PDF_TOOL_NAME, exportPdfParams } from '@figma-forge/core';
+import { type ExportPdfResult, type PdfExport } from '@figma-forge/core';
 
 import { binaryPayload } from './binary-payload.js';
-
-export const EXPORT_PDF_TOOL_NAME = 'export_pdf';
-
-const inputSchema = z.object({
-  nodeId: z
-    .string()
-    .describe(
-      'Node to export to a one-page PDF (a frame / section / component); omit for the current page',
-    )
-    .optional(),
-  outPath: z.string().describe('File path to write the .pdf to (parent dirs created if missing)'),
-});
-
-export const exportPdfTool: ToolSpec = {
-  name: EXPORT_PDF_TOOL_NAME,
-  description:
-    "Export a node (or the current page) to a single-page vector PDF file on disk. Figma's plugin " +
-    'API renders one PDF page per node and cannot paginate a page into one-frame-per-page or merge ' +
-    'multiple nodes into a multi-page file. Pass a frame / section / component id for a vector PDF ' +
-    'of that node; omit nodeId for the current page (large pages can be slow). For raster output ' +
-    '(PNG/JPG) use save_screenshots instead. Returns { nodeId, path, empty? }; path is null if the ' +
-    'target is missing or not exportable, and empty:true means it rendered a blank PDF.',
-  inputSchema,
-  kind: 'local',
-  // Dispatches to a same-named sandbox handler; outPath stays on the server.
-  serverOnlyArgs: ['outPath'],
-  injectedArgs: ['binary'],
-};
 
 export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknown>;
 
@@ -58,7 +30,7 @@ export const handleExportPdf = async (
   dispatch: ToolDispatcher,
   rawArgs: unknown,
 ): Promise<ExportPdfResult> => {
-  const args = inputSchema.parse(rawArgs);
+  const args = exportPdfParams.parse(rawArgs);
   const pluginArgs: Record<string, unknown> = {};
   // These bytes go to disk, never to a model, so they ride the wire as a msgpack `bin`.
   pluginArgs.binary = true;

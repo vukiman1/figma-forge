@@ -6,7 +6,7 @@ import { GetDesignContextResultSchema } from '@figma-forge/core';
 import { expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { SNAPSHOT_FORMAT_VERSION } from '../src/tools/design-diff.js';
+import { SNAPSHOT_FORMAT_VERSION } from '../src/tools/design-diff.handler.js';
 
 // design_diff compares a saved get_design_context against a fresh one field by field, so a field
 // the baseline predates reads as "changed" on every node that has it — a design edit nobody made,

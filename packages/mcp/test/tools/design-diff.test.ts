@@ -1,15 +1,15 @@
-import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { type GetDesignContextResult, GET_DESIGN_CONTEXT_TOOL_NAME } from '@figma-forge/core';
+import { GET_DESIGN_CONTEXT_TOOL_NAME, type GetDesignContextResult } from '@figma-forge/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
   handleDesignDiff,
   SNAPSHOT_FORMAT_VERSION,
   type ToolDispatcher,
-} from '../../src/tools/design-diff.js';
+} from '../../src/tools/design-diff.handler.js';
 
 const SNAP_REL = join('.figma-forge', 'snapshots', '1-1.json');
 

@@ -1,9 +1,10 @@
+import { pingTool } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import type { Follower } from '../../src/election/follower.js';
 import { portConflictMessage } from '../../src/election/leader-lock.js';
 import { type Node, NodeRole } from '../../src/election/node.js';
-import { handlePing, pingTool } from '../../src/tools/ping.js';
+import { handlePing } from '../../src/tools/ping.handler.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const pingToolDefinition = toToolDefinition(pingTool);

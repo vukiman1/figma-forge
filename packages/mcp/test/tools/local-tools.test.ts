@@ -4,8 +4,8 @@ import { join } from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { handleAnalyzeProject } from '../../src/tools/analyze-project.js';
-import { handleScanComponents } from '../../src/tools/scan-components.js';
+import { handleAnalyzeProject } from '../../src/tools/analyze-project.handler.js';
+import { handleScanComponents } from '../../src/tools/scan-components.handler.js';
 
 // The two server-local tools had no coverage of their own. `profile.test.ts` and `scan.test.ts`
 // exercise the detection and the AST walk thoroughly; what was untested is the thin layer these

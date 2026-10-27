@@ -2,7 +2,20 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { GET_SCREENSHOT_TOOL_NAME, LIST_FILES_TOOL_NAME } from '@figma-forge/core';
 import {
+  GET_ANNOTATIONS_TOOL_NAME,
+  GET_DESIGN_CONTEXT_TOOL_NAME,
+  GET_FONTS_TOOL_NAME,
+  GET_LOCAL_COMPONENTS_TOOL_NAME,
+  GET_METADATA_TOOL_NAME,
+  GET_NODE_TOOL_NAME,
+  GET_NODES_INFO_TOOL_NAME,
+  GET_PAGES_TOOL_NAME,
+  GET_REACTIONS_TOOL_NAME,
+  GET_STYLES_TOOL_NAME,
+  GET_VARIABLE_DEFS_TOOL_NAME,
+  GET_VIEWPORT_TOOL_NAME,
   type GetAnnotationsResult,
   type GetDesignContextResult,
   type GetFontsResult,
@@ -17,33 +30,19 @@ import {
   type GetVariableDefsResult,
   type GetViewportResult,
   type ListFilesResult,
-  type ScanNodesByTypesResult,
-  type ScanTextNodesResult,
-  type SearchNodesResult,
-  serializeNode,
-  GET_ANNOTATIONS_TOOL_NAME,
-  GET_DESIGN_CONTEXT_TOOL_NAME,
-  GET_FONTS_TOOL_NAME,
-  GET_LOCAL_COMPONENTS_TOOL_NAME,
-  GET_METADATA_TOOL_NAME,
-  GET_NODE_TOOL_NAME,
-  GET_NODES_INFO_TOOL_NAME,
-  GET_PAGES_TOOL_NAME,
-  GET_REACTIONS_TOOL_NAME,
-  GET_STYLES_TOOL_NAME,
-  GET_VARIABLE_DEFS_TOOL_NAME,
-  GET_VIEWPORT_TOOL_NAME,
   SCAN_NODES_BY_TYPES_TOOL_NAME,
   SCAN_TEXT_NODES_TOOL_NAME,
+  type ScanNodesByTypesResult,
+  type ScanTextNodesResult,
   SEARCH_NODES_TOOL_NAME,
+  type SearchNodesResult,
+  serializeNode,
 } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
 import { dispatchTool } from '../../src/dispatch.js';
-import { GET_SCREENSHOT_TOOL_NAME } from '../../src/tools/get-screenshot.js';
-import { LIST_FILES_TOOL_NAME } from '../../src/tools/list-files.js';
-import { handleSaveScreenshots } from '../../src/tools/save-screenshots.js';
+import { handleSaveScreenshots } from '../../src/tools/save-screenshots.handler.js';
 import {
   closeSocket,
   connectFakePlugin,

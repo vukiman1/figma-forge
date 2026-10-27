@@ -2,6 +2,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { SAVE_SCREENSHOTS_TOOL_NAME, saveScreenshotsTool } from '@figma-forge/core';
 import type {
   GetScreenshotResult,
   SaveScreenshotsResult,
@@ -11,11 +12,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import {
   handleSaveScreenshots,
-  SAVE_SCREENSHOTS_TOOL_NAME,
-  saveScreenshotsTool,
   type ToolDispatcher,
   writeScreenshots,
-} from '../../src/tools/save-screenshots.js';
+} from '../../src/tools/save-screenshots.handler.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const saveScreenshotsToolDefinition = toToolDefinition(saveScreenshotsTool);

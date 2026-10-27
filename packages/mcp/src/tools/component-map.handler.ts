@@ -1,12 +1,8 @@
 import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import {
-  type GetDesignContextResult,
-  GET_DESIGN_CONTEXT_TOOL_NAME,
-  type ToolSpec,
-} from '@figma-forge/core';
-import { z } from 'zod';
+import { componentMapParams } from '@figma-forge/core';
+import { GET_DESIGN_CONTEXT_TOOL_NAME, type GetDesignContextResult } from '@figma-forge/core';
 
 import {
   collectFigmaComponents,
@@ -18,21 +14,9 @@ import { analyzeProject, type ProjectProfile } from '../profile/profile.js';
 import { truncationNote } from '../repo-walk.js';
 import { scanComponents } from '../scan/scan.js';
 
-export const COMPONENT_MAP_TOOL_NAME = 'component_map';
-
 const DEFAULT_THRESHOLD = 0.7;
-const MAP_FILE = 'docs/figma-component-map.md';
 
-const inputSchema = z.object({
-  nodeId: z.string().describe('Root node id; omit to use the selection or current page').optional(),
-  threshold: z
-    .number()
-    .min(0)
-    .max(1)
-    .describe('Confidence at/above which a match counts as a reliable reuse (default 0.7)')
-    .optional(),
-  rootDir: z.string().describe('Project root to scan; defaults to the server cwd').optional(),
-});
+const MAP_FILE = 'docs/figma-component-map.md';
 
 export interface ComponentMapResult {
   mappings: ComponentMapping[];
@@ -53,25 +37,6 @@ export interface ComponentMapResult {
   truncationNote?: string;
 }
 
-export const componentMapTool: ToolSpec = {
-  name: COMPONENT_MAP_TOOL_NAME,
-  description:
-    'Map the Figma component instances in a selection/subtree to existing local code components, so ' +
-    'they can be reused instead of regenerated. Joins the grounded Figma component names (and their ' +
-    'variant axes) against an AST scan of the project; an explicit docs/figma-component-map.md row ' +
-    '(FigmaName | code/path) overrides the fuzzy match — this file is the durable record a verified ' +
-    'mapping is written back to, so the next run reuses it instead of re-guessing. A row whose ' +
-    'target no longer resolves (deleted/renamed) is reported in staleOverrides and degrades to the ' +
-    'fuzzy result rather than a phantom import. Each distinct component is mapped once with all its ' +
-    'instance ids. A mapped candidate also reports matchedProps (Figma axes the component already ' +
-    'has) and unmatchedProps (axes it lacks → component-extension TODOs). ' +
-    'Returns { mappings (candidate + confidence + status high/medium/low/unmapped), unmapped, ' +
-    'staleOverrides, profile }.',
-  inputSchema,
-  kind: 'local',
-  // No sandbox handler of its own; its plugin arguments are recorded under the tool it reuses.
-  serverOnlyArgs: null,
-};
 export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknown>;
 
 const fileExists = async (path: string): Promise<boolean> =>
@@ -118,7 +83,7 @@ export const handleComponentMap = async (
   dispatch: ToolDispatcher,
   rawArgs: unknown,
 ): Promise<ComponentMapResult> => {
-  const args = inputSchema.parse(rawArgs);
+  const args = componentMapParams.parse(rawArgs);
   const rootDir = args.rootDir ?? process.cwd();
   const threshold = args.threshold ?? DEFAULT_THRESHOLD;
 

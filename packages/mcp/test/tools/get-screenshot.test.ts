@@ -1,7 +1,10 @@
 import type { GetScreenshotResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { INLINE_IMAGE_BUDGET_BYTES, screenshotContent } from '../../src/tools/get-screenshot.js';
+import {
+  INLINE_IMAGE_BUDGET_BYTES,
+  screenshotContent,
+} from '../../src/tools/get-screenshot.handler.js';
 
 describe('screenshotContent', () => {
   it('emits a label + image block for raster formats with the right mime type', () => {

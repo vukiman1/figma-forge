@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import type { PluginSessionInfo } from '../../src/routing/sessions.js';
 import { clearFileTarget, setFileTarget } from '../../src/routing/target.js';
-import { handleListFiles, type SessionDispatch } from '../../src/tools/list-files.js';
+import { handleListFiles, type SessionDispatch } from '../../src/tools/list-files.handler.js';
 
 const session = (
   id: string,

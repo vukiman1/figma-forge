@@ -8,6 +8,7 @@ import {
   addPageTool,
   addVariableModeTool,
   alignNodesTool,
+  analyzeProjectTool,
   applyAnimationStyleTool,
   applyManualKeyframeTrackTool,
   applyStyleToNodeTool,
@@ -19,6 +20,7 @@ import {
   booleanNodesTool,
   cloneNodeTool,
   combineAsVariantsTool,
+  componentMapTool,
   createComponentTool,
   createEffectStyleTool,
   createEllipseTool,
@@ -42,8 +44,11 @@ import {
   deleteVariableCollectionTool,
   deleteVariableModeTool,
   deleteVariableTool,
+  designDiffTool,
   detachInstanceTool,
   editComponentPropertyTool,
+  exportPdfTool,
+  exportVideoTool,
   findReplaceTextTool,
   flattenNodesTool,
   flipNodesTool,
@@ -61,19 +66,24 @@ import {
   getNodesInfoTool,
   getPagesTool,
   getReactionsTool,
+  getScreenshotTool,
   getSelectionTool,
   getStylesTool,
   getVariableDefsTool,
   getVectorTool,
   getViewportTool,
   groupNodesTool,
+  iconMapTool,
+  importImageTool,
   importStyleTool,
   importSvgTool,
   importVariableTool,
+  listFilesTool,
   lockNodesTool,
   moveNodesTool,
   navigateToPageTool,
   outlineStrokeTool,
+  pingTool,
   removeAnimationStyleTool,
   removeManualKeyframeTrackTool,
   removeReactionsTool,
@@ -85,6 +95,9 @@ import {
   repeatNodesTool,
   resizeNodesTool,
   rotateNodesTool,
+  saveImageFillsTool,
+  saveScreenshotsTool,
+  scanComponentsTool,
   scanNodesByTypesTool,
   scanTextNodesTool,
   searchNodesTool,
@@ -116,8 +129,8 @@ import {
   setVariableValueTool,
   setVectorTool,
   setVisibleTool,
-  type ToolSpec,
   swapComponentTool,
+  tokenMapTool,
   ungroupNodesTool,
   unlockNodesTool,
   updateEffectStyleTool,
@@ -125,24 +138,10 @@ import {
   updatePaintStyleTool,
   updateTextStyleTool,
   updateVariableCollectionTool,
+  useFileTool,
+  type ToolSpec,
 } from '@figma-forge/core';
 import { z } from 'zod';
-
-import { analyzeProjectTool } from './analyze-project.js';
-import { componentMapTool } from './component-map.js';
-import { designDiffTool } from './design-diff.js';
-import { exportPdfTool } from './export-pdf.js';
-import { exportVideoTool } from './export-video.js';
-import { getScreenshotTool } from './get-screenshot.js';
-import { iconMapTool } from './icon-map.js';
-import { importImageTool } from './import-image.js';
-import { listFilesTool } from './list-files.js';
-import { pingTool } from './ping.js';
-import { saveImageFillsTool } from './save-image-fills.js';
-import { saveScreenshotsTool } from './save-screenshots.js';
-import { scanComponentsTool } from './scan-components.js';
-import { tokenMapTool } from './token-map.js';
-import { useFileTool } from './use-file.js';
 
 /**
  * Every tool the MCP server registers, in ListTools order.

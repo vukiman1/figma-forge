@@ -1,15 +1,12 @@
-import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { type GetDesignContextResult, GET_DESIGN_CONTEXT_TOOL_NAME } from '@figma-forge/core';
+import { COMPONENT_MAP_TOOL_NAME } from '@figma-forge/core';
+import { GET_DESIGN_CONTEXT_TOOL_NAME, type GetDesignContextResult } from '@figma-forge/core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import {
-  COMPONENT_MAP_TOOL_NAME,
-  handleComponentMap,
-  type ToolDispatcher,
-} from '../../src/tools/component-map.js';
+import { handleComponentMap, type ToolDispatcher } from '../../src/tools/component-map.handler.js';
 
 const fakeContext: GetDesignContextResult = {
   nodes: [

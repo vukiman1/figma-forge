@@ -2,16 +2,15 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { EXPORT_VIDEO_TOOL_NAME, exportVideoTool } from '@figma-forge/core';
 import type { ExportVideoResult, VideoExport } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
-  EXPORT_VIDEO_TOOL_NAME,
-  exportVideoTool,
   handleExportVideo,
   type ToolDispatcher,
   writeExportedVideo,
-} from '../../src/tools/export-video.js';
+} from '../../src/tools/export-video.handler.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const exportVideoToolDefinition = toToolDefinition(exportVideoTool);

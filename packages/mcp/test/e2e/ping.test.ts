@@ -2,7 +2,7 @@ import { newId } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
-import { handlePing } from '../../src/tools/ping.js';
+import { handlePing } from '../../src/tools/ping.handler.js';
 import {
   closeSocket,
   connectFakePlugin,
