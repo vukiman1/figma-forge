@@ -250,7 +250,7 @@ const collectRefs = (
   const styleIds = new Set<string>();
   // A node and a mixed-TEXT run carry the same binding shape; collect from either.
   const collectFrom = (bearer: {
-    boundVariables?: Readonly<Record<string, readonly string[]>>;
+    boundVariables?: Readonly<Record<string, readonly string[]>> | undefined;
     styleIds?: unknown;
   }): void => {
     if (bearer.boundVariables) {
@@ -397,7 +397,7 @@ const resolveVariableModes = async (
   }
 
   // Nodes, and the override entries of deduped instances, that carry modes still keyed by id.
-  const carriers: { variableModes?: Readonly<Record<string, string>> }[] = [];
+  const carriers: { variableModes?: Readonly<Record<string, string>> | undefined }[] = [];
   const overrideEntries = new Set<object>();
   const visit = (n: DesignContextNode): void => {
     if (n.variableModes !== undefined) carriers.push(n);

@@ -276,11 +276,7 @@ const textOnPath = base({
 
 const FIXTURES = [frameInGrid, arcWithConstraints, richText, drawnStroke, repeatGroup, textOnPath];
 
-// SerializedNodeSchema is exported as a recursive z.lazy — unwrap to the inner object for keys.
-const schemaKeys = Object.keys(
-  (SerializedNodeSchema as unknown as { unwrap(): { shape: Record<string, unknown> } }).unwrap()
-    .shape,
-);
+const schemaKeys = Object.keys(SerializedNodeSchema.shape);
 const segmentSchemaKeys = Object.keys(SerializedTextSegmentSchema.shape);
 
 const projected = FIXTURES.map(n => project(n, 'full'));
@@ -337,12 +333,7 @@ describe('deduped-instance override entries', () => {
     expect(initial).toHaveLength(2);
     const emitted = new Set([initial[1]!, ...assigned, ...VISUAL_OVERRIDE_FIELDS]);
 
-    const node = (
-      DesignContextNodeSchema as unknown as { unwrap(): { shape: Record<string, unknown> } }
-    ).unwrap().shape;
-    const entry = (
-      node.propertyOverrides as { unwrap(): { element: { shape: Record<string, unknown> } } }
-    ).unwrap().element.shape;
+    const entry = DesignContextNodeSchema.shape.propertyOverrides.unwrap().element.shape;
     expect([...emitted].filter(f => !(f in entry))).toEqual([]);
   });
 });

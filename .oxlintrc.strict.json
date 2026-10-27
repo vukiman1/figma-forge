@@ -15,14 +15,14 @@
       "files": ["**/test/**", "**/*.test.ts"],
       "rules": {
         "max-lines": ["error", { "max": 300, "skipBlankLines": true }],
-        "max-lines-per-function": "off"
+        "max-lines-per-function": "off",
+        "typescript/no-unsafe-type-assertion": "off"
       }
     }
   ],
   "ignorePatterns": [
     "**/dist/**",
     "**/node_modules/**",
-    "packages/core/**",
     "packages/mcp/**",
     "packages/plugin/src/**",
     "packages/plugin/ui/**",

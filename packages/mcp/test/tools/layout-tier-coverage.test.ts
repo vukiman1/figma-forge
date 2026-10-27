@@ -78,16 +78,12 @@ const APPEARANCE: Record<string, string> = {
   propertyOverrides: 'per-instance appearance; textOverrides carries the per-instance content',
 };
 
-/** Unwrap the z.lazy wrapper so the object shape is reachable (public ZodLazy.unwrap). */
-const schemaFieldNames = (): string[] => {
-  const lazy = DesignContextNodeSchema as unknown as { unwrap: () => { shape: object } };
-  return Object.keys(lazy.unwrap().shape);
-};
+const schemaFieldNames = (): string[] => Object.keys(DesignContextNodeSchema.shape);
 
 describe('LAYOUT tier coverage', () => {
   const schemaFields = schemaFieldNames();
 
-  it('reaches the schema shape (guards the unwrap itself)', () => {
+  it('reaches the schema shape', () => {
     expect(schemaFields).toContain('layout');
     expect(schemaFields).toContain('fills');
     expect(schemaFields.length).toBeGreaterThan(40);
