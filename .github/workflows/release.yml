@@ -117,7 +117,7 @@ jobs:
 
           # Create zip
           cd release
-          zip -r ../figma-mcp-bridge-v${{ inputs.version }}.zip .
+          zip -r ../figma-forge-v${{ inputs.version }}.zip .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -126,4 +126,4 @@ jobs:
           target_commitish: ${{ steps.bump.outputs.sha }}
           name: Release v${{ inputs.version }}
           generate_release_notes: true
-          files: figma-mcp-bridge-v${{ inputs.version }}.zip
+          files: figma-forge-v${{ inputs.version }}.zip

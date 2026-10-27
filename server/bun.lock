@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "figma-mcp-bridge",
+      "name": "figma-forge",
       "dependencies": {
         "@figma/plugin-typings": "^1.140.0",
         "@modelcontextprotocol/sdk": "^1.26.0",
