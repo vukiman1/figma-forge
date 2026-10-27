@@ -1,17 +1,17 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
-import type {
-  ImageFillsResult,
-  NodeImageFills,
-  SaveImageFillsResult,
-  SavedImageFill,
-  SavedNodeImageFills,
+import {
+  type ImageFillsResult,
+  type NodeImageFills,
+  type SaveImageFillsResult,
+  type SavedImageFill,
+  type SavedNodeImageFills,
+  type ToolSpec,
 } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';
-import type { ToolSpec } from './spec.js';
 
 export const SAVE_IMAGE_FILLS_TOOL_NAME = 'save_image_fills';
 

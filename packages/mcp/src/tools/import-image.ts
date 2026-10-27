@@ -1,10 +1,8 @@
 import { open, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
+import { SET_IMAGE_FILL_TOOL_NAME, type ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
-
-import { SET_IMAGE_FILL_TOOL_NAME } from './set-image-fill.js';
-import type { ToolSpec } from './spec.js';
 
 export const IMPORT_IMAGE_TOOL_NAME = 'import_image';
 

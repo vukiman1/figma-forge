@@ -1,34 +1,39 @@
-import { describe, expect, it } from 'vitest';
-
-import { GET_ANNOTATIONS_TOOL_NAME, getAnnotationsTool } from '../../src/tools/get-annotations.js';
 import {
+  GET_ANNOTATIONS_TOOL_NAME,
+  getAnnotationsTool,
   GET_DESIGN_CONTEXT_TOOL_NAME,
   getDesignContextTool,
-} from '../../src/tools/get-design-context.js';
-import { GET_FONTS_TOOL_NAME, getFontsTool } from '../../src/tools/get-fonts.js';
-import {
+  GET_FONTS_TOOL_NAME,
+  getFontsTool,
   GET_LOCAL_COMPONENTS_TOOL_NAME,
   getLocalComponentsTool,
-} from '../../src/tools/get-local-components.js';
-import { GET_METADATA_TOOL_NAME, getMetadataTool } from '../../src/tools/get-metadata.js';
-import { GET_NODE_TOOL_NAME, getNodeTool } from '../../src/tools/get-node.js';
-import { GET_NODES_INFO_TOOL_NAME, getNodesInfoTool } from '../../src/tools/get-nodes-info.js';
-import { GET_PAGES_TOOL_NAME, getPagesTool } from '../../src/tools/get-pages.js';
-import { GET_REACTIONS_TOOL_NAME, getReactionsTool } from '../../src/tools/get-reactions.js';
-import { GET_SCREENSHOT_TOOL_NAME, getScreenshotTool } from '../../src/tools/get-screenshot.js';
-import { GET_STYLES_TOOL_NAME, getStylesTool } from '../../src/tools/get-styles.js';
-import {
+  GET_METADATA_TOOL_NAME,
+  getMetadataTool,
+  GET_NODE_TOOL_NAME,
+  getNodeTool,
+  GET_NODES_INFO_TOOL_NAME,
+  getNodesInfoTool,
+  GET_PAGES_TOOL_NAME,
+  getPagesTool,
+  GET_REACTIONS_TOOL_NAME,
+  getReactionsTool,
+  GET_STYLES_TOOL_NAME,
+  getStylesTool,
   GET_VARIABLE_DEFS_TOOL_NAME,
   getVariableDefsTool,
-} from '../../src/tools/get-variable-defs.js';
-import { GET_VIEWPORT_TOOL_NAME, getViewportTool } from '../../src/tools/get-viewport.js';
-import { LIST_FILES_TOOL_NAME, listFilesTool } from '../../src/tools/list-files.js';
-import {
+  GET_VIEWPORT_TOOL_NAME,
+  getViewportTool,
   SCAN_NODES_BY_TYPES_TOOL_NAME,
   scanNodesByTypesTool,
-} from '../../src/tools/scan-nodes-by-types.js';
-import { SCAN_TEXT_NODES_TOOL_NAME, scanTextNodesTool } from '../../src/tools/scan-text-nodes.js';
-import { SEARCH_NODES_TOOL_NAME, searchNodesTool } from '../../src/tools/search-nodes.js';
+  SCAN_TEXT_NODES_TOOL_NAME,
+  scanTextNodesTool,
+  SEARCH_NODES_TOOL_NAME,
+  searchNodesTool,
+} from '@figma-forge/core';
+import { describe, expect, it } from 'vitest';
+
+import { GET_SCREENSHOT_TOOL_NAME, getScreenshotTool } from '../../src/tools/get-screenshot.js';
+import { LIST_FILES_TOOL_NAME, listFilesTool } from '../../src/tools/list-files.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const getAnnotationsToolDefinition = toToolDefinition(getAnnotationsTool);

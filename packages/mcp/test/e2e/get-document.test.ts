@@ -3,12 +3,12 @@ import {
   GetDocumentResultSchema,
   MIXED,
   type SerializedNode,
+  GET_DOCUMENT_TOOL_NAME,
 } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
 import { dispatchTool } from '../../src/dispatch.js';
-import { GET_DOCUMENT_TOOL_NAME } from '../../src/tools/get-document.js';
 import {
   closeSocket,
   connectFakePlugin,

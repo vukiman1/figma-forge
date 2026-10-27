@@ -1,4 +1,8 @@
-import type { GetDesignContextResult } from '@figma-forge/core';
+import {
+  type GetDesignContextResult,
+  GET_DESIGN_CONTEXT_TOOL_NAME,
+  type ToolSpec,
+} from '@figma-forge/core';
 import { z } from 'zod';
 
 import { detectIconLibraries, scanRepoSvgs } from '../icons/repo-icons.js';
@@ -10,8 +14,6 @@ import {
   readProjectDeps,
 } from '../profile/profile.js';
 import { truncationNote } from '../repo-walk.js';
-import { GET_DESIGN_CONTEXT_TOOL_NAME } from './get-design-context.js';
-import type { ToolSpec } from './spec.js';
 
 export const ICON_MAP_TOOL_NAME = 'icon_map';
 

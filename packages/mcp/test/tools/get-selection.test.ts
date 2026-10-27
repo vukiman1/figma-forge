@@ -1,6 +1,6 @@
+import { GET_SELECTION_TOOL_NAME, getSelectionTool } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { GET_SELECTION_TOOL_NAME, getSelectionTool } from '../../src/tools/get-selection.js';
 import { toToolDefinition } from '../tool-schema.js';
 
 const getSelectionToolDefinition = toToolDefinition(getSelectionTool);

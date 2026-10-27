@@ -7,10 +7,10 @@ import {
   LAYOUT_FIELDS,
   LAYOUT_TIER_FIELDS,
   planRootFrom,
+  getDesignContextTool,
 } from '@figma-forge/core';
 
 import { annotateProjectTokens, loadTokenValueIndex } from '../tokens/token-index.js';
-import { getDesignContextTool } from './get-design-context.js';
 
 // The public-path guard around get_design_context, the hot grounding read. Internal consumers
 // (design_diff snapshots, component/icon map walks) dispatch the tool directly and are untouched;

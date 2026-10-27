@@ -21,29 +21,29 @@ import {
   type ScanTextNodesResult,
   type SearchNodesResult,
   serializeNode,
+  GET_ANNOTATIONS_TOOL_NAME,
+  GET_DESIGN_CONTEXT_TOOL_NAME,
+  GET_FONTS_TOOL_NAME,
+  GET_LOCAL_COMPONENTS_TOOL_NAME,
+  GET_METADATA_TOOL_NAME,
+  GET_NODE_TOOL_NAME,
+  GET_NODES_INFO_TOOL_NAME,
+  GET_PAGES_TOOL_NAME,
+  GET_REACTIONS_TOOL_NAME,
+  GET_STYLES_TOOL_NAME,
+  GET_VARIABLE_DEFS_TOOL_NAME,
+  GET_VIEWPORT_TOOL_NAME,
+  SCAN_NODES_BY_TYPES_TOOL_NAME,
+  SCAN_TEXT_NODES_TOOL_NAME,
+  SEARCH_NODES_TOOL_NAME,
 } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
 import { dispatchTool } from '../../src/dispatch.js';
-import { GET_ANNOTATIONS_TOOL_NAME } from '../../src/tools/get-annotations.js';
-import { GET_DESIGN_CONTEXT_TOOL_NAME } from '../../src/tools/get-design-context.js';
-import { GET_FONTS_TOOL_NAME } from '../../src/tools/get-fonts.js';
-import { GET_LOCAL_COMPONENTS_TOOL_NAME } from '../../src/tools/get-local-components.js';
-import { GET_METADATA_TOOL_NAME } from '../../src/tools/get-metadata.js';
-import { GET_NODE_TOOL_NAME } from '../../src/tools/get-node.js';
-import { GET_NODES_INFO_TOOL_NAME } from '../../src/tools/get-nodes-info.js';
-import { GET_PAGES_TOOL_NAME } from '../../src/tools/get-pages.js';
-import { GET_REACTIONS_TOOL_NAME } from '../../src/tools/get-reactions.js';
 import { GET_SCREENSHOT_TOOL_NAME } from '../../src/tools/get-screenshot.js';
-import { GET_STYLES_TOOL_NAME } from '../../src/tools/get-styles.js';
-import { GET_VARIABLE_DEFS_TOOL_NAME } from '../../src/tools/get-variable-defs.js';
-import { GET_VIEWPORT_TOOL_NAME } from '../../src/tools/get-viewport.js';
 import { LIST_FILES_TOOL_NAME } from '../../src/tools/list-files.js';
 import { handleSaveScreenshots } from '../../src/tools/save-screenshots.js';
-import { SCAN_NODES_BY_TYPES_TOOL_NAME } from '../../src/tools/scan-nodes-by-types.js';
-import { SCAN_TEXT_NODES_TOOL_NAME } from '../../src/tools/scan-text-nodes.js';
-import { SEARCH_NODES_TOOL_NAME } from '../../src/tools/search-nodes.js';
 import {
   closeSocket,
   connectFakePlugin,

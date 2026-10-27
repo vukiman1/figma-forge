@@ -1,12 +1,14 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figma-forge/core';
+import {
+  type GetDesignContextResult,
+  GET_DESIGN_CONTEXT_TOOL_NAME,
+  type ToolSpec,
+} from '@figma-forge/core';
 import { z } from 'zod';
 
 import { type DesignDiffChanges, diffDesignContext } from '../diff/design-diff.js';
-import { GET_DESIGN_CONTEXT_TOOL_NAME } from './get-design-context.js';
-import type { ToolSpec } from './spec.js';
 
 export const DESIGN_DIFF_TOOL_NAME = 'design_diff';
 

@@ -1,18 +1,18 @@
-import { ErrorCode } from '@figma-forge/core';
-import { describe, expect, it } from 'vitest';
-
-import { applyAnimationStyleTool } from '../../src/tools/apply-animation-style.js';
-import { applyManualKeyframeTrackTool } from '../../src/tools/apply-manual-keyframe-track.js';
-import { createVariableTool } from '../../src/tools/create-variable.js';
 import {
+  ErrorCode,
+  applyAnimationStyleTool,
+  applyManualKeyframeTrackTool,
+  createVariableTool,
   animationStyleConfigSchema,
   keyframeFieldSchema,
   keyframeValueSchema,
   manualKeyframeTrackInputSchema,
   MOTION_EASING_TYPES,
   motionEasingSchema,
-} from '../../src/tools/motion-schemas.js';
-import { setVariableValueTool } from '../../src/tools/set-variable-value.js';
+  setVariableValueTool,
+} from '@figma-forge/core';
+import { describe, expect, it } from 'vitest';
+
 import { checkBatchOps, checkWireCall } from '../../src/tools/wire-schema.js';
 
 describe('motionEasingSchema', () => {

@@ -2,10 +2,9 @@ import {
   CLIENT_MESSAGE_LIMIT_BYTES,
   type GetScreenshotResult,
   SCREENSHOT_FORMATS,
+  type ToolSpec,
 } from '@figma-forge/core';
 import { z } from 'zod';
-
-import type { ToolSpec } from './spec.js';
 
 export const GET_SCREENSHOT_TOOL_NAME = 'get_screenshot';
 

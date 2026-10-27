@@ -1,6 +1,5 @@
+import type { ToolSpec } from '@figma-forge/core';
 import type { ToolAnnotations } from '@modelcontextprotocol/server';
-
-import type { ToolSpec } from './spec.js';
 
 /**
  * The MCP annotations a spec advertises — derived from the spec, never hand-kept: `kind` drives

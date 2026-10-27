@@ -1,7 +1,7 @@
+import type { ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { analyzeProject, type ProjectProfile } from '../profile/profile.js';
-import type { ToolSpec } from './spec.js';
 
 export const ANALYZE_PROJECT_TOOL_NAME = 'analyze_project';
 

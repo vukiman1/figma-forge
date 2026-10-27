@@ -1,7 +1,11 @@
 import { access, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figma-forge/core';
+import {
+  type GetDesignContextResult,
+  GET_DESIGN_CONTEXT_TOOL_NAME,
+  type ToolSpec,
+} from '@figma-forge/core';
 import { z } from 'zod';
 
 import {
@@ -13,8 +17,6 @@ import {
 import { analyzeProject, type ProjectProfile } from '../profile/profile.js';
 import { truncationNote } from '../repo-walk.js';
 import { scanComponents } from '../scan/scan.js';
-import { GET_DESIGN_CONTEXT_TOOL_NAME } from './get-design-context.js';
-import type { ToolSpec } from './spec.js';
 
 export const COMPONENT_MAP_TOOL_NAME = 'component_map';
 

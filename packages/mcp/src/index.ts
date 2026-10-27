@@ -6,6 +6,11 @@ import {
   newId,
   PROTOCOL_VERSION,
   type SearchNodesResult,
+  BATCH_TOOL_NAME,
+  GET_DESIGN_CONTEXT_TOOL_NAME,
+  SCAN_NODES_BY_TYPES_TOOL_NAME,
+  SCAN_TEXT_NODES_TOOL_NAME,
+  SEARCH_NODES_TOOL_NAME,
 } from '@figma-forge/core';
 import { McpServer } from '@modelcontextprotocol/server';
 import type { CallToolResult } from '@modelcontextprotocol/server';
@@ -30,13 +35,11 @@ import { normalizeIdArgs } from './node-id.js';
 import { PROMPTS } from './prompts/registry.js';
 import { ANALYZE_PROJECT_TOOL_NAME, handleAnalyzeProject } from './tools/analyze-project.js';
 import { annotationsFor } from './tools/annotations.js';
-import { BATCH_TOOL_NAME } from './tools/batch.js';
 import { COMPONENT_MAP_TOOL_NAME, handleComponentMap } from './tools/component-map.js';
 import { handleDesignContext } from './tools/design-context-guard.js';
 import { DESIGN_DIFF_TOOL_NAME, handleDesignDiff } from './tools/design-diff.js';
 import { EXPORT_PDF_TOOL_NAME, handleExportPdf } from './tools/export-pdf.js';
 import { EXPORT_VIDEO_TOOL_NAME, handleExportVideo } from './tools/export-video.js';
-import { GET_DESIGN_CONTEXT_TOOL_NAME } from './tools/get-design-context.js';
 import { GET_SCREENSHOT_TOOL_NAME, screenshotContent } from './tools/get-screenshot.js';
 import { handleIconMap, ICON_MAP_TOOL_NAME } from './tools/icon-map.js';
 import {
@@ -53,9 +56,6 @@ import { assertWithinLimit, fitNodeList } from './tools/result-budget.js';
 import { handleSaveImageFills, SAVE_IMAGE_FILLS_TOOL_NAME } from './tools/save-image-fills.js';
 import { handleSaveScreenshots, SAVE_SCREENSHOTS_TOOL_NAME } from './tools/save-screenshots.js';
 import { handleScanComponents, SCAN_COMPONENTS_TOOL_NAME } from './tools/scan-components.js';
-import { SCAN_NODES_BY_TYPES_TOOL_NAME } from './tools/scan-nodes-by-types.js';
-import { SCAN_TEXT_NODES_TOOL_NAME } from './tools/scan-text-nodes.js';
-import { SEARCH_NODES_TOOL_NAME } from './tools/search-nodes.js';
 import { handleTokenMap, TOKEN_MAP_TOOL_NAME } from './tools/token-map.js';
 import { handleUseFile, USE_FILE_TOOL_NAME } from './tools/use-file.js';
 import { checkBatchOps } from './tools/wire-schema.js';

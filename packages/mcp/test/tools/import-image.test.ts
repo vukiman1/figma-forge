@@ -2,6 +2,7 @@ import { mkdtemp, open, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
+import { SET_IMAGE_FILL_TOOL_NAME, setImageFillTool } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -11,7 +12,6 @@ import {
   resolveBatchImagePaths,
   resolveImagePath,
 } from '../../src/tools/import-image.js';
-import { SET_IMAGE_FILL_TOOL_NAME, setImageFillTool } from '../../src/tools/set-image-fill.js';
 import { WIRE_TOOL_SCHEMAS } from '../../src/tools/wire-schema.js';
 import { toToolDefinition } from '../tool-schema.js';
 

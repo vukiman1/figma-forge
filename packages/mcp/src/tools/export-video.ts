@@ -1,12 +1,15 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-import type { ExportVideoResult, VideoExport } from '@figma-forge/core';
+import {
+  type ExportVideoResult,
+  type VideoExport,
+  videoExportConstraintSchema,
+  type ToolSpec,
+} from '@figma-forge/core';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';
-import { videoExportConstraintSchema } from './motion-schemas.js';
-import type { ToolSpec } from './spec.js';
 
 export const EXPORT_VIDEO_TOOL_NAME = 'export_video';
 

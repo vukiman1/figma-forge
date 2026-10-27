@@ -1,7 +1,6 @@
+import type { ToolSpec } from '@figma-forge/core';
 import type { Tool } from '@modelcontextprotocol/server';
 import { z } from 'zod';
-
-import type { ToolSpec } from '../src/tools/spec.js';
 
 /**
  * Derive the JSON-Schema `Tool` definition a spec advertises — independently of the SDK.

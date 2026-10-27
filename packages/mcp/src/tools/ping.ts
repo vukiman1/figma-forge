@@ -1,10 +1,10 @@
+import type { ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { dispatchTargeted } from '../dispatch.js';
 import type { Follower } from '../election/follower.js';
 import { type Node, NodeRole } from '../election/node.js';
 import { getFileTarget } from '../routing/target.js';
-import type { ToolSpec } from './spec.js';
 
 export const PING_TOOL_NAME = 'ping';
 

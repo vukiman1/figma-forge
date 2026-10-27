@@ -1,16 +1,19 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import type { GetStylesResult, GetVariableDefsResult } from '@figma-forge/core';
+import {
+  type GetStylesResult,
+  type GetVariableDefsResult,
+  GET_STYLES_TOOL_NAME,
+  GET_VARIABLE_DEFS_TOOL_NAME,
+  type ToolSpec,
+} from '@figma-forge/core';
 import { z } from 'zod';
 
 import { joinTokens, parseTokenMapFile, type TokenMapping } from '../join/token-map.js';
 import { analyzeProject, isUtilityFirst, type ProjectProfile } from '../profile/profile.js';
 import { resolveFigmaTokens, resolvePaintStyleTokens } from '../tokens/figma-tokens.js';
 import { loadProjectTokens } from '../tokens/load.js';
-import { GET_STYLES_TOOL_NAME } from './get-styles.js';
-import { GET_VARIABLE_DEFS_TOOL_NAME } from './get-variable-defs.js';
-import type { ToolSpec } from './spec.js';
 
 export const TOKEN_MAP_TOOL_NAME = 'token_map';
 

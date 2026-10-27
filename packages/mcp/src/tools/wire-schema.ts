@@ -1,9 +1,7 @@
-import { ErrorCode } from '@figma-forge/core';
+import { ErrorCode, BATCH_TOOL_NAME, type ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
-import { BATCH_TOOL_NAME } from './batch.js';
 import { ALL_TOOL_SPECS } from './registry.js';
-import type { ToolSpec } from './spec.js';
 
 /**
  * The arguments a tool actually puts on the wire to the plugin, as a schema.

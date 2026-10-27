@@ -7,12 +7,12 @@ import {
   type SaveScreenshotsResult,
   SCREENSHOT_FORMATS,
   type ScreenshotImage,
+  type ToolSpec,
 } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';
 import { GET_SCREENSHOT_TOOL_NAME } from './get-screenshot.js';
-import type { ToolSpec } from './spec.js';
 
 export const SAVE_SCREENSHOTS_TOOL_NAME = 'save_screenshots';
 

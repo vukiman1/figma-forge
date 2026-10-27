@@ -1,0 +1,28 @@
+import { z } from 'zod';
+
+import { SerializedReactionSchema } from '../../model/prototype.js';
+import type { ToolSpec } from '../tool-spec.js';
+
+export const SET_REACTIONS_TOOL_NAME = 'set_reactions';
+
+export const setReactionsTool: ToolSpec = {
+  name: SET_REACTIONS_TOOL_NAME,
+  description:
+    "Replace all of a node's prototype reactions — this overwrites existing reactions rather than " +
+    "appending. Each reaction pairs a trigger (e.g. { type: 'ON_CLICK' }, or ON_KEY_DOWN with " +
+    'device + keyCodes) with an actions array: NODE carries destinationId, navigation ' +
+    '(NAVIGATE / SWAP / OVERLAY / SCROLL_TO / CHANGE_TO) and transition; URL, BACK, CLOSE, ' +
+    'SET_VARIABLE, SET_VARIABLE_MODE, UPDATE_MEDIA_RUNTIME and CONDITIONAL carry their own fields. ' +
+    'An OVERLAY action takes overlayRelativePosition ({ x, y }) to offset the overlay, which Figma ' +
+    "applies only when the destination frame's overlay position is set to Manual — that setting " +
+    'lives on the frame and is read-only to plugins, so it must be chosen in Figma first. ' +
+    'get_reactions output round-trips through here unchanged; to clear all reactions instead use ' +
+    'remove_reactions. On a page with no prototype flows, Figma may make the top-level frame ' +
+    'holding a new connection a flow named "Flow 1" on its own; get_pages lists it and ' +
+    'update_flows renames or removes it. Returns { ok, nodeId }.',
+  inputSchema: z.object({
+    nodeId: z.string().describe('Node to set reactions on'),
+    reactions: z.array(SerializedReactionSchema).describe('Reactions to apply (replaces existing)'),
+  }),
+  kind: 'write',
+};

@@ -1,3 +1,4 @@
+import type { ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
 import type { PluginSessionInfo } from '../routing/sessions.js';
@@ -14,7 +15,6 @@ import {
   namedSessions,
   type SessionDispatch,
 } from './list-files.js';
-import type { ToolSpec } from './spec.js';
 
 export const USE_FILE_TOOL_NAME = 'use_file';
 

@@ -5,6 +5,7 @@
   "description": "Pure domain for Figma Forge: protocol, schemas, design context.",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./src/index.ts",

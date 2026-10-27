@@ -1,9 +1,9 @@
+import type { ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { analyzeProject, type ProjectProfile } from '../profile/profile.js';
 import { truncationNote } from '../repo-walk.js';
 import { scanComponents, type ScannedComponent } from '../scan/scan.js';
-import type { ToolSpec } from './spec.js';
 
 export const SCAN_COMPONENTS_TOOL_NAME = 'scan_components';
 

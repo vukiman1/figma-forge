@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import type { GetDesignContextResult } from '@figma-forge/core';
+import { type GetDesignContextResult, GET_DESIGN_CONTEXT_TOOL_NAME } from '@figma-forge/core';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import {
@@ -10,7 +10,6 @@ import {
   SNAPSHOT_FORMAT_VERSION,
   type ToolDispatcher,
 } from '../../src/tools/design-diff.js';
-import { GET_DESIGN_CONTEXT_TOOL_NAME } from '../../src/tools/get-design-context.js';
 
 const SNAP_REL = join('.figma-forge', 'snapshots', '1-1.json');
 

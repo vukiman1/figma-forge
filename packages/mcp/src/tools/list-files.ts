@@ -1,9 +1,8 @@
-import type { ListFilesResult } from '@figma-forge/core';
+import { type ListFilesResult, type ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
 import type { PluginSessionInfo } from '../routing/sessions.js';
 import { getFileTarget } from '../routing/target.js';
-import type { ToolSpec } from './spec.js';
 
 export const LIST_FILES_TOOL_NAME = 'list_files';
 

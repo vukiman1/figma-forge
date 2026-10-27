@@ -1,42 +1,57 @@
-import { describe, expect, it } from 'vitest';
-
-import { BATCH_TOOL_NAME, batchTool } from '../../src/tools/batch.js';
-import { CLONE_NODE_TOOL_NAME, cloneNodeTool } from '../../src/tools/clone-node.js';
-import { CREATE_FRAME_TOOL_NAME, createFrameTool } from '../../src/tools/create-frame.js';
-import { CREATE_INSTANCE_TOOL_NAME, createInstanceTool } from '../../src/tools/create-instance.js';
 import {
+  BATCH_TOOL_NAME,
+  batchTool,
+  CLONE_NODE_TOOL_NAME,
+  cloneNodeTool,
+  CREATE_FRAME_TOOL_NAME,
+  createFrameTool,
+  CREATE_INSTANCE_TOOL_NAME,
+  createInstanceTool,
   CREATE_RECTANGLE_TOOL_NAME,
   createRectangleTool,
-} from '../../src/tools/create-rectangle.js';
-import { CREATE_TEXT_TOOL_NAME, createTextTool } from '../../src/tools/create-text.js';
-import { DELETE_NODES_TOOL_NAME, deleteNodesTool } from '../../src/tools/delete-nodes.js';
-import { LOCK_NODES_TOOL_NAME, lockNodesTool } from '../../src/tools/lock-nodes.js';
-import { MOVE_NODES_TOOL_NAME, moveNodesTool } from '../../src/tools/move-nodes.js';
-import { RENAME_NODE_TOOL_NAME, renameNodeTool } from '../../src/tools/rename-node.js';
-import { RESIZE_NODES_TOOL_NAME, resizeNodesTool } from '../../src/tools/resize-nodes.js';
-import { ROTATE_NODES_TOOL_NAME, rotateNodesTool } from '../../src/tools/rotate-nodes.js';
-import { SET_AUTO_LAYOUT_TOOL_NAME, setAutoLayoutTool } from '../../src/tools/set-auto-layout.js';
-import { SET_BLEND_MODE_TOOL_NAME, setBlendModeTool } from '../../src/tools/set-blend-mode.js';
-import { SET_CONSTRAINTS_TOOL_NAME, setConstraintsTool } from '../../src/tools/set-constraints.js';
-import {
+  CREATE_TEXT_TOOL_NAME,
+  createTextTool,
+  DELETE_NODES_TOOL_NAME,
+  deleteNodesTool,
+  LOCK_NODES_TOOL_NAME,
+  lockNodesTool,
+  MOVE_NODES_TOOL_NAME,
+  moveNodesTool,
+  RENAME_NODE_TOOL_NAME,
+  renameNodeTool,
+  RESIZE_NODES_TOOL_NAME,
+  resizeNodesTool,
+  ROTATE_NODES_TOOL_NAME,
+  rotateNodesTool,
+  SET_AUTO_LAYOUT_TOOL_NAME,
+  setAutoLayoutTool,
+  SET_BLEND_MODE_TOOL_NAME,
+  setBlendModeTool,
+  SET_CONSTRAINTS_TOOL_NAME,
+  setConstraintsTool,
   SET_CORNER_RADIUS_TOOL_NAME,
   setCornerRadiusTool,
-} from '../../src/tools/set-corner-radius.js';
-import { SET_FILLS_TOOL_NAME, setFillsTool } from '../../src/tools/set-fills.js';
-import { SET_MASK_TOOL_NAME, setMaskTool } from '../../src/tools/set-mask.js';
-import { SET_OPACITY_TOOL_NAME, setOpacityTool } from '../../src/tools/set-opacity.js';
-import { SET_STROKES_TOOL_NAME, setStrokesTool } from '../../src/tools/set-strokes.js';
-import {
+  SET_FILLS_TOOL_NAME,
+  setFillsTool,
+  SET_MASK_TOOL_NAME,
+  setMaskTool,
+  SET_OPACITY_TOOL_NAME,
+  setOpacityTool,
+  SET_STROKES_TOOL_NAME,
+  setStrokesTool,
   SET_TEXT_PROPERTIES_TOOL_NAME,
   setTextPropertiesTool,
-} from '../../src/tools/set-text-properties.js';
-import { SET_TEXT_TOOL_NAME, setTextTool } from '../../src/tools/set-text.js';
-import {
+  SET_TEXT_TOOL_NAME,
+  setTextTool,
   SET_VARIABLE_CODE_SYNTAX_TOOL_NAME,
   setVariableCodeSyntaxTool,
-} from '../../src/tools/set-variable-code-syntax.js';
-import { SET_VISIBLE_TOOL_NAME, setVisibleTool } from '../../src/tools/set-visible.js';
-import { UNLOCK_NODES_TOOL_NAME, unlockNodesTool } from '../../src/tools/unlock-nodes.js';
+  SET_VISIBLE_TOOL_NAME,
+  setVisibleTool,
+  UNLOCK_NODES_TOOL_NAME,
+  unlockNodesTool,
+} from '@figma-forge/core';
+import { describe, expect, it } from 'vitest';
+
 import { toToolDefinition } from '../tool-schema.js';
 
 const batchToolDefinition = toToolDefinition(batchTool);

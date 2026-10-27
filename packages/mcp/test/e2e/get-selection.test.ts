@@ -2,12 +2,12 @@ import {
   type GetSelectionResult,
   GetSelectionResultSchema,
   serializeNode,
+  GET_SELECTION_TOOL_NAME,
 } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
 import { dispatchTool } from '../../src/dispatch.js';
-import { GET_SELECTION_TOOL_NAME } from '../../src/tools/get-selection.js';
 import {
   closeSocket,
   connectFakePlugin,

@@ -1,11 +1,10 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 
-import type { ExportPdfResult, PdfExport } from '@figma-forge/core';
+import { type ExportPdfResult, type PdfExport, type ToolSpec } from '@figma-forge/core';
 import { z } from 'zod';
 
 import { binaryPayload } from './binary-payload.js';
-import type { ToolSpec } from './spec.js';
 
 export const EXPORT_PDF_TOOL_NAME = 'export_pdf';
 
