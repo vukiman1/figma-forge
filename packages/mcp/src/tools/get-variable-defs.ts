@@ -10,8 +10,8 @@ export const getVariableDefsTool: ToolSpec = {
     "Return the document's local variables as { collections, variables }. Each collection lists its modes " +
     'and defaultModeId; each variable lists its resolvedType and valuesByMode (primitives, RGBA colors, ' +
     '{ type: "VARIABLE_ALIAS", id } references to other variables, a composed color ' +
-    '{ color, opacity } pairing a color with a separate opacity where either half may be an alias, ' +
-    'or — for an EASING variable — an easing curve ' +
+    '{ color, opacity } pairing a color with a separate opacity percentage (0–100, not 0–1) where ' +
+    'either half may be an alias, or — for an EASING variable — an easing curve ' +
     '{ type, easingFunctionCubicBezier?, easingFunctionSpring? }). A variable also carries scopes ' +
     'when the designer narrowed where Figma offers it (e.g. ["CORNER_RADIUS"]) — authoritative ' +
     'intent about what the token is for; absent means every scope. This lists local definitions, ' +

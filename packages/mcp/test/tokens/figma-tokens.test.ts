@@ -142,7 +142,7 @@ describe('resolveFigmaTokens', () => {
       key: 'k',
       resolvedType: 'FLOAT',
       collectionId: 'col1',
-      valuesByMode: { m1: 0.5 },
+      valuesByMode: { m1: 50 },
     };
     const result = resolveFigmaTokens(
       defs({
@@ -185,14 +185,14 @@ describe('resolveFigmaTokens', () => {
             resolvedType: 'COLOR',
             collectionId: 'col1',
             valuesByMode: {
-              m1: { color: { type: 'VARIABLE_ALIAS', id: 'gone' }, opacity: 0.5 },
+              m1: { color: { type: 'VARIABLE_ALIAS', id: 'gone' }, opacity: 50 },
             },
           },
         ],
       }),
     );
 
-    // 0.5 × 255 = 127.5 → 0x80; before the composed-color branch these resolved to the easing
+    // 50% → 0.5 × 255 = 127.5 → 0x80; before the composed-color branch these resolved to the easing
     // formatter's output instead, since every remaining object-shaped value was assumed to be one.
     expect(result.find(t => t.name === 'Overlay/both')?.value).toBe('#6266F080');
     expect(result.find(t => t.name === 'Overlay/literal')?.value).toBe('#FFFFFF80');
@@ -202,7 +202,7 @@ describe('resolveFigmaTokens', () => {
 
   // The colour half can resolve to an 8-digit hex of its own, which is the case where "the opacity
   // becomes the alpha" has to mean replace rather than multiply. Measured against a live file:
-  // a base at alpha 0.8 (#FF0000CC) composed with opacity 0.5 reads back as #FF000080, not the
+  // a base at alpha 0.8 (#FF0000CC) composed with opacity 50 reads back as #FF000080, not the
   // #FF000066 a multiply would give.
   it('replaces the base colour own alpha rather than multiplying with it', () => {
     const result = resolveFigmaTokens(
@@ -223,7 +223,7 @@ describe('resolveFigmaTokens', () => {
             resolvedType: 'COLOR',
             collectionId: 'col1',
             valuesByMode: {
-              m1: { color: { type: 'VARIABLE_ALIAS', id: 'base' }, opacity: 0.5 },
+              m1: { color: { type: 'VARIABLE_ALIAS', id: 'base' }, opacity: 50 },
             },
           },
         ],
@@ -232,6 +232,36 @@ describe('resolveFigmaTokens', () => {
 
     expect(result.find(t => t.name === 'palette/translucent')?.value).toBe('#FF0000CC');
     expect(result.find(t => t.name === 'Overlay/half')?.value).toBe('#FF000080');
+  });
+
+  // Read as a 0–1 alpha, an opacity of 12 clamps to 1 and a 12% scrim flattens to its opaque base.
+  it('reads a composed color opacity as a percentage, not as a 0–1 alpha', () => {
+    const result = resolveFigmaTokens(
+      defs({
+        variables: [
+          {
+            id: 'black',
+            name: 'palette/black',
+            key: 'k',
+            resolvedType: 'COLOR',
+            collectionId: 'col1',
+            valuesByMode: { m1: { r: 0, g: 0, b: 0, a: 1 } },
+          },
+          {
+            id: 'scrim',
+            name: 'Overlay/scrim',
+            key: 'k',
+            resolvedType: 'COLOR',
+            collectionId: 'col1',
+            valuesByMode: {
+              m1: { color: { type: 'VARIABLE_ALIAS', id: 'black' }, opacity: 12 },
+            },
+          },
+        ],
+      }),
+    );
+
+    expect(result.find(t => t.name === 'Overlay/scrim')?.value).toBe('#0000001F');
   });
 
   // The link between the two halves of the scopes work: what get_variable_defs reports has to reach

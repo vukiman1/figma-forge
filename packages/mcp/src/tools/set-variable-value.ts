@@ -50,7 +50,7 @@ const variableValue = z
   ])
   .describe(
     'boolean | number | string | { r,g,b,a, space? } | { type:"VARIABLE_ALIAS", id } | ' +
-      '{ color, opacity } composed color | { type: easing }',
+      '{ color, opacity: 0–100 } composed color | { type: easing }',
   );
 
 export const setVariableValueTool: ToolSpec = {
@@ -60,7 +60,8 @@ export const setVariableValueTool: ToolSpec = {
     'match the variable resolvedType: a boolean, a number (FLOAT), a string, a color { r, g, b, a } ' +
     '(0–1, in the document\'s colour space unless `space` names another — pass "SRGB" for a ' +
     'colour taken from code), an alias { type: "VARIABLE_ALIAS", id } pointing at another ' +
-    'variable, or a composed color { color, opacity } that pairs a color with a separate opacity — ' +
+    'variable, or a composed color { color, opacity } that pairs a color with a separate opacity ' +
+    '— a percentage, 0–100 (50 is half), unlike the 0–1 colour channels — ' +
     'each half either a ' +
     'concrete value or an alias, with at least one of the two an alias. An EASING variable takes a ' +
     'Motion easing, a TIMING variable a number of seconds. Create the variable first with ' +

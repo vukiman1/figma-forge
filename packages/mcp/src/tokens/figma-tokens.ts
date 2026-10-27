@@ -20,6 +20,8 @@ import {
 /** A resolved concrete value: hex string for color, primitive otherwise; null if unresolved. */
 type FigmaTokenValue = string | number | boolean | null;
 
+const OPACITY_PERCENT_SCALE = 100;
+
 export interface FigmaToken {
   /** Figma variable name, group separators kept, e.g. "Primary/500". */
   name: string;
@@ -155,7 +157,8 @@ export const resolveFigmaTokens = (defs: GetVariableDefsResult): FigmaToken[] =>
    * A composed colour flattened to one hex, because a token value is one scalar. Each half is
    * resolved on its own — either may be an alias — and the opacity becomes the colour's alpha:
    * Figma authors the two separately precisely so the opacity _is_ the resulting alpha, so a base
-   * colour carrying its own alpha has it replaced rather than multiplied.
+   * colour carrying its own alpha has it replaced rather than multiplied. Figma stores the opacity
+   * as a percentage (0–100, plugin-typings: "a separate opacity percentage"), not a 0–1 alpha.
    *
    * Either half failing to resolve to the right kind of value yields null rather than a colour that
    * is half true — an unresolved token is readable as such, a plausible wrong hex is not.
@@ -172,10 +175,10 @@ export const resolveFigmaTokens = (defs: GetVariableDefsResult): FigmaToken[] =>
     seen: Set<string>,
   ): FigmaTokenValue => {
     const base = isAlias(raw.color) ? chase(raw.color.id, ctx, new Set(seen)) : toHex(raw.color, 1);
-    const alpha =
+    const opacityPercent =
       typeof raw.opacity === 'number' ? raw.opacity : chase(raw.opacity.id, ctx, new Set(seen));
-    if (typeof base !== 'string' || typeof alpha !== 'number') return null;
-    return withAlpha(base, alpha);
+    if (typeof base !== 'string' || typeof opacityPercent !== 'number') return null;
+    return withAlpha(base, opacityPercent / OPACITY_PERCENT_SCALE);
   };
 
   const resolve = (

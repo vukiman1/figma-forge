@@ -20,7 +20,7 @@ export type SerializedVariableColor = z.infer<typeof SerializedVariableColorSche
 /**
  * A composed color — plugin-typings 1.139 widened VariableValue again: a color and its opacity
  * authored separately, with at least one of the two an alias (a shared colour reused at several
- * opacities without duplicating the colour itself).
+ * opacities without duplicating the colour itself). The opacity is a percentage, 0–100.
  *
  * It carries no `type`, so before this member existed it fell through to the plain-colour branch of
  * every reader and came out as `r`/`g`/`b`: undefined behind a fabricated `#NANNANNAN` hex
