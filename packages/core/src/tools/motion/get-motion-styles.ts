@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_MOTION_STYLES_TOOL_NAME = 'get_motion_styles';
 
+export const getMotionStylesParams = z.object({});
+
 export const getMotionStylesTool: ToolSpec = {
   name: GET_MOTION_STYLES_TOOL_NAME,
   description:
@@ -12,6 +14,6 @@ export const getMotionStylesTool: ToolSpec = {
     'is what apply_animation_style takes and props lists a preset’s tunable keys. Motion is a beta ' +
     'feature: this read works wherever the plugin API exposes it; applying presets needs the Figma ' +
     'Design editor.',
-  inputSchema: z.object({}),
+  inputSchema: getMotionStylesParams,
   kind: 'read',
 };

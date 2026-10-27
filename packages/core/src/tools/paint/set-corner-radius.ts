@@ -4,6 +4,16 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_CORNER_RADIUS_TOOL_NAME = 'set_corner_radius';
 
+export const setCornerRadiusParams = z.object({
+  nodeId: z.string().describe('Figma node id'),
+  radius: z.number().min(0).optional().describe('Uniform corner radius in px'),
+  cornerSmoothing: z.number().min(0).max(1).optional().describe('Corner smoothing, 0–1'),
+  topLeftRadius: z.number().min(0).optional().describe('Top-left corner radius in px'),
+  topRightRadius: z.number().min(0).optional().describe('Top-right corner radius in px'),
+  bottomRightRadius: z.number().min(0).optional().describe('Bottom-right corner radius in px'),
+  bottomLeftRadius: z.number().min(0).optional().describe('Bottom-left corner radius in px'),
+});
+
 export const setCornerRadiusTool: ToolSpec = {
   name: SET_CORNER_RADIUS_TOOL_NAME,
   description:
@@ -13,14 +23,6 @@ export const setCornerRadiusTool: ToolSpec = {
     'value overrides radius for that corner. cornerSmoothing is 0–1 (0 = circular, 0.6 = squircle); ' +
     'it can be set without changing any radius. At least one radius or cornerSmoothing is required. ' +
     'Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Figma node id'),
-    radius: z.number().min(0).optional().describe('Uniform corner radius in px'),
-    cornerSmoothing: z.number().min(0).max(1).optional().describe('Corner smoothing, 0–1'),
-    topLeftRadius: z.number().min(0).optional().describe('Top-left corner radius in px'),
-    topRightRadius: z.number().min(0).optional().describe('Top-right corner radius in px'),
-    bottomRightRadius: z.number().min(0).optional().describe('Bottom-right corner radius in px'),
-    bottomLeftRadius: z.number().min(0).optional().describe('Bottom-left corner radius in px'),
-  }),
+  inputSchema: setCornerRadiusParams,
   kind: 'write',
 };

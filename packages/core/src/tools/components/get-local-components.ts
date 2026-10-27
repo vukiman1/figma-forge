@@ -4,6 +4,13 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_LOCAL_COMPONENTS_TOOL_NAME = 'get_local_components';
 
+export const getLocalComponentsParams = z.object({
+  nodeId: z
+    .string()
+    .describe('Root node id to scan within; omit to use the current selection')
+    .optional(),
+});
+
 export const getLocalComponentsTool: ToolSpec = {
   name: GET_LOCAL_COMPONENTS_TOOL_NAME,
   description:
@@ -12,11 +19,6 @@ export const getLocalComponentsTool: ToolSpec = {
     'the frames to scan. A document root is not supported; use get_pages and scan each page by nodeId. ' +
     'Components carry their variantProperties (when part of a set); component sets ' +
     'carry their variantGroupProperties (available values per axis) and the ids of their variant components.',
-  inputSchema: z.object({
-    nodeId: z
-      .string()
-      .describe('Root node id to scan within; omit to use the current selection')
-      .optional(),
-  }),
+  inputSchema: getLocalComponentsParams,
   kind: 'read',
 };

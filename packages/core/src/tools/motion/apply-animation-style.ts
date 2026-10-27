@@ -5,6 +5,14 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const APPLY_ANIMATION_STYLE_TOOL_NAME = 'apply_animation_style';
 
+export const applyAnimationStyleParams = z.object({
+  nodeId: z.string().describe('Figma node id to animate'),
+  styleId: z.string().describe('A styleId from get_motion_styles'),
+  config: animationStyleConfigSchema
+    .describe('Optional tuning: duration, timelineOffset (for stagger), preset props')
+    .optional(),
+});
+
 export const applyAnimationStyleTool: ToolSpec = {
   name: APPLY_ANIMATION_STYLE_TOOL_NAME,
   description:
@@ -14,12 +22,6 @@ export const applyAnimationStyleTool: ToolSpec = {
     '{ ok, nodeId, appliedStyleId } — keep appliedStyleId to remove exactly this instance later. To ' +
     'stagger a whole row in one atomic, undoable call, drive N apply_animation_style ops through ' +
     '`batch` with increasing timelineOffset. Motion is a Figma-Design-only beta feature.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Figma node id to animate'),
-    styleId: z.string().describe('A styleId from get_motion_styles'),
-    config: animationStyleConfigSchema
-      .describe('Optional tuning: duration, timelineOffset (for stagger), preset props')
-      .optional(),
-  }),
+  inputSchema: applyAnimationStyleParams,
   kind: 'write',
 };

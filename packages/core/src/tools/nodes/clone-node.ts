@@ -4,6 +4,10 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CLONE_NODE_TOOL_NAME = 'clone_node';
 
+export const cloneNodeParams = z.object({
+  nodeId: z.string().describe('Node id to clone'),
+});
+
 export const cloneNodeTool: ToolSpec = {
   name: CLONE_NODE_TOOL_NAME,
   description:
@@ -12,8 +16,6 @@ export const cloneNodeTool: ToolSpec = {
     "a fresh instance of a component use create_instance instead. Cloning a prototype flow's " +
     'starting frame also clones the flow, under the same name, right after the original (rename ' +
     'or remove it with update_flows). Returns { ok, nodeId, name, type } for the copy.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node id to clone'),
-  }),
+  inputSchema: cloneNodeParams,
   kind: 'write',
 };

@@ -4,6 +4,14 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_MOTION_CONTEXT_TOOL_NAME = 'get_motion_context';
 
+export const getMotionContextParams = z.object({
+  nodeId: z
+    .string()
+    .describe(
+      'Frame or layer id whose subtree to inventory (a top-level frame covers its timeline)',
+    ),
+});
+
 export const getMotionContextTool: ToolSpec = {
   name: GET_MOTION_CONTEXT_TOOL_NAME,
   description:
@@ -18,12 +26,6 @@ export const getMotionContextTool: ToolSpec = {
     'coverage names why and lists ' +
     'pendingNodeIds, disjoint subtree roots to call it on next. Nodes on one timeline id share a ' +
     'clock. Loop, trigger and pivot are not in the data — never fill them in as if Figma had.',
-  inputSchema: z.object({
-    nodeId: z
-      .string()
-      .describe(
-        'Frame or layer id whose subtree to inventory (a top-level frame covers its timeline)',
-      ),
-  }),
+  inputSchema: getMotionContextParams,
   kind: 'read',
 };

@@ -4,6 +4,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const RENAME_NODE_TOOL_NAME = 'rename_node';
 
+export const renameNodeParams = z.object({
+  nodeId: z.string().describe('Figma node id'),
+  name: z.string().describe('New layer name'),
+});
+
 export const renameNodeTool: ToolSpec = {
   name: RENAME_NODE_TOOL_NAME,
   description:
@@ -11,9 +16,6 @@ export const renameNodeTool: ToolSpec = {
     'instances. To rename a document page use rename_page; to rename many nodes by pattern use ' +
     "batch_rename_nodes; a prototype flow's name is not its frame's name, so rename a flow with " +
     'update_flows. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Figma node id'),
-    name: z.string().describe('New layer name'),
-  }),
+  inputSchema: renameNodeParams,
   kind: 'write',
 };

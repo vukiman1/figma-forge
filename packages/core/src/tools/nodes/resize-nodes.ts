@@ -4,6 +4,15 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const RESIZE_NODES_TOOL_NAME = 'resize_nodes';
 
+export const resizeNodesParams = z.object({
+  nodeIds: z.array(z.string()).describe('Node ids to resize'),
+  width: z.number().min(0.01),
+  height: z
+    .number()
+    .min(0)
+    .describe('At least 0.01 px; a LINE keeps height 0 whatever is passed (0 is exact for a line)'),
+});
+
 export const resizeNodesTool: ToolSpec = {
   name: RESIZE_NODES_TOOL_NAME,
   description:
@@ -17,15 +26,6 @@ export const resizeNodesTool: ToolSpec = {
     'reached the requested size, and adjusted lists any Figma sized differently (an instance layer, a ' +
     'minWidth / maxWidth / minHeight / maxHeight bound) with its actual size and why. A call that ' +
     'changed nothing throws. Returns { ok, affected, adjusted? }.',
-  inputSchema: z.object({
-    nodeIds: z.array(z.string()).describe('Node ids to resize'),
-    width: z.number().min(0.01),
-    height: z
-      .number()
-      .min(0)
-      .describe(
-        'At least 0.01 px; a LINE keeps height 0 whatever is passed (0 is exact for a line)',
-      ),
-  }),
+  inputSchema: resizeNodesParams,
   kind: 'write',
 };

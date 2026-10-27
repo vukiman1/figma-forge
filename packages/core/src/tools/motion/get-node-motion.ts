@@ -4,6 +4,10 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_NODE_MOTION_TOOL_NAME = 'get_node_motion';
 
+export const getNodeMotionParams = z.object({
+  nodeId: z.string().describe('Figma node id to read Motion state from'),
+});
+
 export const getNodeMotionTool: ToolSpec = {
   name: GET_NODE_MOTION_TOOL_NAME,
   description:
@@ -15,8 +19,6 @@ export const getNodeMotionTool: ToolSpec = {
     "supports no Motion. Also returns playheadPosition — the editor's Motion playhead in seconds, " +
     'present only with an active timeline. Use it as a keyframe timelinePosition when the user ' +
     'means "here", i.e. wherever they have scrubbed to.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Figma node id to read Motion state from'),
-  }),
+  inputSchema: getNodeMotionParams,
   kind: 'read',
 };

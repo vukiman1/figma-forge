@@ -5,6 +5,16 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const REPEAT_NODES_TOOL_NAME = 'repeat_nodes';
 
+export const repeatNodesParams = z.object({
+  nodeIds: z.array(z.string()).min(1).describe('Layers to repeat (one parent)'),
+  modifiers: z
+    .array(repeatModifierSchema)
+    .min(1)
+    .max(2)
+    .describe('1 or 2 modifiers; the second repeats everything the first drew'),
+  name: z.string().optional().describe('Name for the repeat group'),
+});
+
 export const repeatNodesTool: ToolSpec = {
   name: REPEAT_NODES_TOOL_NAME,
   description:
@@ -15,14 +25,6 @@ export const repeatNodesTool: ToolSpec = {
     ' The nodes must share a parent; the group takes the place of the topmost and the content keeps ' +
     'its position. Change the repeat later with set_repeat; ungroup_nodes removes it. Returns ' +
     '{ ok, nodeId, name, type } for the new TRANSFORM_GROUP.',
-  inputSchema: z.object({
-    nodeIds: z.array(z.string()).min(1).describe('Layers to repeat (one parent)'),
-    modifiers: z
-      .array(repeatModifierSchema)
-      .min(1)
-      .max(2)
-      .describe('1 or 2 modifiers; the second repeats everything the first drew'),
-    name: z.string().optional().describe('Name for the repeat group'),
-  }),
+  inputSchema: repeatNodesParams,
   kind: 'write',
 };

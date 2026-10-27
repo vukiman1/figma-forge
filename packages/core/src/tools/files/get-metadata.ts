@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_METADATA_TOOL_NAME = 'get_metadata';
 
+export const getMetadataParams = z.object({});
+
 export const getMetadataTool: ToolSpec = {
   name: GET_METADATA_TOOL_NAME,
   description:
@@ -12,6 +14,6 @@ export const getMetadataTool: ToolSpec = {
     'variables or styles — and colorProfile, the space its colours are stored in (SRGB / ' +
     'DISPLAY_P3 / LEGACY): in a DISPLAY_P3 file every r/g/b is P3, so a colour written from code ' +
     'takes space: "SRGB".',
-  inputSchema: z.object({}),
+  inputSchema: getMetadataParams,
   kind: 'read',
 };

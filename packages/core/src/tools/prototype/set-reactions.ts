@@ -5,6 +5,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_REACTIONS_TOOL_NAME = 'set_reactions';
 
+export const setReactionsParams = z.object({
+  nodeId: z.string().describe('Node to set reactions on'),
+  reactions: z.array(SerializedReactionSchema).describe('Reactions to apply (replaces existing)'),
+});
+
 export const setReactionsTool: ToolSpec = {
   name: SET_REACTIONS_TOOL_NAME,
   description:
@@ -20,9 +25,6 @@ export const setReactionsTool: ToolSpec = {
     'remove_reactions. On a page with no prototype flows, Figma may make the top-level frame ' +
     'holding a new connection a flow named "Flow 1" on its own; get_pages lists it and ' +
     'update_flows renames or removes it. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node to set reactions on'),
-    reactions: z.array(SerializedReactionSchema).describe('Reactions to apply (replaces existing)'),
-  }),
+  inputSchema: setReactionsParams,
   kind: 'write',
 };

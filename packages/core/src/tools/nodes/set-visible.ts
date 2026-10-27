@@ -4,6 +4,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_VISIBLE_TOOL_NAME = 'set_visible';
 
+export const setVisibleParams = z.object({
+  nodeId: z.string().describe('Figma node id'),
+  visible: z.boolean().describe('true to show, false to hide'),
+});
+
 export const setVisibleTool: ToolSpec = {
   name: SET_VISIBLE_TOOL_NAME,
   description:
@@ -11,9 +16,6 @@ export const setVisibleTool: ToolSpec = {
     'is excluded from rendering and exports, and its descendants are hidden with it; the change is ' +
     'fully reversible. To remove a node use delete_nodes; to dim one while keeping it visible and ' +
     'exported use set_opacity. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Figma node id'),
-    visible: z.boolean().describe('true to show, false to hide'),
-  }),
+  inputSchema: setVisibleParams,
   kind: 'write',
 };

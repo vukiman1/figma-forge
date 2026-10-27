@@ -4,6 +4,10 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_VECTOR_TOOL_NAME = 'get_vector';
 
+export const getVectorParams = z.object({
+  nodeId: z.string().describe('A VECTOR or TEXT_PATH node id'),
+});
+
 export const getVectorTool: ToolSpec = {
   name: GET_VECTOR_TOOL_NAME,
   description:
@@ -15,8 +19,6 @@ export const getVectorTool: ToolSpec = {
     'VECTOR first. Not part of get_node / get_design_context, which stay small; codegen exports ' +
     'vector art rather than rebuilding it from its points. Returns { nodeId, type, width, height, ' +
     'vectorPaths, vectorNetwork, handleMirroring }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('A VECTOR or TEXT_PATH node id'),
-  }),
+  inputSchema: getVectorParams,
   kind: 'read',
 };

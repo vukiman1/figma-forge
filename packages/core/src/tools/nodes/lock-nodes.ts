@@ -4,6 +4,10 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const LOCK_NODES_TOOL_NAME = 'lock_nodes';
 
+export const lockNodesParams = z.object({
+  nodeIds: z.array(z.string()).describe('Node ids to lock'),
+});
+
 export const lockNodesTool: ToolSpec = {
   name: LOCK_NODES_TOOL_NAME,
   description:
@@ -11,8 +15,6 @@ export const lockNodesTool: ToolSpec = {
     'parent also locks its descendants. Locked nodes still render and export — this only affects ' +
     'canvas interaction and is reversed by unlock_nodes. Returns { ok, affected } with the ids ' +
     'actually locked.',
-  inputSchema: z.object({
-    nodeIds: z.array(z.string()).describe('Node ids to lock'),
-  }),
+  inputSchema: lockNodesParams,
   kind: 'write',
 };

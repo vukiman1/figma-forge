@@ -4,13 +4,15 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const ROTATE_NODES_TOOL_NAME = 'rotate_nodes';
 
+export const rotateNodesParams = z.object({
+  nodeIds: z.array(z.string()).describe('Node ids to rotate'),
+  rotation: z.number().describe('Rotation in degrees'),
+});
+
 export const rotateNodesTool: ToolSpec = {
   name: ROTATE_NODES_TOOL_NAME,
   description:
     'Set absolute rotation (degrees) on nodes. Nodes without rotation are skipped. Returns { ok, affected }.',
-  inputSchema: z.object({
-    nodeIds: z.array(z.string()).describe('Node ids to rotate'),
-    rotation: z.number().describe('Rotation in degrees'),
-  }),
+  inputSchema: rotateNodesParams,
   kind: 'write',
 };

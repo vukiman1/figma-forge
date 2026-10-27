@@ -5,6 +5,13 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const UPDATE_EFFECT_STYLE_TOOL_NAME = 'update_effect_style';
 
+export const updateEffectStyleParams = z.object({
+  styleId: z.string().describe('Effect style id to update'),
+  name: z.string().optional(),
+  effects: z.array(effectItemSchema).optional().describe('New effects (replaces all)'),
+  description: z.string().optional(),
+});
+
 export const updateEffectStyleTool: ToolSpec = {
   name: UPDATE_EFFECT_STYLE_TOOL_NAME,
   description:
@@ -15,11 +22,6 @@ export const updateEffectStyleTool: ToolSpec = {
     'replace wholesale, an effect written back WITHOUT its boundVariables clears the variables it ' +
     'was bound to — re-send them, or change the variable itself instead. Returns { ok, ' +
     'styleId, name }.',
-  inputSchema: z.object({
-    styleId: z.string().describe('Effect style id to update'),
-    name: z.string().optional(),
-    effects: z.array(effectItemSchema).optional().describe('New effects (replaces all)'),
-    description: z.string().optional(),
-  }),
+  inputSchema: updateEffectStyleParams,
   kind: 'write',
 };

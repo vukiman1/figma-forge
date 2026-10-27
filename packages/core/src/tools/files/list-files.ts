@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const LIST_FILES_TOOL_NAME = 'list_files';
 
+export const listFilesParams = z.object({});
+
 export const listFilesTool: ToolSpec = {
   name: LIST_FILES_TOOL_NAME,
   description:
@@ -15,6 +17,6 @@ export const listFilesTool: ToolSpec = {
     'duplicateName marks entries sharing a name (Figma allows it; "x (Copy)" is the usual way), ' +
     'for which use_file needs the sessionId rather than the name. fileKey is always null: only ' +
     'private-org plugins can read it.',
-  inputSchema: z.object({}),
+  inputSchema: listFilesParams,
   kind: 'read',
 };

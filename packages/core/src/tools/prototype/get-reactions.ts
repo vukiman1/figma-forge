@@ -4,6 +4,10 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_REACTIONS_TOOL_NAME = 'get_reactions';
 
+export const getReactionsParams = z.object({
+  nodeId: z.string().describe('Figma node id to read reactions from'),
+});
+
 export const getReactionsTool: ToolSpec = {
   name: GET_REACTIONS_TOOL_NAME,
   description:
@@ -13,6 +17,6 @@ export const getReactionsTool: ToolSpec = {
     'variable mode, control media, or a conditional block. Every field Figma holds is returned, ' +
     "including each action's transition and easing, so the output can be handed back to " +
     'set_reactions unchanged to reproduce the reactions exactly.',
-  inputSchema: z.object({ nodeId: z.string().describe('Figma node id to read reactions from') }),
+  inputSchema: getReactionsParams,
   kind: 'read',
 };

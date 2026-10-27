@@ -5,6 +5,17 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_TEXT_TOOL_NAME = 'create_text';
 
+export const createTextParams = z.object({
+  characters: z.string().describe('Text content'),
+  parentId: z.string().optional().describe('Container node id; omit for current page'),
+  x: z.number().optional().describe('X position in the parent'),
+  y: z.number().optional().describe('Y position in the parent'),
+  ...initialTextShape,
+  fills: initialStyleShape.fills,
+  layoutSizingHorizontal: initialStyleShape.layoutSizingHorizontal,
+  layoutSizingVertical: initialStyleShape.layoutSizingVertical,
+});
+
 export const createTextTool: ToolSpec = {
   name: CREATE_TEXT_TOOL_NAME,
   description:
@@ -14,15 +25,6 @@ export const createTextTool: ToolSpec = {
     'textAlignHorizontal, …) takes the same fields as set_text_properties, and fills the text ' +
     'colour (as set_fills), all in this call — set the real font here, a new node is Inter. ' +
     'Returns { ok, nodeId, name, type }.',
-  inputSchema: z.object({
-    characters: z.string().describe('Text content'),
-    parentId: z.string().optional().describe('Container node id; omit for current page'),
-    x: z.number().optional().describe('X position in the parent'),
-    y: z.number().optional().describe('Y position in the parent'),
-    ...initialTextShape,
-    fills: initialStyleShape.fills,
-    layoutSizingHorizontal: initialStyleShape.layoutSizingHorizontal,
-    layoutSizingVertical: initialStyleShape.layoutSizingVertical,
-  }),
+  inputSchema: createTextParams,
   kind: 'write',
 };

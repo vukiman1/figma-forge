@@ -54,6 +54,11 @@ const rangeSchema = z.object({
     ),
 });
 
+export const setTextRangeParams = z.object({
+  nodeId: z.string().describe('TEXT node id whose ranges to style'),
+  ranges: z.array(rangeSchema).describe('Character ranges + the run properties to apply to each'),
+});
+
 export const setTextRangeTool: ToolSpec = {
   name: SET_TEXT_RANGE_TOOL_NAME,
   description:
@@ -68,9 +73,6 @@ export const setTextRangeTool: ToolSpec = {
     '(TEXT_PATH) takes the run fields it draws — fontName, fontSize, fills, textCase, ' +
     'letterSpacing, hyperlink and the bindings — and refuses decoration, lineHeight, lists and ' +
     'textWrapStyle. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('TEXT node id whose ranges to style'),
-    ranges: z.array(rangeSchema).describe('Character ranges + the run properties to apply to each'),
-  }),
+  inputSchema: setTextRangeParams,
   kind: 'write',
 };

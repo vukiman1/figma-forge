@@ -4,6 +4,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const OUTLINE_STROKE_TOOL_NAME = 'outline_stroke';
 
+export const outlineStrokeParams = z.object({
+  nodeId: z.string().describe('A node with a visible stroke'),
+  name: z.string().optional().describe('Name for the outline'),
+});
+
 export const outlineStrokeTool: ToolSpec = {
   name: OUTLINE_STROKE_TOOL_NAME,
   description:
@@ -19,9 +24,6 @@ export const outlineStrokeTool: ToolSpec = {
     'delete_nodes ' +
     'it to replace it. A scatter brush outlines into thousands of shapes. Returns { ok, nodeId, ' +
     'name, type } for the outline.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('A node with a visible stroke'),
-    name: z.string().optional().describe('Name for the outline'),
-  }),
+  inputSchema: outlineStrokeParams,
   kind: 'write',
 };

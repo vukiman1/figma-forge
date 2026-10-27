@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const PING_TOOL_NAME = 'ping';
 
+export const pingParams = z.object({});
+
 export const pingTool: ToolSpec = {
   name: PING_TOOL_NAME,
   description:
@@ -13,6 +15,6 @@ export const pingTool: ToolSpec = {
     'each connected file as of its last activity, so a file whose tab has not been in front since ' +
     'it connected shows fileName: null — use list_files, which asks each plugin directly, when you ' +
     'need the names (and use_file to claim one).',
-  inputSchema: z.object({}),
+  inputSchema: pingParams,
   kind: 'read',
 };

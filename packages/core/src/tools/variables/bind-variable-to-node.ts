@@ -4,6 +4,15 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const BIND_VARIABLE_TO_NODE_TOOL_NAME = 'bind_variable_to_node';
 
+export const bindVariableToNodeParams = z.object({
+  nodeId: z.string().describe('Node to bind on'),
+  field: z.string().describe('Bindable field name, e.g. "width"'),
+  variableId: z
+    .string()
+    .nullable()
+    .describe('Variable id to bind, or null to remove the binding on this field'),
+});
+
 export const bindVariableToNodeTool: ToolSpec = {
   name: BIND_VARIABLE_TO_NODE_TOOL_NAME,
   description:
@@ -14,13 +23,6 @@ export const bindVariableToNodeTool: ToolSpec = {
     'variable, call import_variable with its key in the target file and bind the returned variableId ' +
     '(not the key or a source-file id). Returns ' +
     '{ ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node to bind on'),
-    field: z.string().describe('Bindable field name, e.g. "width"'),
-    variableId: z
-      .string()
-      .nullable()
-      .describe('Variable id to bind, or null to remove the binding on this field'),
-  }),
+  inputSchema: bindVariableToNodeParams,
   kind: 'write',
 };

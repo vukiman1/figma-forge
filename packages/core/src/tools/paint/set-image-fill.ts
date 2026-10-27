@@ -4,6 +4,27 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_IMAGE_FILL_TOOL_NAME = 'set_image_fill';
 
+export const setImageFillParams = z.object({
+  nodeId: z.string().describe('Node whose fills take the image (frame, shape or text)'),
+  path: z
+    .string()
+    .min(1)
+    .optional()
+    .describe(
+      'Local image file (PNG / JPEG / GIF), read by the MCP server; relative paths resolve ' +
+        'against its working directory',
+    ),
+  data: z.string().optional().describe('Base64-encoded image bytes (PNG / JPG / GIF)'),
+  url: z.string().optional().describe('Image URL to fetch instead of data'),
+  index: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe('Fill to replace, 0 = bottom (default: the topmost IMAGE fill, else add on top)'),
+  scaleMode: z.enum(['FILL', 'FIT', 'CROP', 'TILE']).optional(),
+});
+
 export const setImageFillTool: ToolSpec = {
   name: SET_IMAGE_FILL_TOOL_NAME,
   description:
@@ -18,26 +39,7 @@ export const setImageFillTool: ToolSpec = {
     'lists them in), that fill is replaced. scaleMode is FILL / FIT / CROP / TILE (default: keep ' +
     "the replaced image's, else FILL). Setting fills unlinks a fill style. Returns { ok, nodeId, " +
     'index, imageHash, width, height } — the fill it wrote and the image size in pixels.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node whose fills take the image (frame, shape or text)'),
-    path: z
-      .string()
-      .min(1)
-      .optional()
-      .describe(
-        'Local image file (PNG / JPEG / GIF), read by the MCP server; relative paths resolve ' +
-          'against its working directory',
-      ),
-    data: z.string().optional().describe('Base64-encoded image bytes (PNG / JPG / GIF)'),
-    url: z.string().optional().describe('Image URL to fetch instead of data'),
-    index: z
-      .number()
-      .int()
-      .min(0)
-      .optional()
-      .describe('Fill to replace, 0 = bottom (default: the topmost IMAGE fill, else add on top)'),
-    scaleMode: z.enum(['FILL', 'FIT', 'CROP', 'TILE']).optional(),
-  }),
+  inputSchema: setImageFillParams,
   kind: 'write',
   serverOnlyArgs: ['path'],
 };

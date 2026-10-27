@@ -5,6 +5,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_FILLS_TOOL_NAME = 'set_fills';
 
+export const setFillsParams = z.object({
+  nodeId: z.string().describe('Figma node id to repaint'),
+  fills: z.array(fillPaintItemSchema).describe('Paints to apply'),
+});
+
 export const setFillsTool: ToolSpec = {
   name: SET_FILLS_TOOL_NAME,
   description:
@@ -17,9 +22,6 @@ export const setFillsTool: ToolSpec = {
     "{ type:'PATTERN', sourceNodeId, tileType, scalingFactor, spacing, horizontalAlignment, " +
     'verticalAlignment } (round-trips get_node output; omitted fields take the defaults). Images ' +
     'go in with set_image_fill. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Figma node id to repaint'),
-    fills: z.array(fillPaintItemSchema).describe('Paints to apply'),
-  }),
+  inputSchema: setFillsParams,
   kind: 'write',
 };

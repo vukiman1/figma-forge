@@ -4,6 +4,12 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_COMPONENT_API_TOOL_NAME = 'get_component_api';
 
+export const getComponentApiParams = z.object({
+  nodeId: z
+    .string()
+    .describe('A COMPONENT, COMPONENT_SET, or INSTANCE node id to read the property API of'),
+});
+
 export const getComponentApiTool: ToolSpec = {
   name: GET_COMPONENT_API_TOOL_NAME,
   description:
@@ -14,10 +20,6 @@ export const getComponentApiTool: ToolSpec = {
     'description? }. Property names come back verbatim for set_instance_properties: VARIANT by bare name ' +
     '(e.g. "Size"), BOOLEAN/TEXT/INSTANCE_SWAP suffixed with #id (e.g. "Label#2:0"). Unlike ' +
     'get_local_components (a subtree inventory), this targets one component and is safe on large files.',
-  inputSchema: z.object({
-    nodeId: z
-      .string()
-      .describe('A COMPONENT, COMPONENT_SET, or INSTANCE node id to read the property API of'),
-  }),
+  inputSchema: getComponentApiParams,
   kind: 'read',
 };

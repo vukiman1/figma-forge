@@ -4,6 +4,19 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const ADD_COMPONENT_PROPERTY_TOOL_NAME = 'add_component_property';
 
+export const addComponentPropertyParams = z.object({
+  componentId: z.string().describe('Component or component-set id (a variant resolves to its set)'),
+  name: z.string().describe('Property name, e.g. "Show Icon"'),
+  type: z.enum(['BOOLEAN', 'TEXT', 'INSTANCE_SWAP']).describe('Property type'),
+  defaultValue: z
+    .union([z.boolean(), z.string()])
+    .describe('Default: boolean (BOOLEAN), string (TEXT), or a component key (INSTANCE_SWAP)'),
+  preferredValues: z
+    .array(z.object({ type: z.enum(['COMPONENT', 'COMPONENT_SET']), key: z.string() }))
+    .describe('INSTANCE_SWAP only: components/sets offered in the swap menu')
+    .optional(),
+});
+
 export const addComponentPropertyTool: ToolSpec = {
   name: ADD_COMPONENT_PROPERTY_TOOL_NAME,
   description:
@@ -14,19 +27,6 @@ export const addComponentPropertyTool: ToolSpec = {
     'string / a component key string); preferredValues (INSTANCE_SWAP only) pre-populates the swap ' +
     'menu. VARIANT properties come from combine_as_variants, not here. Returns { ok, componentId, ' +
     'propertyId, name } — pass propertyId to bind / edit / delete / set_instance_properties.',
-  inputSchema: z.object({
-    componentId: z
-      .string()
-      .describe('Component or component-set id (a variant resolves to its set)'),
-    name: z.string().describe('Property name, e.g. "Show Icon"'),
-    type: z.enum(['BOOLEAN', 'TEXT', 'INSTANCE_SWAP']).describe('Property type'),
-    defaultValue: z
-      .union([z.boolean(), z.string()])
-      .describe('Default: boolean (BOOLEAN), string (TEXT), or a component key (INSTANCE_SWAP)'),
-    preferredValues: z
-      .array(z.object({ type: z.enum(['COMPONENT', 'COMPONENT_SET']), key: z.string() }))
-      .describe('INSTANCE_SWAP only: components/sets offered in the swap menu')
-      .optional(),
-  }),
+  inputSchema: addComponentPropertyParams,
   kind: 'write',
 };

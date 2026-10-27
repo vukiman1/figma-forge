@@ -9,6 +9,21 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_FRAME_TOOL_NAME = 'create_frame';
 
+export const createFrameParams = z.object({
+  parentId: z
+    .string()
+    .optional()
+    .describe('Container node id to append into; omit for current page'),
+  name: z.string().optional().describe('Frame name'),
+  x: z.number().optional(),
+  y: z.number().optional(),
+  width: z.number().optional().describe('Frame width (with height, resizes from default)'),
+  height: z.number().optional().describe('Frame height (with width, resizes from default)'),
+  ...initialStyleShape,
+  ...initialRadiusShape,
+  ...initialFrameShape,
+});
+
 export const createFrameTool: ToolSpec = {
   name: CREATE_FRAME_TOOL_NAME,
   description:
@@ -19,19 +34,6 @@ export const createFrameTool: ToolSpec = {
     'autoLayout, a width + height you pass stays FIXED on any axis whose layoutSizing* you omit ' +
     '(Figma would otherwise hug it); omit the size, or pass HUG, to hug the content. For a ' +
     'canvas-level grouping container use create_section instead. Returns { ok, nodeId, name, type }.',
-  inputSchema: z.object({
-    parentId: z
-      .string()
-      .optional()
-      .describe('Container node id to append into; omit for current page'),
-    name: z.string().optional().describe('Frame name'),
-    x: z.number().optional(),
-    y: z.number().optional(),
-    width: z.number().optional().describe('Frame width (with height, resizes from default)'),
-    height: z.number().optional().describe('Frame height (with width, resizes from default)'),
-    ...initialStyleShape,
-    ...initialRadiusShape,
-    ...initialFrameShape,
-  }),
+  inputSchema: createFrameParams,
   kind: 'write',
 };

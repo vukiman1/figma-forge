@@ -4,6 +4,24 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const BIND_VARIABLE_TO_PAINT_TOOL_NAME = 'bind_variable_to_paint';
 
+export const bindVariableToPaintParams = z.object({
+  nodeId: z.string().describe('Node whose fill/stroke paint to bind'),
+  target: z
+    .enum(['fills', 'strokes'])
+    .optional()
+    .describe('Which paint list to bind on (default fills)'),
+  index: z
+    .number()
+    .int()
+    .min(0)
+    .optional()
+    .describe('Index of the paint within the list (default 0)'),
+  variableId: z
+    .string()
+    .nullable()
+    .describe('COLOR variable id to bind, or null to remove the binding'),
+});
+
 export const bindVariableToPaintTool: ToolSpec = {
   name: BIND_VARIABLE_TO_PAINT_TOOL_NAME,
   description:
@@ -16,22 +34,6 @@ export const bindVariableToPaintTool: ToolSpec = {
     'translucent token, bind a variable whose value carries that alpha. For a library variable, ' +
     'call import_variable with its key in the target file and bind the returned variableId. ' +
     'Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node whose fill/stroke paint to bind'),
-    target: z
-      .enum(['fills', 'strokes'])
-      .optional()
-      .describe('Which paint list to bind on (default fills)'),
-    index: z
-      .number()
-      .int()
-      .min(0)
-      .optional()
-      .describe('Index of the paint within the list (default 0)'),
-    variableId: z
-      .string()
-      .nullable()
-      .describe('COLOR variable id to bind, or null to remove the binding'),
-  }),
+  inputSchema: bindVariableToPaintParams,
   kind: 'write',
 };

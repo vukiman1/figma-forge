@@ -4,6 +4,12 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const BOOLEAN_NODES_TOOL_NAME = 'boolean_nodes';
 
+export const booleanNodesParams = z.object({
+  operation: z.enum(['UNION', 'SUBTRACT', 'INTERSECT', 'EXCLUDE']),
+  nodeIds: z.array(z.string()).min(2).describe('Shapes to combine (2 or more, one parent)'),
+  name: z.string().optional().describe('Name for the resulting layer'),
+});
+
 export const booleanNodesTool: ToolSpec = {
   name: BOOLEAN_NODES_TOOL_NAME,
   description:
@@ -17,10 +23,6 @@ export const booleanNodesTool: ToolSpec = {
     'can still be unpicked; use flatten_nodes to bake it into one vector. The nodes must share ' +
     'a parent, and the result takes their place there. Needs at least 2 distinct nodes. Not allowed ' +
     'inside a batch. Returns { ok, nodeId, name, type }.',
-  inputSchema: z.object({
-    operation: z.enum(['UNION', 'SUBTRACT', 'INTERSECT', 'EXCLUDE']),
-    nodeIds: z.array(z.string()).min(2).describe('Shapes to combine (2 or more, one parent)'),
-    name: z.string().optional().describe('Name for the resulting layer'),
-  }),
+  inputSchema: booleanNodesParams,
   kind: 'write',
 };

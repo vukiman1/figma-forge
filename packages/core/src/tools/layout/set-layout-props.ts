@@ -4,6 +4,56 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_LAYOUT_PROPS_TOOL_NAME = 'set_layout_props';
 
+export const setLayoutPropsParams = z.object({
+  nodeId: z.string().describe('Node id — a frame-like container, or an auto-layout child'),
+  clipsContent: z.boolean().optional().describe('Clip children to the container bounds'),
+  layoutSizingHorizontal: z
+    .enum(['FIXED', 'HUG', 'FILL'])
+    .optional()
+    .describe('Horizontal sizing: HUG fits content, FILL fills the parent, FIXED keeps width'),
+  layoutSizingVertical: z
+    .enum(['FIXED', 'HUG', 'FILL'])
+    .optional()
+    .describe('Vertical sizing: HUG fits content, FILL fills the parent, FIXED keeps height'),
+  layoutAlign: z
+    .enum(['STRETCH', 'INHERIT'])
+    .optional()
+    .describe('STRETCH fills the counter axis; INHERIT follows the parent'),
+  layoutGrow: z
+    .number()
+    .min(0)
+    .optional()
+    .describe('1 = grow to fill the primary axis, 0 = hug content'),
+  layoutPositioning: z
+    .enum(['AUTO', 'ABSOLUTE'])
+    .optional()
+    .describe('ABSOLUTE takes the node out of the auto-layout flow'),
+  minWidth: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Minimum width in px (null clears the bound)'),
+  maxWidth: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Maximum width in px (null clears the bound)'),
+  minHeight: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Minimum height in px (null clears the bound)'),
+  maxHeight: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Maximum height in px (null clears the bound)'),
+});
+
 export const setLayoutPropsTool: ToolSpec = {
   name: SET_LAYOUT_PROPS_TOOL_NAME,
   description:
@@ -22,54 +72,6 @@ export const setLayoutPropsTool: ToolSpec = {
     'max-w); pass null to clear a bound. Bounds apply to auto-layout frames and their direct ' +
     'children. HUG needs an auto-layout frame (or text); FILL needs an auto-layout parent. Any ' +
     'field may be omitted to leave it unchanged. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node id — a frame-like container, or an auto-layout child'),
-    clipsContent: z.boolean().optional().describe('Clip children to the container bounds'),
-    layoutSizingHorizontal: z
-      .enum(['FIXED', 'HUG', 'FILL'])
-      .optional()
-      .describe('Horizontal sizing: HUG fits content, FILL fills the parent, FIXED keeps width'),
-    layoutSizingVertical: z
-      .enum(['FIXED', 'HUG', 'FILL'])
-      .optional()
-      .describe('Vertical sizing: HUG fits content, FILL fills the parent, FIXED keeps height'),
-    layoutAlign: z
-      .enum(['STRETCH', 'INHERIT'])
-      .optional()
-      .describe('STRETCH fills the counter axis; INHERIT follows the parent'),
-    layoutGrow: z
-      .number()
-      .min(0)
-      .optional()
-      .describe('1 = grow to fill the primary axis, 0 = hug content'),
-    layoutPositioning: z
-      .enum(['AUTO', 'ABSOLUTE'])
-      .optional()
-      .describe('ABSOLUTE takes the node out of the auto-layout flow'),
-    minWidth: z
-      .number()
-      .positive()
-      .nullable()
-      .optional()
-      .describe('Minimum width in px (null clears the bound)'),
-    maxWidth: z
-      .number()
-      .positive()
-      .nullable()
-      .optional()
-      .describe('Maximum width in px (null clears the bound)'),
-    minHeight: z
-      .number()
-      .positive()
-      .nullable()
-      .optional()
-      .describe('Minimum height in px (null clears the bound)'),
-    maxHeight: z
-      .number()
-      .positive()
-      .nullable()
-      .optional()
-      .describe('Maximum height in px (null clears the bound)'),
-  }),
+  inputSchema: setLayoutPropsParams,
   kind: 'write',
 };

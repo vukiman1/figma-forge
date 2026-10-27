@@ -6,6 +6,23 @@ export const ALIGN_NODES_TOOL_NAME = 'align_nodes';
 
 const edge = z.enum(['MIN', 'CENTER', 'MAX']);
 
+export const alignNodesParams = z.object({
+  nodeIds: z.array(z.string()).min(1).describe('Nodes to align / distribute'),
+  horizontal: edge.optional().describe('Horizontal alignment: MIN (left), CENTER or MAX (right)'),
+  vertical: edge.optional().describe('Vertical alignment: MIN (top), CENTER or MAX (bottom)'),
+  relativeTo: z
+    .enum(['PARENT', 'SELECTION'])
+    .optional()
+    .describe(
+      "PARENT (default): each node within its own parent's bounds. SELECTION: to the bounding " +
+        'box of all the given nodes',
+    ),
+  distribute: z
+    .enum(['HORIZONTAL', 'VERTICAL'])
+    .optional()
+    .describe('Equalise the gaps between nodes along this axis; needs 3+ nodes'),
+});
+
 export const alignNodesTool: ToolSpec = {
   name: ALIGN_NODES_TOOL_NAME,
   description:
@@ -26,21 +43,6 @@ export const alignNodesTool: ToolSpec = {
     'inside an instance (align the instance, or edit its main component); a node whose ancestor ' +
     'is in the same call (moving the ancestor already carries it). A repeated id is moved once. ' +
     'Returns { ok, affected }.',
-  inputSchema: z.object({
-    nodeIds: z.array(z.string()).min(1).describe('Nodes to align / distribute'),
-    horizontal: edge.optional().describe('Horizontal alignment: MIN (left), CENTER or MAX (right)'),
-    vertical: edge.optional().describe('Vertical alignment: MIN (top), CENTER or MAX (bottom)'),
-    relativeTo: z
-      .enum(['PARENT', 'SELECTION'])
-      .optional()
-      .describe(
-        "PARENT (default): each node within its own parent's bounds. SELECTION: to the bounding " +
-          'box of all the given nodes',
-      ),
-    distribute: z
-      .enum(['HORIZONTAL', 'VERTICAL'])
-      .optional()
-      .describe('Equalise the gaps between nodes along this axis; needs 3+ nodes'),
-  }),
+  inputSchema: alignNodesParams,
   kind: 'write',
 };

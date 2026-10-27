@@ -6,6 +6,16 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_VECTOR_TOOL_NAME = 'create_vector';
 
+export const createVectorParams = z.object({
+  parentId: z.string().optional().describe('Container node id; omit for current page'),
+  name: z.string().optional().describe('Layer name'),
+  x: z.number().optional().describe('Where the drawing’s x = 0 falls in the parent (default 0)'),
+  y: z.number().optional().describe('Where the drawing’s y = 0 falls in the parent (default 0)'),
+  vectorPaths: vectorPathsSchema.optional(),
+  vectorNetwork: vectorNetworkSchema.optional(),
+  ...initialStyleShape,
+});
+
 export const createVectorTool: ToolSpec = {
   name: CREATE_VECTOR_TOOL_NAME,
   description:
@@ -19,14 +29,6 @@ export const createVectorTool: ToolSpec = {
     'here); a closed one takes fills. Then shape its stroke ' +
     'with set_complex_stroke (a brush, a hand-drawn wobble, a taper) or set text along it with ' +
     'create_text_path. For a whole SVG file use import_svg. Returns { ok, nodeId, name, type }.',
-  inputSchema: z.object({
-    parentId: z.string().optional().describe('Container node id; omit for current page'),
-    name: z.string().optional().describe('Layer name'),
-    x: z.number().optional().describe('Where the drawing’s x = 0 falls in the parent (default 0)'),
-    y: z.number().optional().describe('Where the drawing’s y = 0 falls in the parent (default 0)'),
-    vectorPaths: vectorPathsSchema.optional(),
-    vectorNetwork: vectorNetworkSchema.optional(),
-    ...initialStyleShape,
-  }),
+  inputSchema: createVectorParams,
   kind: 'write',
 };

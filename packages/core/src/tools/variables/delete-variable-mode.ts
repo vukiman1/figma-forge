@@ -4,6 +4,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const DELETE_VARIABLE_MODE_TOOL_NAME = 'delete_variable_mode';
 
+export const deleteVariableModeParams = z.object({
+  collectionId: z.string().describe('Variable collection id'),
+  modeId: z.string().describe('Mode id to remove, from get_variable_defs'),
+});
+
 export const deleteVariableModeTool: ToolSpec = {
   name: DELETE_VARIABLE_MODE_TOOL_NAME,
   description:
@@ -15,10 +20,7 @@ export const deleteVariableModeTool: ToolSpec = {
     "collection's default mode is allowed (Figma moves the default to a mode that remains); the " +
     'last remaining mode cannot be removed. Mode ids come from get_variable_defs. Returns ' +
     '{ ok, collectionId, modeId, name }.',
-  inputSchema: z.object({
-    collectionId: z.string().describe('Variable collection id'),
-    modeId: z.string().describe('Mode id to remove, from get_variable_defs'),
-  }),
+  inputSchema: deleteVariableModeParams,
   kind: 'write',
   destructive: true,
 };

@@ -5,6 +5,19 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_SCREENSHOT_TOOL_NAME = 'get_screenshot';
 
+export const getScreenshotParams = z.object({
+  nodeIds: z.array(z.string()).describe('Figma node ids to export'),
+  format: z
+    .enum(SCREENSHOT_FORMATS)
+    .describe('Export format: PNG (default) / JPG / SVG')
+    .optional(),
+  scale: z
+    .number()
+    .positive()
+    .describe('Raster scale factor (PNG/JPG); omit to auto-fit each node to a legible size')
+    .optional(),
+});
+
 export const getScreenshotTool: ToolSpec = {
   name: GET_SCREENSHOT_TOOL_NAME,
   description:
@@ -25,18 +38,7 @@ export const getScreenshotTool: ToolSpec = {
     'non-exportable nodes. Nodes that are fully clipped or off-canvas (carousels, masks, off-screen ' +
     'states) are auto-recovered at their intrinsic bounds and flagged recovered:true. empty:true ' +
     'means the node genuinely renders nothing even unclipped (hidden / no content) so the export is blank.',
-  inputSchema: z.object({
-    nodeIds: z.array(z.string()).describe('Figma node ids to export'),
-    format: z
-      .enum(SCREENSHOT_FORMATS)
-      .describe('Export format: PNG (default) / JPG / SVG')
-      .optional(),
-    scale: z
-      .number()
-      .positive()
-      .describe('Raster scale factor (PNG/JPG); omit to auto-fit each node to a legible size')
-      .optional(),
-  }),
+  inputSchema: getScreenshotParams,
   kind: 'read',
   injectedArgs: ['forVision', 'binary'],
 };

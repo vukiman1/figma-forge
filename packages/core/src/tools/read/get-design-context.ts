@@ -5,6 +5,26 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_DESIGN_CONTEXT_TOOL_NAME = 'get_design_context';
 
+export const getDesignContextParams = z.object({
+  nodeId: z
+    .string()
+    .describe('Root node id (a pasted Figma URL also works); omit to use the selection')
+    .optional(),
+  depth: z
+    .number()
+    .min(0)
+    .describe('Max child levels to include; omit or 0 for unlimited')
+    .optional(),
+  detail: z
+    .enum(DETAIL_LEVELS)
+    .describe('How much per-node data: minimal / compact / full (default)')
+    .optional(),
+  dedupeComponents: z
+    .boolean()
+    .describe('Collapse repeated instances of the same main component (default true)')
+    .optional(),
+});
+
 export const getDesignContextTool: ToolSpec = {
   name: GET_DESIGN_CONTEXT_TOOL_NAME,
   description:
@@ -53,25 +73,7 @@ export const getDesignContextTool: ToolSpec = {
     'hypothesis to verify, not a resolved binding: emit the ref only when the token fits the ' +
     'context semantically, keep the raw value otherwise, and let a bound Figma variable win over ' +
     'a raw-value match.',
-  inputSchema: z.object({
-    nodeId: z
-      .string()
-      .describe('Root node id (a pasted Figma URL also works); omit to use the selection')
-      .optional(),
-    depth: z
-      .number()
-      .min(0)
-      .describe('Max child levels to include; omit or 0 for unlimited')
-      .optional(),
-    detail: z
-      .enum(DETAIL_LEVELS)
-      .describe('How much per-node data: minimal / compact / full (default)')
-      .optional(),
-    dedupeComponents: z
-      .boolean()
-      .describe('Collapse repeated instances of the same main component (default true)')
-      .optional(),
-  }),
+  inputSchema: getDesignContextParams,
   kind: 'read',
   injectedArgs: ['budget'],
 };

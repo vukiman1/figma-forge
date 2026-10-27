@@ -30,6 +30,22 @@ const VARIABLE_SCOPES = [
   'PARAGRAPH_INDENT',
 ] as const;
 
+export const createVariableParams = z.object({
+  name: z.string().describe('Variable name, e.g. "color/primary"'),
+  collectionId: z.string().describe('Variable collection id'),
+  resolvedType: z
+    .enum(['BOOLEAN', 'FLOAT', 'STRING', 'COLOR', 'EASING', 'TIMING'])
+    .describe('Variable data type'),
+  scopes: z
+    .array(z.enum(VARIABLE_SCOPES))
+    .nonempty()
+    .optional()
+    .describe(
+      'Where Figma offers this variable in its picker, e.g. ["CORNER_RADIUS"] or ' +
+        '["FRAME_FILL","SHAPE_FILL"]. Omit for all scopes. Not available for EASING / TIMING.',
+    ),
+});
+
 export const createVariableTool: ToolSpec = {
   name: CREATE_VARIABLE_TOOL_NAME,
   description:
@@ -41,20 +57,6 @@ export const createVariableTool: ToolSpec = {
     'scopes to narrow where Figma offers the variable in its picker (a radius token scoped to ' +
     'CORNER_RADIUS stops being suggested for width or gap); omit it to leave the variable in every ' +
     "scope, which is Figma's default. Returns { ok, variableId, name }.",
-  inputSchema: z.object({
-    name: z.string().describe('Variable name, e.g. "color/primary"'),
-    collectionId: z.string().describe('Variable collection id'),
-    resolvedType: z
-      .enum(['BOOLEAN', 'FLOAT', 'STRING', 'COLOR', 'EASING', 'TIMING'])
-      .describe('Variable data type'),
-    scopes: z
-      .array(z.enum(VARIABLE_SCOPES))
-      .nonempty()
-      .optional()
-      .describe(
-        'Where Figma offers this variable in its picker, e.g. ["CORNER_RADIUS"] or ' +
-          '["FRAME_FILL","SHAPE_FILL"]. Omit for all scopes. Not available for EASING / TIMING.',
-      ),
-  }),
+  inputSchema: createVariableParams,
   kind: 'write',
 };

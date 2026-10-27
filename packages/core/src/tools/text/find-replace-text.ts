@@ -4,6 +4,13 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const FIND_REPLACE_TEXT_TOOL_NAME = 'find_replace_text';
 
+export const findReplaceTextParams = z.object({
+  find: z.string().describe('Substring to find (non-empty)'),
+  replace: z.string().describe('Replacement string'),
+  root: z.string().optional().describe('Optional node id to scope the search (default: page)'),
+  caseSensitive: z.boolean().optional().describe('Match case (default false)'),
+});
+
 export const findReplaceTextTool: ToolSpec = {
   name: FIND_REPLACE_TEXT_TOOL_NAME,
   description:
@@ -13,11 +20,6 @@ export const findReplaceTextTool: ToolSpec = {
     'text changes: every other run keeps its styling, and each replacement takes the style of the ' +
     'text it replaces. Fonts are loaded before each edit. Returns { ok, affected } — the text node ' +
     'ids changed.',
-  inputSchema: z.object({
-    find: z.string().describe('Substring to find (non-empty)'),
-    replace: z.string().describe('Replacement string'),
-    root: z.string().optional().describe('Optional node id to scope the search (default: page)'),
-    caseSensitive: z.boolean().optional().describe('Match case (default false)'),
-  }),
+  inputSchema: findReplaceTextParams,
   kind: 'write',
 };

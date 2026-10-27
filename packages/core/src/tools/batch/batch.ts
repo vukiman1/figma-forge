@@ -4,6 +4,18 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const BATCH_TOOL_NAME = 'batch';
 
+export const batchParams = z.object({
+  ops: z
+    .array(
+      z.object({
+        tool: z.string().describe('The name of the write tool to run'),
+        params: z.record(z.string(), z.unknown()).optional().describe("The tool's parameters"),
+      }),
+    )
+    .min(1)
+    .describe('Ordered write ops applied atomically'),
+});
+
 export const batchTool: ToolSpec = {
   name: BATCH_TOOL_NAME,
   description:
@@ -14,16 +26,6 @@ export const batchTool: ToolSpec = {
     'ungroup_nodes, detach_instance, remove_animation_style) are refused, since what they delete ' +
     'cannot come back under its id. Returns { ok, results } with one result per op in order; on ' +
     'failure the error says what was rolled back.',
-  inputSchema: z.object({
-    ops: z
-      .array(
-        z.object({
-          tool: z.string().describe('The name of the write tool to run'),
-          params: z.record(z.string(), z.unknown()).optional().describe("The tool's parameters"),
-        }),
-      )
-      .min(1)
-      .describe('Ordered write ops applied atomically'),
-  }),
+  inputSchema: batchParams,
   kind: 'write',
 };

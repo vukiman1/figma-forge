@@ -4,6 +4,11 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_TEXT_TOOL_NAME = 'set_text';
 
+export const setTextParams = z.object({
+  nodeId: z.string().describe('TEXT node id to update'),
+  characters: z.string().describe('New text content'),
+});
+
 export const setTextTool: ToolSpec = {
   name: SET_TEXT_TOOL_NAME,
   description:
@@ -14,9 +19,6 @@ export const setTextTool: ToolSpec = {
     'text it replaces. For formatting (font, size, ' +
     'color, spacing) use set_text_properties, and to substitute text across many nodes use ' +
     'find_replace_text. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('TEXT node id to update'),
-    characters: z.string().describe('New text content'),
-  }),
+  inputSchema: setTextParams,
   kind: 'write',
 };

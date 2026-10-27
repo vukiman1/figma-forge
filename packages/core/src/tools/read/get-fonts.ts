@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_FONTS_TOOL_NAME = 'get_fonts';
 
+export const getFontsParams = z.object({});
+
 export const getFontsTool: ToolSpec = {
   name: GET_FONTS_TOOL_NAME,
   description:
@@ -14,6 +16,6 @@ export const getFontsTool: ToolSpec = {
     '{ family: ["wght", "slnt", ...] } lists the OpenType axes each variable family exposes: ' +
     'those are the tags the write tools accept in fontName.variationSettings. A family missing ' +
     'from it is static.',
-  inputSchema: z.object({}),
+  inputSchema: getFontsParams,
   kind: 'read',
 };

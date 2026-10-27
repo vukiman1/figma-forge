@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_STYLES_TOOL_NAME = 'get_styles';
 
+export const getStylesParams = z.object({});
+
 export const getStylesTool: ToolSpec = {
   name: GET_STYLES_TOOL_NAME,
   description:
@@ -20,6 +22,6 @@ export const getStylesTool: ToolSpec = {
     'pass its key to import_style in that target file and use the returned styleId. A result led ' +
     'by colorProfile: "DISPLAY_P3" comes from a Display P3 file: its colours are P3, so emit one ' +
     'as color(display-p3 r g b), not the plain hex.',
-  inputSchema: z.object({}),
+  inputSchema: getStylesParams,
   kind: 'read',
 };

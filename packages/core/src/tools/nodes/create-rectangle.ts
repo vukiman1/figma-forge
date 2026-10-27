@@ -5,6 +5,17 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_RECTANGLE_TOOL_NAME = 'create_rectangle';
 
+export const createRectangleParams = z.object({
+  parentId: z.string().optional().describe('Container node id; omit for current page'),
+  name: z.string().optional().describe('Layer name'),
+  x: z.number().optional().describe('X position in the parent'),
+  y: z.number().optional().describe('Y position in the parent'),
+  width: z.number().optional().describe('Width in px'),
+  height: z.number().optional().describe('Height in px'),
+  ...initialStyleShape,
+  ...initialRadiusShape,
+});
+
 export const createRectangleTool: ToolSpec = {
   name: CREATE_RECTANGLE_TOOL_NAME,
   description:
@@ -14,15 +25,6 @@ export const createRectangleTool: ToolSpec = {
     'into this rectangle (a rounded thumbnail, an avatar). fills, strokes, cornerRadius and ' +
     'layoutSizing* style it in the same call. Returns ' +
     '{ ok, nodeId, name, type }.',
-  inputSchema: z.object({
-    parentId: z.string().optional().describe('Container node id; omit for current page'),
-    name: z.string().optional().describe('Layer name'),
-    x: z.number().optional().describe('X position in the parent'),
-    y: z.number().optional().describe('Y position in the parent'),
-    width: z.number().optional().describe('Width in px'),
-    height: z.number().optional().describe('Height in px'),
-    ...initialStyleShape,
-    ...initialRadiusShape,
-  }),
+  inputSchema: createRectangleParams,
   kind: 'write',
 };

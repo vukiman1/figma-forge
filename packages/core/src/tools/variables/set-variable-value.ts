@@ -42,6 +42,12 @@ const variableValue = z
       '{ color, opacity: 0–100 } composed color | { type: easing }',
   );
 
+export const setVariableValueParams = z.object({
+  variableId: z.string().describe('Variable id'),
+  modeId: z.string().describe('Mode id (from the collection)'),
+  value: variableValue,
+});
+
 export const setVariableValueTool: ToolSpec = {
   name: SET_VARIABLE_VALUE_TOOL_NAME,
   description:
@@ -55,10 +61,6 @@ export const setVariableValueTool: ToolSpec = {
     'concrete value or an alias, with at least one of the two an alias. An EASING variable takes a ' +
     'Motion easing, a TIMING variable a number of seconds. Create the variable first with ' +
     'create_variable. Returns { ok, variableId, name }.',
-  inputSchema: z.object({
-    variableId: z.string().describe('Variable id'),
-    modeId: z.string().describe('Mode id (from the collection)'),
-    value: variableValue,
-  }),
+  inputSchema: setVariableValueParams,
   kind: 'write',
 };

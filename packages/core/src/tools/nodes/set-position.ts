@@ -4,6 +4,12 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_POSITION_TOOL_NAME = 'set_position';
 
+export const setPositionParams = z.object({
+  nodeId: z.string().describe('Node id to position'),
+  x: z.number().optional().describe('X position relative to the parent'),
+  y: z.number().optional().describe('Y position relative to the parent'),
+});
+
 export const setPositionTool: ToolSpec = {
   name: SET_POSITION_TOOL_NAME,
   description:
@@ -14,10 +20,6 @@ export const setPositionTool: ToolSpec = {
     'in-flow inside an auto-layout frame is positioned by the layout — set layoutPositioning ' +
     'ABSOLUTE (set_layout_props) first to place it freely. Either coordinate may be omitted to ' +
     'leave it unchanged. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node id to position'),
-    x: z.number().optional().describe('X position relative to the parent'),
-    y: z.number().optional().describe('Y position relative to the parent'),
-  }),
+  inputSchema: setPositionParams,
   kind: 'write',
 };

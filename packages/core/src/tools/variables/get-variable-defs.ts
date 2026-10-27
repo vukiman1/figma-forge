@@ -4,6 +4,8 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_VARIABLE_DEFS_TOOL_NAME = 'get_variable_defs';
 
+export const getVariableDefsParams = z.object({});
+
 export const getVariableDefsTool: ToolSpec = {
   name: GET_VARIABLE_DEFS_TOOL_NAME,
   description:
@@ -19,6 +21,6 @@ export const getVariableDefsTool: ToolSpec = {
     'to import_variable in that target file and use the returned variableId. A result led by ' +
     'colorProfile: "DISPLAY_P3" comes from a Display P3 file: its COLOR values are P3, so emit ' +
     'one as color(display-p3 r g b), not the plain hex.',
-  inputSchema: z.object({}),
+  inputSchema: getVariableDefsParams,
   kind: 'read',
 };

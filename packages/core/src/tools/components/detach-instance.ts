@@ -4,6 +4,10 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const DETACH_INSTANCE_TOOL_NAME = 'detach_instance';
 
+export const detachInstanceParams = z.object({
+  instanceId: z.string().describe('Instance node id to detach'),
+});
+
 export const detachInstanceTool: ToolSpec = {
   name: DETACH_INSTANCE_TOOL_NAME,
   description:
@@ -11,9 +15,7 @@ export const detachInstanceTool: ToolSpec = {
     'component; the frame keeps its current appearance and its layers become directly editable. To ' +
     'switch an instance to a different component instead of detaching, use swap_component. Returns ' +
     '{ ok, nodeId, name, type } for the resulting frame.',
-  inputSchema: z.object({
-    instanceId: z.string().describe('Instance node id to detach'),
-  }),
+  inputSchema: detachInstanceParams,
   kind: 'write',
   destructive: true,
 };

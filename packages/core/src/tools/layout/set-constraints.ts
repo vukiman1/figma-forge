@@ -6,6 +6,12 @@ export const SET_CONSTRAINTS_TOOL_NAME = 'set_constraints';
 
 const constraint = z.enum(['MIN', 'CENTER', 'MAX', 'STRETCH', 'SCALE']);
 
+export const setConstraintsParams = z.object({
+  nodeId: z.string().describe('Node to constrain'),
+  horizontal: constraint.describe('Horizontal behavior when the parent resizes'),
+  vertical: constraint.describe('Vertical behavior when the parent resizes'),
+});
+
 export const setConstraintsTool: ToolSpec = {
   name: SET_CONSTRAINTS_TOOL_NAME,
   description:
@@ -14,10 +20,6 @@ export const setConstraintsTool: ToolSpec = {
     'STRETCH pins both edges (grows with the parent), and SCALE resizes proportionally. Constraints ' +
     'apply to children of a plain frame and to ABSOLUTE children of an auto-layout frame; an ' +
     'in-flow auto-layout child is positioned by the layout and ignores them. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('Node to constrain'),
-    horizontal: constraint.describe('Horizontal behavior when the parent resizes'),
-    vertical: constraint.describe('Vertical behavior when the parent resizes'),
-  }),
+  inputSchema: setConstraintsParams,
   kind: 'write',
 };

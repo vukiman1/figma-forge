@@ -16,6 +16,53 @@ const letterSpacing = z
   .object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() })
   .describe('Letter spacing: { unit: "PIXELS" | "PERCENT", value }');
 
+export const setTextPropertiesParams = z.object({
+  nodeId: z.string().describe('TEXT node id'),
+  fontName: fontNameSchema.optional(),
+  fontSize: z.number().positive().optional().describe('Font size in px'),
+  lineHeight: lineHeight.optional(),
+  letterSpacing: letterSpacing.optional(),
+  paragraphSpacing: z
+    .number()
+    .min(0)
+    .optional()
+    .describe('Space between paragraphs in px (paragraphs split at "\\n")'),
+  paragraphIndent: z
+    .number()
+    .min(0)
+    .optional()
+    .describe('First-line indent of each paragraph in px'),
+  textWrapStyle: z
+    .enum(['AUTO', 'BALANCE', 'PRETTY'])
+    .optional()
+    .describe('How each paragraph balances its line breaks; maps 1:1 to CSS text-wrap'),
+  textCase: z
+    .enum(['ORIGINAL', 'UPPER', 'LOWER', 'TITLE', 'SMALL_CAPS', 'SMALL_CAPS_FORCED'])
+    .optional(),
+  textDecoration: z.enum(['NONE', 'UNDERLINE', 'STRIKETHROUGH']).optional(),
+  textAlignHorizontal: z
+    .enum(['LEFT', 'CENTER', 'RIGHT', 'JUSTIFIED'])
+    .optional()
+    .describe('Horizontal alignment of the lines within the text box (CSS text-align)'),
+  textAlignVertical: z
+    .enum(['TOP', 'CENTER', 'BOTTOM'])
+    .optional()
+    .describe('Vertical alignment of the text within a box taller than its content'),
+  textTruncation: z
+    .enum(['DISABLED', 'ENDING'])
+    .optional()
+    .describe('ENDING truncates with an ellipsis'),
+  maxLines: z
+    .number()
+    .nullable()
+    .optional()
+    .describe('Max lines before truncation; null = unlimited'),
+  textAutoResize: z
+    .enum(['NONE', 'HEIGHT', 'WIDTH_AND_HEIGHT', 'TRUNCATE'])
+    .optional()
+    .describe('How the text box resizes to its content'),
+});
+
 export const setTextPropertiesTool: ToolSpec = {
   name: SET_TEXT_PROPERTIES_TOOL_NAME,
   description:
@@ -34,51 +81,6 @@ export const setTextPropertiesTool: ToolSpec = {
     'letterSpacing, textCase and the two alignments — on a path textAlignHorizontal anchors the ' +
     'text at its start point and textAlignVertical picks the side of the path; the line, ' +
     'paragraph, decoration and box fields are refused there. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('TEXT node id'),
-    fontName: fontNameSchema.optional(),
-    fontSize: z.number().positive().optional().describe('Font size in px'),
-    lineHeight: lineHeight.optional(),
-    letterSpacing: letterSpacing.optional(),
-    paragraphSpacing: z
-      .number()
-      .min(0)
-      .optional()
-      .describe('Space between paragraphs in px (paragraphs split at "\\n")'),
-    paragraphIndent: z
-      .number()
-      .min(0)
-      .optional()
-      .describe('First-line indent of each paragraph in px'),
-    textWrapStyle: z
-      .enum(['AUTO', 'BALANCE', 'PRETTY'])
-      .optional()
-      .describe('How each paragraph balances its line breaks; maps 1:1 to CSS text-wrap'),
-    textCase: z
-      .enum(['ORIGINAL', 'UPPER', 'LOWER', 'TITLE', 'SMALL_CAPS', 'SMALL_CAPS_FORCED'])
-      .optional(),
-    textDecoration: z.enum(['NONE', 'UNDERLINE', 'STRIKETHROUGH']).optional(),
-    textAlignHorizontal: z
-      .enum(['LEFT', 'CENTER', 'RIGHT', 'JUSTIFIED'])
-      .optional()
-      .describe('Horizontal alignment of the lines within the text box (CSS text-align)'),
-    textAlignVertical: z
-      .enum(['TOP', 'CENTER', 'BOTTOM'])
-      .optional()
-      .describe('Vertical alignment of the text within a box taller than its content'),
-    textTruncation: z
-      .enum(['DISABLED', 'ENDING'])
-      .optional()
-      .describe('ENDING truncates with an ellipsis'),
-    maxLines: z
-      .number()
-      .nullable()
-      .optional()
-      .describe('Max lines before truncation; null = unlimited'),
-    textAutoResize: z
-      .enum(['NONE', 'HEIGHT', 'WIDTH_AND_HEIGHT', 'TRUNCATE'])
-      .optional()
-      .describe('How the text box resizes to its content'),
-  }),
+  inputSchema: setTextPropertiesParams,
   kind: 'write',
 };

@@ -5,6 +5,12 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_VECTOR_TOOL_NAME = 'set_vector';
 
+export const setVectorParams = z.object({
+  nodeId: z.string().describe('The VECTOR to redraw'),
+  vectorPaths: vectorPathsSchema.optional(),
+  vectorNetwork: vectorNetworkSchema.optional(),
+});
+
 export const setVectorTool: ToolSpec = {
   name: SET_VECTOR_TOOL_NAME,
   description:
@@ -18,10 +24,6 @@ export const setVectorTool: ToolSpec = {
     '(Figma allows none there). A rectangle, ellipse, polygon, star or line has to be ' +
     'flatten_nodes’d into a VECTOR first; a vector inside an instance cannot be redrawn (change ' +
     'the main component); text on a path cannot change its path. Returns { ok, nodeId }.',
-  inputSchema: z.object({
-    nodeId: z.string().describe('The VECTOR to redraw'),
-    vectorPaths: vectorPathsSchema.optional(),
-    vectorNetwork: vectorNetworkSchema.optional(),
-  }),
+  inputSchema: setVectorParams,
   kind: 'write',
 };
