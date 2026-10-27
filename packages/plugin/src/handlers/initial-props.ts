@@ -1,9 +1,9 @@
 import type { SandboxToolHandler } from '../dispatcher.js';
+import { createSetAutoLayoutHandler } from '../features/layout/set-auto-layout.handler.js';
+import { createSetLayoutPropsHandler } from '../features/layout/set-layout-props.handler.js';
 import { createSetCornerRadiusHandler } from '../features/paint/set-corner-radius.handler.js';
 import { createSetFillsHandler } from '../features/paint/set-fills.handler.js';
 import { createSetStrokesHandler } from '../features/paint/set-strokes.handler.js';
-import { createSetAutoLayoutHandler } from './set-auto-layout.js';
-import { createSetLayoutPropsHandler } from './set-layout-props.js';
 import { createSetTextPropertiesHandler } from './set-text-properties.js';
 
 const TEXT_KEYS = [

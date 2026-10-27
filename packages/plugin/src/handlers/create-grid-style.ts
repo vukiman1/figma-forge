@@ -1,7 +1,7 @@
-import type { SerializedLayoutGrid, StyleResult } from '@figma-forge/core';
+import type { GridInput, StyleResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaLayoutGridsBound } from './bindings.js';
+import { toFigmaLayoutGridsBound } from '../features/layout/bound-layout-grids.js';
 
 export const createCreateGridStyleHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
@@ -14,7 +14,7 @@ export const createCreateGridStyleHandler =
     // Bindings resolve first, so a bad variable id fails before a half-built style exists.
     const grids = await toFigmaLayoutGridsBound(
       figmaCtx,
-      p.grids as SerializedLayoutGrid[],
+      p.grids as GridInput[],
       'create_grid_style',
     );
 

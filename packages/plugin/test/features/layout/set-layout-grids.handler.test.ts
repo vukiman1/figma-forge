@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetLayoutGridsHandler } from '../../src/handlers/set-layout-grids.js';
+import { createSetLayoutGridsHandler } from '../../../src/features/layout/set-layout-grids.handler.js';
 
 const fakeFigma = (
   lookup: Record<string, unknown>,
@@ -53,7 +53,6 @@ describe('set_layout_grids handler', () => {
     const handler = createSetLayoutGridsHandler(fakeFigma({ '1:1': frame }));
     await handler({
       nodeId: '1:1',
-      // A CENTER grid needs sectionSize and must NOT carry offset; the converter drops offset here.
       grids: [
         {
           pattern: 'COLUMNS',
@@ -100,7 +99,9 @@ describe('set_layout_grids handler', () => {
       fakeFigma({ '1:1': { id: '1:1', layoutGrids: [] }, '2:2': { id: '2:2' } }),
     );
     await expect(handler({ grids: [] })).rejects.toThrow(/nodeId/);
-    await expect(handler({ nodeId: '1:1', grids: 'nope' })).rejects.toThrow(/must be an array/);
+    await expect(handler({ nodeId: '1:1', grids: 'nope' })).rejects.toThrow(
+      /grids: Invalid input: expected array/,
+    );
     await expect(handler({ nodeId: '9:9', grids: [] })).rejects.toThrow(/not found/);
     await expect(handler({ nodeId: '2:2', grids: [] })).rejects.toThrow(/does not support/);
   });

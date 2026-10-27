@@ -1,21 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { toFigmaLayoutGridsBound } from '../../src/handlers/bindings.js';
-
-// The write half of issue #164. Two measured facts shape every test here:
-//
-//  1. Figma accepts a binding embedded in a plain object literal — the only way to bind a gradient
-//     stop, which has no setter — but that path validates almost nothing. An id matching no
-//     variable, and a variable of the wrong resolved type, are both taken silently and then render
-//     white. So the official setters are used wherever they exist, and the gradient stop is checked
-//     here instead.
-//  2. Writing an array back WITHOUT `boundVariables` clears whatever it was bound to, because Figma
-//     replaces the whole array. That is the semantics these functions preserve — there is no
-//     separate unbind path to test.
+import { toFigmaLayoutGridsBound } from '../../../src/features/layout/bound-layout-grids.js';
 
 const VAR = (id: string, resolvedType = 'COLOR') => ({ id, name: `var/${id}`, resolvedType });
 
-/** SetBoundVariableFor* return a NEW object; the fake records the call and marks the result. */
 const fakeFigma = (variables: Record<string, unknown>) => {
   const ctx = {
     variables: {

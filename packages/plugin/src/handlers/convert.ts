@@ -1,6 +1,5 @@
 import type {
   SerializedAction,
-  SerializedLayoutGrid,
   SerializedLineHeight,
   SerializedReaction,
   SerializedTrigger,
@@ -10,33 +9,6 @@ import type {
 // (serializer.ts owns the Figma → wire direction; these are the matching wire → Figma helpers.)
 
 /** The colour spaces a write may name its channels in. */
-export const toFigmaLayoutGrid = (g: SerializedLayoutGrid): LayoutGrid => {
-  if (g.pattern === 'GRID') {
-    return { pattern: 'GRID', visible: g.visible, sectionSize: g.sectionSize ?? 10 };
-  }
-  if (g.pattern === 'ROWS' || g.pattern === 'COLUMNS') {
-    const alignment = g.alignment ?? 'STRETCH';
-    return {
-      pattern: g.pattern,
-      visible: g.visible,
-      alignment,
-      gutterSize: g.gutterSize ?? 0,
-      count: g.count ?? 1,
-      // Figma rejects `offset` on a CENTER grid at runtime (it's ignored there) — only MIN/MAX/STRETCH
-      // accept it. Omit it for CENTER so a valid centered grid isn't rejected for carrying the key.
-      ...(alignment === 'CENTER' ? {} : { offset: g.offset ?? 0 }),
-      ...(g.sectionSize === undefined ? {} : { sectionSize: g.sectionSize }),
-    } as LayoutGrid;
-  }
-  throw new TypeError(`unsupported layout grid pattern: ${g.pattern}`);
-};
-
-/**
- * Wire font → Figma `FontNameInput`. `style` is optional: Figma then resolves the named instance
- * closest to `variationSettings`, which is how a caller holding a CSS weight expresses itself
- * without knowing what the family calls that instance. Rebuilt field by field rather than passed
- * through, so nothing beyond the three known keys reaches `figma.*`.
- */
 export const toFigmaFontName = (fn: {
   family?: unknown;
   style?: unknown;

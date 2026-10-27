@@ -19,3 +19,5 @@ export const gridItemSchema = z
       .optional(),
   })
   .loose();
+
+export type GridInput = z.infer<typeof gridItemSchema>;

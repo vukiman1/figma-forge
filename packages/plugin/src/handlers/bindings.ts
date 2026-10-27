@@ -1,39 +1,10 @@
-import type { SerializedLayoutGrid } from '@figma-forge/core';
-
 import {
-  boundIdsOf,
   resolveVariables,
   type VariableTable,
   variableFor,
 } from '../features/variables/resolve-variables.js';
-import { toFigmaLayoutGrid } from './convert.js';
 
 /** Serialized layout grids → Figma layout grids, with each grid's per-field bindings applied. */
-export const toFigmaLayoutGridsBound = async (
-  figmaCtx: typeof figma,
-  grids: readonly SerializedLayoutGrid[],
-  where: string,
-): Promise<LayoutGrid[]> => {
-  const table = await resolveVariables(figmaCtx, boundIdsOf(grids), where);
-  return grids.map(src => {
-    let grid = toFigmaLayoutGrid(src);
-    for (const [field, id] of Object.entries(src.boundVariables ?? {})) {
-      grid = figmaCtx.variables.setBoundVariableForLayoutGrid(
-        grid,
-        field as VariableBindableLayoutGridField,
-        variableFor(table, id),
-      );
-    }
-    return grid;
-  });
-};
-
-/**
- * A text style's bindings on the way IN. Unlike paints and effects — whole arrays that Figma
- * replaces, so omitting a binding clears it — a text style write is a patch: fields left out stay
- * as they were. Unbinding therefore needs to be sayable, and `null` says it, the same shape
- * set_text_range already uses for a run's bindings.
- */
 export type TextStyleBindings = Record<string, string | null>;
 
 /**

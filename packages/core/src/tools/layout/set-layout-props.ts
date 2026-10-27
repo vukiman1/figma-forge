@@ -16,7 +16,12 @@ export const setLayoutPropsParams = z.object({
     .optional()
     .describe('Vertical sizing: HUG fits content, FILL fills the parent, FIXED keeps height'),
   layoutAlign: z
-    .enum(['STRETCH', 'INHERIT'])
+    .enum(['STRETCH', 'INHERIT'], {
+      error:
+        'layoutAlign MIN / CENTER / MAX no longer does anything in Figma — every child of an ' +
+        'auto-layout frame shares its counterAxisAlignItems. To align one child alone, wrap it in ' +
+        'its own auto-layout frame, or set layoutPositioning ABSOLUTE and use align_nodes.',
+    })
     .optional()
     .describe('STRETCH fills the counter axis; INHERIT follows the parent'),
   layoutGrow: z

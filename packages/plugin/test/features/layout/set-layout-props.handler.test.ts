@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetLayoutPropsHandler } from '../../src/handlers/set-layout-props.js';
+import { createSetLayoutPropsHandler } from '../../../src/features/layout/set-layout-props.handler.js';
 
 const fakeFigma = (lookup: Record<string, unknown>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => lookup[id] ?? null }) as unknown as typeof figma;
@@ -103,7 +103,7 @@ describe('set_layout_props handler', () => {
     await createSetLayoutPropsHandler(fakeFigma({ '1:1': node }))({
       nodeId: '1:1',
       minWidth: 120,
-      maxWidth: null, // clears the existing bound
+      maxWidth: null,
       maxHeight: 300,
     });
     expect(node).toMatchObject({ minWidth: 120, maxWidth: null, minHeight: null, maxHeight: 300 });
@@ -115,7 +115,7 @@ describe('set_layout_props handler', () => {
         nodeId: '1:1',
         minWidth: 0,
       }),
-    ).rejects.toThrow(/minWidth must be a positive number or null/);
+    ).rejects.toThrow(/minWidth: Too small/);
     await expect(
       createSetLayoutPropsHandler(fakeFigma({ '1:1': { id: '1:1', layoutAlign: 'INHERIT' } }))({
         nodeId: '1:1',

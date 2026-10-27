@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetConstraintsHandler } from '../../src/handlers/set-constraints.js';
+import { createSetConstraintsHandler } from '../../../src/features/layout/set-constraints.handler.js';
 
 const fakeFigma = (lookup: Record<string, unknown>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => lookup[id] ?? null }) as unknown as typeof figma;

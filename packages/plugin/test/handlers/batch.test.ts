@@ -4,6 +4,7 @@ import type { BatchResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { SandboxHandlers } from '../../src/dispatcher.js';
+import { createSetAutoLayoutHandler } from '../../src/features/layout/set-auto-layout.handler.js';
 import { createSetComplexStrokeHandler } from '../../src/features/paint/set-complex-stroke.handler.js';
 import { createSetCornerRadiusHandler } from '../../src/features/paint/set-corner-radius.handler.js';
 import { createSetFillsHandler } from '../../src/features/paint/set-fills.handler.js';
@@ -36,7 +37,6 @@ import { createRenameNodeHandler } from '../../src/handlers/rename-node.js';
 import { createReorderNodesHandler } from '../../src/handlers/reorder-nodes.js';
 import { createReparentNodesHandler } from '../../src/handlers/reparent-nodes.js';
 import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/handlers/repeat.js';
-import { createSetAutoLayoutHandler } from '../../src/handlers/set-auto-layout.js';
 import { createSetInstancePropertiesHandler } from '../../src/handlers/set-instance-properties.js';
 import { createSetPositionHandler } from '../../src/handlers/set-position.js';
 import { createSetReactionsHandler } from '../../src/handlers/set-reactions.js';
