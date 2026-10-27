@@ -4,14 +4,18 @@ import type { BatchResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { SandboxHandlers } from '../../src/dispatcher.js';
+import { createAddVariableModeHandler } from '../../src/features/variables/add-variable-mode.handler.js';
+import { createBindVariableToNodeHandler } from '../../src/features/variables/bind-variable-to-node.handler.js';
+import { createRenameVariableHandler } from '../../src/features/variables/rename-variable.handler.js';
+import { createSetVariableCodeSyntaxHandler } from '../../src/features/variables/set-variable-code-syntax.handler.js';
+import { createSetVariableValueHandler } from '../../src/features/variables/set-variable-value.handler.js';
+import { createUpdateVariableCollectionHandler } from '../../src/features/variables/update-variable-collection.handler.js';
 import { createAddComponentPropertyHandler } from '../../src/handlers/add-component-property.js';
-import { createAddVariableModeHandler } from '../../src/handlers/add-variable-mode.js';
 import { createApplyAnimationStyleHandler } from '../../src/handlers/apply-animation-style.js';
 import { createApplyManualKeyframeTrackHandler } from '../../src/handlers/apply-manual-keyframe-track.js';
 import { createBatchRenameNodesHandler } from '../../src/handlers/batch-rename-nodes.js';
 import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
-import { createBindVariableToNodeHandler } from '../../src/handlers/bind-variable-to-node.js';
 import { createCombineAsVariantsHandler } from '../../src/handlers/combine-as-variants.js';
 import { createSetComplexStrokeHandler } from '../../src/handlers/complex-stroke.js';
 import { createCreateComponentHandler } from '../../src/handlers/create-component.js';
@@ -25,7 +29,6 @@ import { createMoveNodesHandler } from '../../src/handlers/move-nodes.js';
 import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
 import { createRemoveReactionsHandler } from '../../src/handlers/remove-reactions.js';
 import { createRenameNodeHandler } from '../../src/handlers/rename-node.js';
-import { createRenameVariableHandler } from '../../src/handlers/rename-variable.js';
 import { createReorderNodesHandler } from '../../src/handlers/reorder-nodes.js';
 import { createReparentNodesHandler } from '../../src/handlers/reparent-nodes.js';
 import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/handlers/repeat.js';
@@ -40,15 +43,12 @@ import { createSetStrokesHandler } from '../../src/handlers/set-strokes.js';
 import { createSetTextPropertiesHandler } from '../../src/handlers/set-text-properties.js';
 import { createSetTextHandler } from '../../src/handlers/set-text.js';
 import { createSetTimelineDurationHandler } from '../../src/handlers/set-timeline-duration.js';
-import { createSetVariableCodeSyntaxHandler } from '../../src/handlers/set-variable-code-syntax.js';
-import { createSetVariableValueHandler } from '../../src/handlers/set-variable-value.js';
 import { createSetVisibleHandler } from '../../src/handlers/set-visible.js';
 import { createSwapComponentHandler } from '../../src/handlers/swap-component.js';
 import { createSetTextPathHandler } from '../../src/handlers/text-path.js';
 import { createUpdateFlowsHandler } from '../../src/handlers/update-flows.js';
 import { createUpdatePaintStyleHandler } from '../../src/handlers/update-paint-style.js';
 import { createUpdateTextStyleHandler } from '../../src/handlers/update-text-style.js';
-import { createUpdateVariableCollectionHandler } from '../../src/handlers/update-variable-collection.js';
 import {
   createCreateVectorHandler,
   createOutlineStrokeHandler,

@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  toDocumentRgb,
-  toDocumentRgba,
-  toFigmaEffect,
-  toFigmaVariableValue,
-} from '../../src/handlers/convert.js';
+import { toDocumentRgb, toDocumentRgba, toFigmaEffect } from '../../src/handlers/convert.js';
 
 // Stands in for Figma's conversion: what it returns is what a Display P3 file stores for sRGB
 // 0.8 / 0.4 / 0.2 (measured live), tagged with the space it came from.
@@ -136,40 +131,6 @@ describe('toFigmaEffect', () => {
       offset: { x: 0, y: 0 },
       spread: 0,
       blendMode: 'NORMAL',
-    });
-  });
-});
-
-describe('toFigmaVariableValue', () => {
-  it('converts a COLOR value that names its space', () => {
-    const { figmaCtx } = doc('DISPLAY_P3');
-    const value = toFigmaVariableValue(
-      { r: 0.8, g: 0.4, b: 0.2, a: 1, space: 'SRGB' } as never,
-      figmaCtx,
-    );
-    // Exactly the channels: setValueForMode rejects the sourceColor a paint would keep.
-    expect(value).toStrictEqual({ ...P3_OF_SRGB_ORANGE, a: 1 });
-  });
-
-  it('converts the concrete half of a composed colour that names its space', () => {
-    const { figmaCtx } = doc('DISPLAY_P3');
-    const value = toFigmaVariableValue(
-      {
-        color: { r: 0.8, g: 0.4, b: 0.2, a: 1, space: 'SRGB' },
-        opacity: { type: 'VARIABLE_ALIAS', id: 'VariableID:1:2' },
-      } as never,
-      figmaCtx,
-    ) as VariableComposedColor;
-    expect(value.color).toStrictEqual({ ...P3_OF_SRGB_ORANGE, a: 1 });
-    expect(value.opacity).toEqual({ type: 'VARIABLE_ALIAS', id: 'VariableID:1:2' });
-  });
-
-  it('writes a COLOR value with no space exactly as before, alpha absent included', () => {
-    expect(toFigmaVariableValue({ r: 0.1, g: 0.2, b: 0.3 } as never, untouchable)).toEqual({
-      r: 0.1,
-      g: 0.2,
-      b: 0.3,
-      a: undefined,
     });
   });
 });

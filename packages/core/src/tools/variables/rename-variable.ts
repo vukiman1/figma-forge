@@ -6,7 +6,7 @@ export const RENAME_VARIABLE_TOOL_NAME = 'rename_variable';
 
 export const renameVariableParams = z.object({
   variableId: z.string().describe('Variable id'),
-  name: z.string().describe('New variable name, e.g. "color/brand"'),
+  name: z.string().min(1).describe('New variable name, e.g. "color/brand"'),
 });
 
 export const renameVariableTool: ToolSpec = {

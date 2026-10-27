@@ -6,12 +6,12 @@ export const UPDATE_VARIABLE_COLLECTION_TOOL_NAME = 'update_variable_collection'
 
 export const updateVariableCollectionParams = z.object({
   collectionId: z.string().describe('Variable collection id'),
-  name: z.string().optional().describe('New collection name, e.g. "Color"'),
+  name: z.string().min(1).optional().describe('New collection name, e.g. "Color"'),
   modes: z
     .array(
       z.object({
         modeId: z.string().describe('Mode id, from get_variable_defs'),
-        name: z.string().describe('New mode name, e.g. "Dark"'),
+        name: z.string().min(1).describe('New mode name, e.g. "Dark"'),
       }),
     )
     .optional()

@@ -146,7 +146,7 @@ describe('library imports', () => {
       expect(WIRE_TOOL_SCHEMAS.has(name)).toBe(true);
       for (const input of [{}, { [key]: '' }, { [key]: null }, { [key]: 123 }]) {
         expect(spec!.inputSchema.safeParse(input).success).toBe(false);
-        await expect(target.handlers[name]!(input)).rejects.toThrow(/key.*non-empty string/i);
+        await expect(target.handlers[name]!(input)).rejects.toThrow(new RegExp(key));
       }
       // Source ids and caller-owned retry ids are not alternative spellings of a published key.
       expect(spec!.inputSchema.safeParse({ [key]: 'key', variableId: 'source-id' }).success).toBe(

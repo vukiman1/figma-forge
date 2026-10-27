@@ -42,6 +42,8 @@ const variableValue = z
       '{ color, opacity: 0–100 } composed color | { type: easing }',
   );
 
+export type VariableValueInput = z.infer<typeof variableValue>;
+
 export const setVariableValueParams = z.object({
   variableId: z.string().describe('Variable id'),
   modeId: z.string().describe('Mode id (from the collection)'),

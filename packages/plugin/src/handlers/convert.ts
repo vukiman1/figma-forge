@@ -5,8 +5,6 @@ import type {
   SerializedLineHeight,
   SerializedReaction,
   SerializedTrigger,
-  SerializedVariableComposedColor,
-  SerializedVariableValue,
 } from '@figma-forge/core';
 
 import { documentColorProfile } from './color-profile.js';
@@ -58,7 +56,7 @@ export const toDocumentRgb = (figmaCtx: typeof figma, c: WireColor, where: strin
  * the `sourceColor` Figma's conversion attaches ("Unrecognized key(s) in object: 'sourceColor'"),
  * where a paint or an effect keeps it.
  */
-const toDocumentChannels = (figmaCtx: typeof figma, c: WireColor, where: string): RGB => {
+export const toDocumentChannels = (figmaCtx: typeof figma, c: WireColor, where: string): RGB => {
   const { r, g, b } = toDocumentRgb(figmaCtx, c, where);
   return { r, g, b };
 };
@@ -176,71 +174,6 @@ export const toFigmaLineHeight = (lh: SerializedLineHeight): LineHeight => {
   return { unit: lh.unit as 'PIXELS' | 'PERCENT', value: lh.value };
 };
 
-/**
- * Wire composed color → Figma VariableComposedColor (plugin-typings 1.139).
- *
- * Figma's type admits the pair only when at least one half is an alias: a concrete colour at a
- * concrete opacity is just an RGBA and there is nothing to compose. Rejecting that combination here
- * rather than casting past it means the agent is told what to send instead, at the tool boundary,
- * rather than meeting an opaque refusal from Figma.
- */
-const toFigmaComposedColor = (
-  value: SerializedVariableComposedColor,
-  figmaCtx: typeof figma,
-): VariableComposedColor => {
-  const opacity =
-    typeof value.opacity === 'number'
-      ? value.opacity
-      : ({ type: 'VARIABLE_ALIAS', id: value.opacity.id } as const);
-  if ('r' in value.color) {
-    if (typeof opacity === 'number') {
-      throw new TypeError(
-        'set_variable_value: a composed color needs an alias on at least one of color / opacity — ' +
-          'a concrete color at a concrete opacity is just { r, g, b, a }',
-      );
-    }
-    const { a } = value.color;
-    return {
-      color: { ...toDocumentChannels(figmaCtx, value.color, 'set_variable_value'), a },
-      opacity,
-    } as VariableComposedColor;
-  }
-  return { color: { type: 'VARIABLE_ALIAS', id: value.color.id }, opacity };
-};
-
-/** Wire variable value → Figma VariableValue (alias / color / composed color / easing / primitive). */
-export const toFigmaVariableValue = (
-  value: SerializedVariableValue,
-  figmaCtx: typeof figma,
-): VariableValue => {
-  if (typeof value === 'object' && value !== null) {
-    if ('r' in value) {
-      return {
-        ...toDocumentChannels(figmaCtx, value, 'set_variable_value'),
-        a: value.a,
-      } as VariableValue;
-    }
-    // A composed color nests the keys the other branches look for (`r` inside `color`, `id` inside
-    // either half) rather than carrying them, so it is recognised by carrying both of its own and
-    // neither of theirs. The tool schema's members are loose objects, which keep unknown keys, so a
-    // malformed RGBA that also carried a stray `color` would land here if this were tried first —
-    // and `'r' in value.color` would then throw on a non-object.
-    if ('color' in value && 'opacity' in value) return toFigmaComposedColor(value, figmaCtx);
-    // Only an alias carries `id`; an EASING value carries its own `type` (EASE_IN / CUSTOM_SPRING /
-    // …) instead. Keying on `id` rather than falling through keeps an easing curve from being turned
-    // into an alias with `id: undefined`, which Figma would reject.
-    if ('id' in value) return { type: 'VARIABLE_ALIAS', id: value.id };
-    return value as unknown as VariableValue;
-  }
-  return value;
-};
-
-// Reactions: the Figma Action/Trigger types are strict discriminated unions, so we hand the wire
-// object over whole and cast. Whitelisting fields here is what makes a round-trip lossy — the
-// per-variant required fields (ON_KEY_DOWN's keyCodes, SET_VARIABLE's variableId, a directional
-// transition's direction/matchLayers, an overlay's overlayRelativePosition) are precisely the ones
-// no shared subset contains. setReactionsAsync validates the result, so a shape Figma cannot use is
-// rejected there rather than applied.
 const toFigmaTrigger = (t: SerializedTrigger | null): Trigger | null =>
   t === null ? null : ({ ...t } as unknown as Trigger);
 

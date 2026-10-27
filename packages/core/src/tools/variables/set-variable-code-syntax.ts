@@ -9,12 +9,15 @@ const platformDeclaration = z.string().min(1).nullable();
 export const setVariableCodeSyntaxParams = z.object({
   variableId: z.string().describe('Variable id'),
   codeSyntax: z
-    .object({
+    .strictObject({
       WEB: platformDeclaration
         .optional()
         .describe('Web/CSS name, e.g. "--color-primary" or "theme.colors.primary"'),
       ANDROID: platformDeclaration.optional().describe('Android resource name'),
       iOS: platformDeclaration.optional().describe('iOS symbol name'),
+    })
+    .refine(declarations => Object.keys(declarations).length > 0, {
+      message: 'declare at least one platform (WEB / ANDROID / iOS)',
     })
     .describe('Per-platform declarations: string sets, null removes, omitted is untouched'),
 });
