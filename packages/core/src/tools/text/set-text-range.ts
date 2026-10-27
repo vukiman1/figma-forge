@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { fontNameSchema } from '../shared/font-name-schema.js';
 import { paintItemSchema } from '../shared/paint-schema.js';
+import { letterSpacingSchema, lineHeightSchema } from '../shared/text-metrics-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_TEXT_RANGE_TOOL_NAME = 'set_text_range';
@@ -19,13 +20,8 @@ const rangeSchema = z.object({
   textCase: z
     .enum(['ORIGINAL', 'UPPER', 'LOWER', 'TITLE', 'SMALL_CAPS', 'SMALL_CAPS_FORCED'])
     .optional(),
-  lineHeight: z
-    .union([
-      z.object({ unit: z.literal('AUTO') }),
-      z.object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() }),
-    ])
-    .optional(),
-  letterSpacing: z.object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() }).optional(),
+  lineHeight: lineHeightSchema.optional(),
+  letterSpacing: letterSpacingSchema.optional(),
   hyperlink: z
     .union([z.object({ type: z.enum(['URL', 'NODE']), value: z.string() }), z.null()])
     .optional()

@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSetTextHandler } from '../../src/handlers/set-text.js';
+import { createSetTextHandler } from '../../../src/features/text/set-text.handler.js';
 import { makeText } from './text-fake.js';
 
 const MIXED = Symbol('figma.mixed');
@@ -19,7 +19,6 @@ const fakeFigma = (
     getNodeByIdAsync: async (id: string) => lookup[id] ?? null,
   }) as unknown as typeof figma;
 
-/** Run set_text on a node laid out as `runs`, and return its runs afterwards. */
 const edit = async (runs: [string, string][], characters: string) => {
   const fonts = { loaded: false };
   const node = makeText('1:1', runs, fonts);
@@ -61,8 +60,6 @@ describe('set_text handler', () => {
     expect(node.characters).toBe('cd');
   });
 
-  // Measured: assigning `characters` restyled the whole node. A typo fix must leave the runs it
-  // does not touch — here the smaller "/mo" after a price.
   it('keeps the styling of the text the old and new strings share', async () => {
     const node = await edit(
       [
@@ -107,7 +104,6 @@ describe('set_text handler', () => {
     ]);
   });
 
-  // Nothing in common: the same as assigning `characters` — one run in the first character's style.
   it('restyles to the first character when nothing is shared, as before', async () => {
     const node = await edit(
       [
@@ -124,9 +120,6 @@ describe('set_text handler', () => {
     expect(node.characters).toBe('Hi');
   });
 
-  // "Hello World" with a bold "World", rewritten as "Changed": the strings share only the final
-  // "d". Keeping it would leave one bold letter at the end of a plain word — worse than the old
-  // whole-node rewrite. A shared edge that cuts into a run backs off to the run's boundary.
   it('keeps no part of a run the edit cuts into, so nothing is left styled on its own', async () => {
     const node = await edit(
       [
@@ -154,8 +147,6 @@ describe('set_text handler', () => {
     ]);
   });
 
-  // The old and new emoji share the high half of their surrogate pair, so a shared prefix counted
-  // in UTF-16 units ends mid-pair. Backing off to the run boundary hands Figma the whole character.
   it('replaces an emoji whole, never half of its surrogate pair', async () => {
     const fonts = { loaded: false };
     const node = makeText(
@@ -202,7 +193,6 @@ describe('set_text on text set along a path', () => {
   it('edits it like a TEXT node', async () => {
     const fonts = { loaded: false };
     const node = makeText('1:1', [['Round', 'a']], fonts);
-    // Set in place: spreading the fake would freeze its `characters` getter into a value.
     (node as { type: string }).type = 'TEXT_PATH';
     await createSetTextHandler(fakeFigma({ '1:1': node }, fonts))({
       nodeId: '1:1',

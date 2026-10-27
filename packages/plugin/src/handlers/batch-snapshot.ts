@@ -22,7 +22,7 @@
  */
 
 import { writePaints } from '../features/paint/write-paints.js';
-import type { TextLike } from './text-like.js';
+import type { TextLike } from '../features/text/text-like.js';
 
 type Bag = Record<string, unknown>;
 

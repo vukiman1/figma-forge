@@ -1,4 +1,5 @@
 import { writePaints } from '../features/paint/write-paints.js';
+import { isTextLike } from '../features/text/text-like.js';
 import {
   type BindingSnapshot,
   captureBindings,
@@ -10,7 +11,6 @@ import {
   same,
   type TextSnapshot,
 } from './batch-snapshot.js';
-import { isTextLike } from './text-like.js';
 
 /**
  * Instance override guard.

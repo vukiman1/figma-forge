@@ -1,12 +1,19 @@
-import type { SerializedLetterSpacing, SerializedLineHeight, StyleResult } from '@figma-forge/core';
+import {
+  fontNameSchema,
+  type LineHeightParam,
+  type SerializedLetterSpacing,
+  type StyleResult,
+} from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
+import { parseParams } from '../features/parse-params.js';
+import { toFigmaFontName } from '../features/text/fonts.js';
+import { toFigmaLineHeight } from '../features/text/text-metrics.js';
 import {
   applyTextStyleBindings,
   resolveTextStyleBindings,
   type TextStyleBindings,
-} from './bindings.js';
-import { toFigmaFontName, toFigmaLineHeight } from './convert.js';
+} from '../features/text/text-style-bindings.js';
 
 export const createUpdateTextStyleHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
@@ -34,7 +41,9 @@ export const createUpdateTextStyleHandler =
     if (typeof p.name === 'string') ts.name = p.name;
     // A new fontName must be loaded before assignment (Figma throws otherwise).
     if (p.fontName !== undefined) {
-      const fontName = toFigmaFontName(p.fontName as Record<string, unknown>);
+      const fontName = toFigmaFontName(
+        parseParams('update_text_style', fontNameSchema, p.fontName),
+      );
       await figmaCtx.loadFontAsync(fontName);
       // Declared as `FontName` though the API accepts a `FontNameInput` — see create_text_style.
       ts.fontName = fontName as FontName;
@@ -48,7 +57,7 @@ export const createUpdateTextStyleHandler =
     await figmaCtx.loadFontAsync(ts.fontName);
     if (typeof p.fontSize === 'number') ts.fontSize = p.fontSize;
     if (p.lineHeight !== undefined)
-      ts.lineHeight = toFigmaLineHeight(p.lineHeight as SerializedLineHeight);
+      ts.lineHeight = toFigmaLineHeight(p.lineHeight as LineHeightParam);
     if (p.letterSpacing !== undefined) {
       const ls = p.letterSpacing as SerializedLetterSpacing;
       ts.letterSpacing = { unit: ls.unit as 'PIXELS' | 'PERCENT', value: ls.value };

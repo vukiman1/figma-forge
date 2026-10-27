@@ -10,6 +10,9 @@ import { createSetCornerRadiusHandler } from '../../src/features/paint/set-corne
 import { createSetFillsHandler } from '../../src/features/paint/set-fills.handler.js';
 import { createSetOpacityHandler } from '../../src/features/paint/set-opacity.handler.js';
 import { createSetStrokesHandler } from '../../src/features/paint/set-strokes.handler.js';
+import { createSetTextPathHandler } from '../../src/features/text/set-text-path.handler.js';
+import { createSetTextPropertiesHandler } from '../../src/features/text/set-text-properties.handler.js';
+import { createSetTextHandler } from '../../src/features/text/set-text.handler.js';
 import { createAddVariableModeHandler } from '../../src/features/variables/add-variable-mode.handler.js';
 import { createBindVariableToNodeHandler } from '../../src/features/variables/bind-variable-to-node.handler.js';
 import { createRenameVariableHandler } from '../../src/features/variables/rename-variable.handler.js';
@@ -40,12 +43,9 @@ import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/hand
 import { createSetInstancePropertiesHandler } from '../../src/handlers/set-instance-properties.js';
 import { createSetPositionHandler } from '../../src/handlers/set-position.js';
 import { createSetReactionsHandler } from '../../src/handlers/set-reactions.js';
-import { createSetTextPropertiesHandler } from '../../src/handlers/set-text-properties.js';
-import { createSetTextHandler } from '../../src/handlers/set-text.js';
 import { createSetTimelineDurationHandler } from '../../src/handlers/set-timeline-duration.js';
 import { createSetVisibleHandler } from '../../src/handlers/set-visible.js';
 import { createSwapComponentHandler } from '../../src/handlers/swap-component.js';
-import { createSetTextPathHandler } from '../../src/handlers/text-path.js';
 import { createUpdateFlowsHandler } from '../../src/handlers/update-flows.js';
 import { createUpdatePaintStyleHandler } from '../../src/handlers/update-paint-style.js';
 import { createUpdateTextStyleHandler } from '../../src/handlers/update-text-style.js';
@@ -774,12 +774,16 @@ describe('batch handler', () => {
     // would restore everything except the newest field and still report success. Read the fields
     // off the handlers' own writes, so adding one fails here until the snapshot learns about it.
     const source = (file: string): string =>
-      readFileSync(new URL(`../../src/handlers/${file}`, import.meta.url), 'utf8');
-    const assigned = [...source('set-text-properties.ts').matchAll(/\btext\.([A-Za-z]+) = /g)].map(
-      m => m[1]!,
-    );
+      readFileSync(new URL(`../../src/features/text/${file}`, import.meta.url), 'utf8');
+    const properties = source('set-text-properties.handler.ts');
+    const plainList = /PLAIN_FIELDS = \[([^\]]*)\]/.exec(properties)?.[1] ?? '';
+    const assigned = [
+      ...[...properties.matchAll(/\btext\.([A-Za-z]+) = /g)].map(m => m[1]!),
+      ...[...properties.matchAll(/Reflect\.set\(text, '([A-Za-z]+)'/g)].map(m => m[1]!),
+      ...[...plainList.matchAll(/'([A-Za-z]+)'/g)].map(m => m[1]!),
+    ];
     const ranged = [
-      ...source('set-text-range.ts').matchAll(/\btext\.setRange([A-Za-z]+?)(?:Async)?\(/g),
+      ...source('apply-text-range.ts').matchAll(/\btext\.setRange([A-Za-z]+?)(?:Async)?\(/g),
     ].map(m => {
       const field = m[1]![0]!.toLowerCase() + m[1]!.slice(1);
       return field === 'boundVariable' ? 'boundVariables' : field;

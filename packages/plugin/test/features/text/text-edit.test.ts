@@ -1,18 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createFindReplaceTextHandler } from '../../src/handlers/find-replace-text.js';
-import { createSetTextHandler } from '../../src/handlers/set-text.js';
+import { createFindReplaceTextHandler } from '../../../src/features/text/find-replace-text.handler.js';
+import { createSetTextHandler } from '../../../src/features/text/set-text.handler.js';
 import { makeText } from './text-fake.js';
-
-// Differential tests for in-place text editing against what assigning `characters` did before.
-// The text must come out identical; the styling may only be kept where the old way discarded it,
-// never invented. Random cases use a two-letter alphabet so shared prefixes, suffixes and repeated
-// matches — the cases most likely to go wrong — come up constantly.
 
 const SEED = 20_261_001;
 const CASES = 3_000;
 
-/** Mulberry32: a small seeded PRNG, so every run of this test sees the same cases. */
 const prng = (seed: number) => {
   let a = seed;
   return (): number => {
@@ -40,11 +34,9 @@ const randomRuns = (rand: () => number): [string, string][] => {
   return runs;
 };
 
-/** Per-character styles of a run layout. */
 const stylesOf = (runs: [string, string][]): string[] =>
-  runs.flatMap(([text, style]) => [...text].map(() => style));
+  runs.flatMap(([text, style]) => Array.from({ length: text.length }, () => style));
 
-/** Character offsets where a run starts, plus the end. */
 const boundsOf = (runs: [string, string][]): number[] => {
   const out = [0];
   for (const [text] of runs) out.push(out.at(-1)! + text.length);
@@ -64,7 +56,6 @@ const fakeFigma = (lookup: Record<string, unknown>, fonts: { loaded: boolean }) 
 describe('set_text against assigning characters', () => {
   it(`agrees on the text and keeps only whole shared runs, over ${CASES} random edits`, async () => {
     const rand = prng(SEED);
-    // Collected rather than asserted one by one, so a failure lists every case that broke.
     const failures: string[] = [];
     for (let c = 0; c < CASES; c += 1) {
       const runs = randomRuns(rand);
@@ -78,12 +69,9 @@ describe('set_text against assigning characters', () => {
       });
       const where = `case ${c}: ${JSON.stringify(runs)} -> ${JSON.stringify(next)}`;
 
-      // 1. The text is exactly what the old assignment produced.
       if (node.characters !== next)
         failures.push(`${where}: text ${JSON.stringify(node.characters)}`);
 
-      // 2–3. Split the result into the longest prefix and suffix that are whole input runs, kept
-      // verbatim in text and style; what lies between must be one style.
       const input = stylesOf(runs);
       const output = stylesOf(node.runs());
       const bounds = boundsOf(runs);
@@ -114,7 +102,6 @@ describe('set_text against assigning characters', () => {
         failures.push(`${where}: rewritten text in ${new Set(middle).size} styles`);
       }
 
-      // 4. With no whole run shared, the result is the old one: everything in the first style.
       const allFirst = output.every(style => style === input[0]);
       if (prefix === 0 && suffix === 0 && next.length > 0 && !allFirst) {
         failures.push(`${where}: differs from assigning`);
@@ -124,7 +111,6 @@ describe('set_text against assigning characters', () => {
   });
 });
 
-/** A plausible edit of `s`: change, insert or drop one span. */
 function mutate(rand: () => number, s: string): string {
   const at = Math.floor(rand() * (s.length + 1));
   const len = Math.floor(rand() * 3);
@@ -152,7 +138,6 @@ describe('find_replace_text against assigning characters', () => {
       });
       const where = `case ${c}: ${JSON.stringify(runs)} /${find}/ -> ${JSON.stringify(replace)}`;
 
-      // 1. The text is exactly what the old replacement produced.
       const expected = caseSensitive
         ? before.split(find).join(replace)
         : before.replace(new RegExp(escape(find), 'gi'), replace);
@@ -160,8 +145,6 @@ describe('find_replace_text against assigning characters', () => {
         failures.push(`${where}: text ${JSON.stringify(node.characters)}`);
       }
 
-      // 2–3. Walk the input: untouched characters keep their style; each replacement is wholly in
-      // the style of the first character it replaced.
       const input = stylesOf(runs);
       const output = stylesOf(node.runs());
       const pattern = new RegExp(escape(find), caseSensitive ? 'g' : 'gi');

@@ -1,6 +1,8 @@
 import type { BatchResult, FlowStartingPoint } from '@figma-forge/core';
 
 import type { SandboxHandlers, SandboxToolHandler } from '../dispatcher.js';
+import { findReplacePlan } from '../features/text/find-replace-text.handler.js';
+import { isTextLike, type TextLike } from '../features/text/text-like.js';
 import {
   captureOverrideGuard,
   type InstanceGuard,
@@ -33,7 +35,6 @@ import {
 } from './batch-snapshot.js';
 import { resolveSharedParent } from './boolean-nodes.js';
 import { propertyDisplayName, resolveComponentOwner } from './component-property.js';
-import { findReplacePlan } from './find-replace-text.js';
 import {
   assertFigmaEditor,
   assertKeyframeField,
@@ -41,7 +42,6 @@ import {
   isMotionNode,
   toPlainJson,
 } from './motion-shared.js';
-import { isTextLike, type TextLike } from './text-like.js';
 import { readFlows, sameFlows } from './update-flows.js';
 
 /**

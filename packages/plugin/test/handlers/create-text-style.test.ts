@@ -92,7 +92,7 @@ describe('create_text_style handler', () => {
         name: 'Heading/H1',
         fontName: { family: 'Inter', variationSettings: { wght: null } },
       }),
-    ).rejects.toThrow(/variationSettings\.wght must be a number/);
+    ).rejects.toThrow(/variationSettings\.wght: Invalid input/);
     expect(createTextStyle).not.toHaveBeenCalled();
   });
 

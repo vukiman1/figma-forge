@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { textStyleBindingsSchema } from '../shared/binding-schema.js';
 import { fontNameSchema } from '../shared/font-name-schema.js';
+import { letterSpacingSchema, lineHeightSchema } from '../shared/text-metrics-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_TEXT_STYLE_TOOL_NAME = 'create_text_style';
@@ -10,10 +11,8 @@ export const createTextStyleParams = z.object({
   name: z.string().describe('Style name, e.g. "Heading/H1"'),
   fontName: fontNameSchema.optional(),
   fontSize: z.number().optional(),
-  lineHeight: z
-    .object({ unit: z.enum(['AUTO', 'PIXELS', 'PERCENT']), value: z.number().optional() })
-    .optional(),
-  letterSpacing: z.object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() }).optional(),
+  lineHeight: lineHeightSchema.optional(),
+  letterSpacing: letterSpacingSchema.optional(),
   textWrapStyle: z
     .enum(['AUTO', 'BALANCE', 'PRETTY'])
     .optional()

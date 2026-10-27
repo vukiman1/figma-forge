@@ -1,7 +1,7 @@
 import type { BatchNodeResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createFindReplaceTextHandler } from '../../src/handlers/find-replace-text.js';
+import { createFindReplaceTextHandler } from '../../../src/features/text/find-replace-text.handler.js';
 import { type FakeText, makeText } from './text-fake.js';
 
 const makeFigma = (nodes: FakeText[], fonts: { loaded: boolean }): typeof figma =>
@@ -41,8 +41,6 @@ describe('find_replace_text handler', () => {
     expect(node!.characters).toBe('Hello hi');
   });
 
-  // Measured: assigning `characters` restyled the whole node, so replacing one word wiped a bold
-  // red run elsewhere in it. Only the matched text may change.
   it('leaves the styling of text it does not replace as it was', async () => {
     const {
       texts: [node],

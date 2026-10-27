@@ -1,14 +1,3 @@
-/**
- * A TEXT node that keeps a style per character, the way Figma's does, for the set_text and
- * find_replace_text tests. What a plain `characters` string cannot show, and these tests are
- * about:
- *
- * - Assigning `characters` restyles the whole node with its first character's style (measured);
- * - `insertCharacters` / `deleteCharacters` leave every other character's style alone, and inserted
- *   text copies its style from the character before it ('BEFORE', the default) or after it;
- * - All three refuse to run before the node's fonts are loaded, as Figma does.
- */
-
 export interface FakeText {
   id: string;
   type: 'TEXT';
@@ -19,14 +8,9 @@ export interface FakeText {
   getStyledTextSegments(
     fields: readonly string[],
   ): { start: number; end: number; characters: string }[];
-  /** Consecutive characters sharing a style, as [text, style] pairs. */
   runs(): [string, string][];
 }
 
-/**
- * `runs` lays out the starting text, e.g. [['Hello ', 'regular'], ['bold', 'bold-red']]. Pass the
- * `loaded` flag of the fake figma, so an edit before `loadFontAsync` throws.
- */
 export const makeText = (
   id: string,
   runs: [string, string][],

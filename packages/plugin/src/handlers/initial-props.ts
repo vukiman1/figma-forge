@@ -4,7 +4,7 @@ import { createSetLayoutPropsHandler } from '../features/layout/set-layout-props
 import { createSetCornerRadiusHandler } from '../features/paint/set-corner-radius.handler.js';
 import { createSetFillsHandler } from '../features/paint/set-fills.handler.js';
 import { createSetStrokesHandler } from '../features/paint/set-strokes.handler.js';
-import { createSetTextPropertiesHandler } from './set-text-properties.js';
+import { createSetTextPropertiesHandler } from '../features/text/set-text-properties.handler.js';
 
 const TEXT_KEYS = [
   'fontName',

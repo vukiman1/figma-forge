@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { textStyleBindingsSchema } from '../shared/binding-schema.js';
 import { fontNameSchema } from '../shared/font-name-schema.js';
+import { letterSpacingSchema, lineHeightSchema } from '../shared/text-metrics-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const UPDATE_TEXT_STYLE_TOOL_NAME = 'update_text_style';
@@ -11,10 +12,8 @@ export const updateTextStyleParams = z.object({
   name: z.string().optional(),
   fontName: fontNameSchema.optional(),
   fontSize: z.number().optional(),
-  lineHeight: z
-    .object({ unit: z.enum(['AUTO', 'PIXELS', 'PERCENT']), value: z.number().optional() })
-    .optional(),
-  letterSpacing: z.object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() }).optional(),
+  lineHeight: lineHeightSchema.optional(),
+  letterSpacing: letterSpacingSchema.optional(),
   textWrapStyle: z
     .enum(['AUTO', 'BALANCE', 'PRETTY'])
     .optional()

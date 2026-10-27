@@ -5,7 +5,7 @@ import type { ToolSpec } from '../tool-spec.js';
 export const FIND_REPLACE_TEXT_TOOL_NAME = 'find_replace_text';
 
 export const findReplaceTextParams = z.object({
-  find: z.string().describe('Substring to find (non-empty)'),
+  find: z.string().min(1).describe('Substring to find (non-empty)'),
   replace: z.string().describe('Replacement string'),
   root: z.string().optional().describe('Optional node id to scope the search (default: page)'),
   caseSensitive: z.boolean().optional().describe('Match case (default false)'),

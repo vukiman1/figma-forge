@@ -1,27 +1,17 @@
 import { z } from 'zod';
 
 import { fontNameSchema } from '../shared/font-name-schema.js';
+import { letterSpacingSchema, lineHeightSchema } from '../shared/text-metrics-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_TEXT_PROPERTIES_TOOL_NAME = 'set_text_properties';
-
-const lineHeight = z
-  .union([
-    z.object({ unit: z.literal('AUTO') }),
-    z.object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() }),
-  ])
-  .describe('Line height: { unit: "AUTO" } or { unit: "PIXELS" | "PERCENT", value }');
-
-const letterSpacing = z
-  .object({ unit: z.enum(['PIXELS', 'PERCENT']), value: z.number() })
-  .describe('Letter spacing: { unit: "PIXELS" | "PERCENT", value }');
 
 export const setTextPropertiesParams = z.object({
   nodeId: z.string().describe('TEXT node id'),
   fontName: fontNameSchema.optional(),
   fontSize: z.number().positive().optional().describe('Font size in px'),
-  lineHeight: lineHeight.optional(),
-  letterSpacing: letterSpacing.optional(),
+  lineHeight: lineHeightSchema.optional(),
+  letterSpacing: letterSpacingSchema.optional(),
   paragraphSpacing: z
     .number()
     .min(0)

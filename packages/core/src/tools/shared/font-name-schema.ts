@@ -20,3 +20,5 @@ export const fontNameSchema = z
       ),
   })
   .describe('Font: { family, style?, variationSettings? }');
+
+export type FontNameParam = z.infer<typeof fontNameSchema>;

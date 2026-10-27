@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSetTextPropertiesHandler } from '../../src/handlers/set-text-properties.js';
+import { createSetTextPropertiesHandler } from '../../../src/features/text/set-text-properties.handler.js';
 
 const MIXED = Symbol('mixed');
 
@@ -20,6 +20,7 @@ describe('set_text_properties handler', () => {
     const node = {
       id: '1:1',
       type: 'TEXT',
+      fontName: { family: 'Inter', style: 'Regular' },
       textTruncation: 'DISABLED',
       maxLines: null,
       textAutoResize: 'NONE',
@@ -71,7 +72,6 @@ describe('set_text_properties handler', () => {
       nodeId: '1:1',
       fontName: { family: 'Inter', variationSettings: { wght: 900 } },
     });
-    // No `style: undefined` key — Figma reads the presence of the key, not its value.
     expect(node.fontName).toEqual({ family: 'Inter', variationSettings: { wght: 900 } });
     expect(Object.hasOwn(node.fontName, 'style')).toBe(false);
   });
@@ -88,8 +88,7 @@ describe('set_text_properties handler', () => {
         nodeId: '1:1',
         fontName: { family: 'Inter', variationSettings: { wght: '650' } },
       }),
-    ).rejects.toThrow(/variationSettings\.wght must be a number/);
-    // Rejected before the write, so the node is untouched.
+    ).rejects.toThrow(/variationSettings\.wght: Invalid input/);
     expect(node.fontName).toEqual({ family: 'Inter', style: 'Regular' });
   });
 
@@ -97,6 +96,7 @@ describe('set_text_properties handler', () => {
     const node = {
       id: '1:1',
       type: 'TEXT',
+      fontName: { family: 'Inter', style: 'Regular' },
       textTruncation: 'ENDING',
       maxLines: 3,
       textAutoResize: 'HEIGHT',
@@ -133,7 +133,6 @@ describe('set_text_properties handler', () => {
       textDecoration: 'UNDERLINE',
     });
 
-    // both the node's current font and the new target font get loaded before mutation
     expect(loadFontAsync).toHaveBeenCalledWith({ family: 'Inter', style: 'Regular' });
     expect(loadFontAsync).toHaveBeenCalledWith({ family: 'Roboto', style: 'Bold' });
     expect(node).toMatchObject({
@@ -184,11 +183,6 @@ describe('set_text_properties handler', () => {
     expect(node.textWrapStyle).toBe('BALANCE');
   });
 
-  // Figma refuses these three against an unloaded font exactly as it refuses a typography write,
-  // so each is checked on its own: `{nodeId, maxLines: 3}` threw `Cannot write to node with
-  // unloaded font` in a real file while `{nodeId, fontSize: 24, maxLines: 3}` went through, which
-  // is why the miss survived — any call that also touched typography loaded the font on the way
-  // past. A mock cannot reproduce the refusal, so what is pinned here is that the load happens.
   it.each(['textAutoResize', 'textTruncation', 'maxLines'])(
     'loads the node font before writing %s on its own',
     async field => {
@@ -255,7 +249,6 @@ describe('set_text_properties handler', () => {
         maxLines: 'x',
       }),
     ).rejects.toThrow(/maxLines/);
-    // Figma rejects negative paragraph values at the API boundary — refuse before touching the node.
     await expect(
       createSetTextPropertiesHandler(fakeFigma({ id: '1:1', type: 'TEXT' }))({
         nodeId: '1:1',
@@ -274,112 +267,5 @@ describe('set_text_properties handler', () => {
         textWrapStyle: 3,
       }),
     ).rejects.toThrow(/textWrapStyle/);
-  });
-});
-
-describe('set_text_properties on a mixed-font node', () => {
-  it('loads the target face without mutating the frozen range font list', async () => {
-    // getRangeAllFontNames hands back a frozen array in Figma's runtime (measured); pushing the
-    // target face onto it threw "object is not extensible" for every mixed-font node given a
-    // fontName. The live rollback harness is what caught it.
-    const loadFontAsync = vi.fn<() => Promise<void>>(async () => {});
-    const node = {
-      id: '1:1',
-      type: 'TEXT',
-      characters: 'ab',
-      fontName: MIXED as unknown,
-      getRangeAllFontNames: () =>
-        Object.freeze([
-          { family: 'Inter', style: 'Regular' },
-          { family: 'Inter', style: 'Bold' },
-        ]),
-    };
-    await createSetTextPropertiesHandler(fakeFigma(node, loadFontAsync))({
-      nodeId: '1:1',
-      fontName: { family: 'Inter', style: 'Medium' },
-    });
-    expect(node.fontName).toEqual({ family: 'Inter', style: 'Medium' });
-    expect(loadFontAsync).toHaveBeenCalledWith({ family: 'Inter', style: 'Bold' });
-    expect(loadFontAsync).toHaveBeenCalledWith({ family: 'Inter', style: 'Medium' });
-  });
-
-  it('sets horizontal and vertical text alignment, loading the font first', async () => {
-    const loadFontAsync = vi.fn<() => Promise<void>>(async () => {});
-    const node = {
-      id: '1:1',
-      type: 'TEXT',
-      characters: 'hi',
-      fontName: { family: 'Inter', style: 'Regular' },
-      textAlignHorizontal: 'LEFT',
-      textAlignVertical: 'TOP',
-    };
-    const result = (await createSetTextPropertiesHandler(fakeFigma(node, loadFontAsync))({
-      nodeId: '1:1',
-      textAlignHorizontal: 'CENTER',
-      textAlignVertical: 'BOTTOM',
-    })) as MutateResult;
-
-    expect(node).toMatchObject({ textAlignHorizontal: 'CENTER', textAlignVertical: 'BOTTOM' });
-    expect(loadFontAsync).toHaveBeenCalledWith({ family: 'Inter', style: 'Regular' });
-    expect(result).toEqual({ ok: true, nodeId: '1:1' });
-  });
-
-  it('leaves alignment alone when it is not passed, and rejects a non-string value', async () => {
-    const node = {
-      id: '1:1',
-      type: 'TEXT',
-      characters: 'hi',
-      fontName: { family: 'Inter', style: 'Regular' },
-      textAlignHorizontal: 'RIGHT',
-      textAlignVertical: 'CENTER',
-    };
-    await createSetTextPropertiesHandler(fakeFigma(node))({ nodeId: '1:1', fontSize: 14 });
-    expect(node).toMatchObject({ textAlignHorizontal: 'RIGHT', textAlignVertical: 'CENTER' });
-    await expect(
-      createSetTextPropertiesHandler(fakeFigma(node))({ nodeId: '1:1', textAlignHorizontal: 1 }),
-    ).rejects.toThrow(/textAlignHorizontal must be a string/);
-  });
-});
-
-describe('set_text_properties on text set along a path', () => {
-  it('sets the typography and the two alignments a path has', async () => {
-    const node = {
-      id: '1:1',
-      type: 'TEXT_PATH',
-      characters: 'Round',
-      fontName: { family: 'Inter', style: 'Regular' },
-    };
-    await createSetTextPropertiesHandler(fakeFigma(node))({
-      nodeId: '1:1',
-      fontSize: 18,
-      letterSpacing: { unit: 'PERCENT', value: 8 },
-      textAlignHorizontal: 'CENTER',
-      textAlignVertical: 'BOTTOM',
-    });
-    expect(node).toMatchObject({
-      fontSize: 18,
-      letterSpacing: { unit: 'PERCENT', value: 8 },
-      textAlignHorizontal: 'CENTER',
-      textAlignVertical: 'BOTTOM',
-    });
-  });
-
-  it('refuses the line, box and decoration fields a path lacks — all of them, before writing', async () => {
-    const node: Record<string, unknown> = {
-      id: '1:1',
-      type: 'TEXT_PATH',
-      characters: 'Round',
-      fontName: { family: 'Inter', style: 'Regular' },
-    };
-    await expect(
-      createSetTextPropertiesHandler(fakeFigma(node))({
-        nodeId: '1:1',
-        fontSize: 18,
-        lineHeight: { unit: 'AUTO' },
-        textDecoration: 'UNDERLINE',
-        maxLines: 2,
-      }),
-    ).rejects.toThrow('is text on a path, which has no lineHeight, textDecoration, maxLines');
-    expect(node).not.toHaveProperty('fontSize');
   });
 });
