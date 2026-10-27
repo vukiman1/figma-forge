@@ -1,3 +1,12 @@
+> [!NOTE]
+> **Figma Forge** is a fork of [Figwright](https://github.com/awdr74100/figwright) (MIT, © Roya). It keeps Figwright's tools and adds its own on top. What differs from upstream:
+>
+> - The plugin installs as **Figma Forge** (`id: figma-forge`) and the relay listens on **127.0.0.1:3056**, so it can run beside a stock Figwright on 3055.
+> - It is not published to npm. Build it from source (`pnpm install && pnpm build`), point your MCP client at `node /path/to/figma-forge/packages/mcp/dist/index.mjs`, and import `packages/plugin/manifest.json` in Figma.
+> - Releases go through this repo only — don't run `pnpm release`, which publishes `@figwright/mcp`.
+>
+> The rest of this README is upstream's.
+
 <div align="center">
 
 <br />
