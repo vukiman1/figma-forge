@@ -2,14 +2,14 @@ import type {
   CreateResult,
   GetVectorResult,
   MutateResult,
-  SerializedPaint,
+  FillPaintInput,
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { type Affine, compose, invert } from '../draw.js';
+import { toFigmaPaintsBound } from '../features/paint/bound-paints.js';
 import { serializePaint } from '../serializer.js';
 import { toFigmaPathData } from '../svg-path.js';
-import { toFigmaPaintsBound } from './bindings.js';
 import { applyInitialProps } from './initial-props.js';
 import { placeNode } from './place.js';
 
@@ -132,7 +132,7 @@ export const toFigmaVectorNetwork = async (
       // eslint-disable-next-line no-await-in-loop -- a handful of regions, bindings resolved in order
       (region as { fills?: readonly Paint[] }).fills = await toFigmaPaintsBound(
         figmaCtx,
-        r.fills as SerializedPaint[],
+        r.fills as FillPaintInput[],
         tool,
       );
     }

@@ -1,8 +1,8 @@
 import type { GetVariableDefsResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../dispatcher.js';
-import { displayP3Marker } from '../../handlers/color-profile.js';
 import { serializeCodeSyntax } from '../../serializer.js';
+import { displayP3Marker } from '../color-space.js';
 import { serializeVariableValue } from './serialize-variable-value.js';
 
 type SerializedVariable = GetVariableDefsResult['variables'][number];

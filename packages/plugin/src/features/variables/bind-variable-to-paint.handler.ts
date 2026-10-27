@@ -5,7 +5,7 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../dispatcher.js';
-import { writePaints } from '../../handlers/paints.js';
+import { writePaints } from '../paint/write-paints.js';
 import { parseParams } from '../parse-params.js';
 import { findVariable } from './lookup.js';
 

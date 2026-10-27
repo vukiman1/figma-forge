@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetEffectsHandler } from '../../src/handlers/set-effects.js';
+import { createSetEffectsHandler } from '../../../src/features/paint/set-effects.handler.js';
 
 const fakeFigma = (
   lookup: Record<string, unknown>,
@@ -42,8 +42,6 @@ describe('set_effects handler', () => {
         offset: { x: 0, y: 2 },
         spread: 0,
         blendMode: 'NORMAL',
-        // Stated, not left out: Figma stores an omitted one as true (measured), and a CSS box-shadow
-        // is false.
         showShadowBehindNode: false,
       },
     ]);

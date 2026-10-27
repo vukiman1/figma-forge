@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { boundVariablesSchema } from '../shared/binding-schema.js';
 import { colorSpaceSchema } from '../shared/color-space-schema.js';
+import { blendModeSchema } from './blend-mode-schema.js';
 
 const rgba = z.object({
   r: z.number(),
@@ -35,8 +36,7 @@ export const effectItemSchema = z
           'which is what a CSS box-shadow draws; a shadow read from Figma carries it only when true.',
       )
       .optional(),
-    blendMode: z
-      .string()
+    blendMode: blendModeSchema
       .describe(
         'Shadows only: the blend mode the shadow is composited with, e.g. "MULTIPLY". Omit for NORMAL.',
       )
@@ -48,3 +48,5 @@ export const effectItemSchema = z
       .optional(),
   })
   .loose();
+
+export type EffectInput = z.infer<typeof effectItemSchema>;

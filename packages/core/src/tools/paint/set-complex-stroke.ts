@@ -103,6 +103,12 @@ export const setComplexStrokeParams = z.object({
     .optional(),
 });
 
+type SetComplexStrokeInput = z.infer<typeof setComplexStrokeParams>;
+export type ComplexStrokeInput = NonNullable<SetComplexStrokeInput['complexStrokeProperties']>;
+export type VariableWidthInput = NonNullable<
+  SetComplexStrokeInput['variableWidthStrokeProperties']
+>;
+
 export const setComplexStrokeTool: ToolSpec = {
   name: SET_COMPLEX_STROKE_TOOL_NAME,
   description:

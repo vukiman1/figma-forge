@@ -7,6 +7,7 @@ import type {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
+import { displayP3Marker } from '../features/color-space.js';
 import {
   collectBindings,
   serializeCodeSyntax,
@@ -15,7 +16,6 @@ import {
   serializeLayoutGrid,
   serializePaint,
 } from '../serializer.js';
-import { displayP3Marker } from './color-profile.js';
 
 const serializeLineHeight = (lh: LineHeight): SerializedLineHeight =>
   lh.unit === 'AUTO' ? { unit: 'AUTO' } : { unit: lh.unit, value: lh.value };

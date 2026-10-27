@@ -1,6 +1,6 @@
 import { SET_VARIABLE_VALUE_TOOL_NAME as TOOL, type VariableValueInput } from '@figma-forge/core';
 
-import { toDocumentChannels } from '../../handlers/convert.js';
+import { toDocumentChannels } from '../color-space.js';
 
 type ObjectValue = Extract<VariableValueInput, object>;
 type ColorValue = Extract<ObjectValue, { r: number }>;

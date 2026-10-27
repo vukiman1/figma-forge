@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSetComplexStrokeHandler } from '../../src/handlers/complex-stroke.js';
+import { createSetComplexStrokeHandler } from '../../../src/features/paint/set-complex-stroke.handler.js';
 
 const setup = (over: Record<string, unknown> = {}) => {
   const log: string[] = [];
@@ -58,7 +58,6 @@ describe('set_complex_stroke handler', () => {
     });
     expect(t.log).toEqual(['load:SCATTER', 'widths', 'complex']);
     expect(t.complex()).toEqual({ type: 'BRUSH', brushType: 'SCATTER', brushName: 'OI', gap: 2 });
-    // A preset's points are its own: the ones read back with it are not written.
     expect(t.widths()).toEqual({ widthProfile: 'TAPER' });
   });
 
@@ -86,10 +85,7 @@ describe('set_complex_stroke handler', () => {
       { type: 'BRUSH', brushType: 'SCATTER', brushName: 'NOIR' },
       'a SCATTER brush needs a brushName from',
     ],
-    [
-      { type: 'BRUSH', brushType: 'STRETCH', brushName: 'CUSTOM' },
-      'cannot be set through the plugin API',
-    ],
+    [{ type: 'BRUSH', brushType: 'STRETCH', brushName: 'CUSTOM' }, 'brushName: Invalid option'],
     [
       { type: 'DYNAMIC', frequency: 3, direction: 'FORWARD' },
       'direction does not apply to a DYNAMIC stroke',

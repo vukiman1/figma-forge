@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
+import { blendModeSchema } from '../shared/blend-mode-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_BLEND_MODE_TOOL_NAME = 'set_blend_mode';
 
 export const setBlendModeParams = z.object({
   nodeId: z.string().describe('Node to set the blend mode on'),
-  blendMode: z.string().describe('Figma blend mode literal, e.g. "MULTIPLY"'),
+  blendMode: blendModeSchema.describe('Figma blend mode literal, e.g. "MULTIPLY"'),
 });
 
 export const setBlendModeTool: ToolSpec = {

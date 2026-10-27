@@ -1,7 +1,7 @@
-import type { SerializedPaint, StyleResult } from '@figma-forge/core';
+import type { FillPaintInput, StyleResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaPaintsBound } from './bindings.js';
+import { toFigmaPaintsBound } from '../features/paint/bound-paints.js';
 
 export const createCreatePaintStyleHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
@@ -16,7 +16,7 @@ export const createCreatePaintStyleHandler =
     // half-built style behind in the design-system panel (the create_text_style lesson).
     const paints = await toFigmaPaintsBound(
       figmaCtx,
-      p.paints as SerializedPaint[],
+      p.paints as FillPaintInput[],
       'create_paint_style',
     );
 

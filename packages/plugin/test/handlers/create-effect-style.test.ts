@@ -36,7 +36,9 @@ describe('create_effect_style handler', () => {
       effects: [{ type: 'LAYER_BLUR', visible: true, radius: 8 }],
     })) as StyleResult;
 
-    expect(style.effects).toEqual([{ type: 'LAYER_BLUR', visible: true, radius: 8 }]);
+    expect(style.effects).toEqual([
+      { type: 'LAYER_BLUR', blurType: 'NORMAL', visible: true, radius: 8 },
+    ]);
     expect(result).toEqual({ ok: true, styleId: 'E:0', name: 'Elevation/Blur' });
   });
 

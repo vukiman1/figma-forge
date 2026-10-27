@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetCornerRadiusHandler } from '../../src/handlers/set-corner-radius.js';
+import { createSetCornerRadiusHandler } from '../../../src/features/paint/set-corner-radius.handler.js';
 
 const fakeFigma = (lookup: Record<string, unknown>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => lookup[id] ?? null }) as unknown as typeof figma;
@@ -31,10 +31,10 @@ describe('set_corner_radius handler', () => {
       topLeftRadius: 8,
       topRightRadius: 8,
     })) as MutateResult;
-    expect(node.cornerRadius).toBe(4); // uniform applied first
-    expect(node.topLeftRadius).toBe(8); // per-corner overrides
+    expect(node.cornerRadius).toBe(4);
+    expect(node.topLeftRadius).toBe(8);
     expect(node.topRightRadius).toBe(8);
-    expect(node.bottomRightRadius).toBe(0); // untouched corners keep uniform
+    expect(node.bottomRightRadius).toBe(0);
     expect(result).toEqual({ ok: true, nodeId: '1:1' });
   });
 

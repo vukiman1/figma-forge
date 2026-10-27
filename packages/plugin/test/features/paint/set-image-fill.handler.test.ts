@@ -1,8 +1,8 @@
 import type { ImageFillResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createBatchHandler } from '../../src/handlers/batch.js';
-import { createSetImageFillHandler } from '../../src/handlers/set-image-fill.js';
+import { createSetImageFillHandler } from '../../../src/features/paint/set-image-fill.handler.js';
+import { createBatchHandler } from '../../../src/handlers/batch.js';
 
 const MIXED = Symbol('mixed');
 const SOLID = {
@@ -164,7 +164,7 @@ describe('set_image_fill handler', () => {
     await expect(handler({ nodeId: '1:1', data: 'ab', url: 'u' })).rejects.toThrow('exactly one');
     await expect(handler({ nodeId: '1:1' })).rejects.toThrow('exactly one');
     await expect(handler({ nodeId: '1:1', data: 'ab', scaleMode: 'STRETCH' })).rejects.toThrow(
-      'scaleMode must be one of',
+      'scaleMode: Invalid option',
     );
     expect(createImage).not.toHaveBeenCalled();
   });
@@ -193,7 +193,6 @@ describe('set_image_fill in a batch', () => {
       },
     );
     const node = frame([SOLID], { fillStyleId: 'S:surface', setFillStyleIdAsync });
-    // Like Figma: assigning fills unlinks the style.
     let fills: unknown = [SOLID];
     Object.defineProperty(node, 'fills', {
       get: () => fills,

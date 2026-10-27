@@ -16,8 +16,8 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
+import { displayP3Marker } from '../features/color-space.js';
 import { inheritRepeat, serializeCodeSyntax, serializeFlatSync } from '../serializer.js';
-import { displayP3Marker } from './color-profile.js';
 
 const isSceneNode = (node: BaseNode): node is SceneNode =>
   node.type !== 'DOCUMENT' && node.type !== 'PAGE';

@@ -182,7 +182,7 @@ describe('basic node property round-trips', () => {
     const spec = ALL_TOOL_SPECS.find(tool => tool.name === name)!;
     expect(spec.inputSchema.safeParse(input).success).toBe(false);
     expect(WIRE_TOOL_SCHEMAS.get(name)!.safeParse(input).success).toBe(false);
-    await expect(target.handlers[name]!(input)).rejects.toThrow(/must be/);
+    await expect(target.handlers[name]!(input)).rejects.toThrow(/must be|invalid params/);
     expect(target.frame).toMatchObject({ clipsContent: true, cornerSmoothing: 0.2 });
     expect(target.line.width).toBe(100);
   });

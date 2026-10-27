@@ -1,7 +1,7 @@
-import type { SerializedEffect, StyleResult } from '@figma-forge/core';
+import type { EffectInput, StyleResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaEffectsBound } from './bindings.js';
+import { toFigmaEffectsBound } from '../features/paint/bound-effects.js';
 
 export const createUpdateEffectStyleHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
@@ -25,7 +25,7 @@ export const createUpdateEffectStyleHandler =
     if (Array.isArray(p.effects)) {
       es.effects = await toFigmaEffectsBound(
         figmaCtx,
-        p.effects as SerializedEffect[],
+        p.effects as EffectInput[],
         'update_effect_style',
       );
     }

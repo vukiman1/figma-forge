@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetFillsHandler } from '../../src/handlers/set-fills.js';
+import { createSetFillsHandler } from '../../../src/features/paint/set-fills.handler.js';
 
 const fakeFigma = (
   lookup: Record<string, unknown>,
@@ -20,8 +20,6 @@ const fakeFigma = (
 
 describe('set_fills handler', () => {
   it('ignores the read-only cssAngle when a read gradient is written straight back', async () => {
-    // get_design_context now returns cssAngle on linear gradients; feeding that paint back into
-    // set_fills unchanged must still work, and must not leak a derived field into Figma.
     const node = { id: '1:1', fills: [] as unknown };
     const handler = createSetFillsHandler(fakeFigma({ '1:1': node }));
     await handler({
@@ -104,14 +102,12 @@ describe('set_fills handler', () => {
     ).rejects.toThrow(/gradientStops/);
     await expect(
       handler({ nodeId: '1:1', fills: [{ type: 'IMAGE', visible: true, opacity: 1 }] }),
-    ).rejects.toThrow(/unsupported paint type IMAGE/);
+    ).rejects.toThrow(/fills\.0\.type: Invalid option/);
     await expect(handler({ nodeId: '9:9', fills: [] })).rejects.toThrow(/not found/);
     await expect(handler({ fills: [] })).rejects.toThrow(/nodeId/);
     await expect(handler({ nodeId: '1:1', fills: 'x' })).rejects.toThrow(/fills/);
   });
 
-  // A fill's variable binding lives on the paint (issue #164). Writing the paint back without
-  // applying it would silently replace the token with the literal beside it.
   it('applies a paint binding, so a token fill stays a token', async () => {
     const node = { id: '1:1', fills: [] as unknown };
     const handler = createSetFillsHandler(
@@ -154,8 +150,6 @@ describe('set_fills handler', () => {
     expect(node.fills).toBe('UNTOUCHED');
   });
 
-  // A colour taken from code is sRGB; written raw into a Display P3 file it would paint more
-  // saturated than the code. Naming its space hands the conversion to Figma.
   it("converts a SOLID colour and a gradient stop that name their space, through Figma's util", async () => {
     const node = { id: '1:1', fills: [] as unknown };
     const calls: unknown[] = [];
@@ -200,7 +194,6 @@ describe('set_fills handler', () => {
     const [solid, gradient] = node.fills as [SolidPaint, GradientPaint];
     expect(solid.color).toEqual({ r: 0.4, g: 0.2, b: 0.1 });
     expect(gradient.gradientStops[0]?.color).toEqual({ r: 0.5, g: 0.5, b: 0.5, a: 0.5 });
-    // The stop that named no space keeps its channels.
     expect(gradient.gradientStops[1]?.color).toEqual({ r: 0, g: 0, b: 0, a: 1 });
   });
 });

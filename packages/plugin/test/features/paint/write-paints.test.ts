@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { writePaints } from '../../src/handlers/paints.js';
+import { writePaints } from '../../../src/features/paint/write-paints.js';
 
 describe('writePaints', () => {
   const pattern = { type: 'PATTERN', sourceNodeId: '1:1' } as unknown as Paint;

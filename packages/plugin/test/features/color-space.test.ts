@@ -1,9 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { toDocumentRgb, toDocumentRgba, toFigmaEffect } from '../../src/handlers/convert.js';
+import { toDocumentRgb, toDocumentRgba } from '../../src/features/color-space.js';
 
-// Stands in for Figma's conversion: what it returns is what a Display P3 file stores for sRGB
-// 0.8 / 0.4 / 0.2 (measured live), tagged with the space it came from.
 const P3_OF_SRGB_ORANGE = { r: 0.7488, g: 0.4216, b: 0.2478 };
 
 const throwing = (what: string): object =>
@@ -16,7 +14,6 @@ const throwing = (what: string): object =>
     },
   );
 
-/** A document with the given profile, whose conversion is recorded. */
 const doc = (profile: string | undefined) => {
   const calls: unknown[] = [];
   const figmaCtx = {
@@ -31,10 +28,8 @@ const doc = (profile: string | undefined) => {
   return { figmaCtx, calls };
 };
 
-/** A colour that names no space must not read the document or its conversion at all. */
 const untouchable = throwing('figma') as typeof figma;
 
-/** A document whose conversion must not run. */
 const noConversion = (profile: string | undefined): typeof figma =>
   ({
     root: profile === undefined ? {} : { documentColorProfile: profile },
@@ -66,8 +61,6 @@ describe('toDocumentRgb', () => {
     expect(calls).toEqual([{ space: 'DISPLAY_P3', r: 1, g: 0, b: 0 }]);
   });
 
-  // The guarantee that keeps every sRGB file exactly as it was: naming the space a colour is
-  // already in writes the same channels, without a round trip through Figma's arithmetic.
   it.each([
     ['SRGB', 'SRGB'],
     ['SRGB', 'LEGACY'],
@@ -93,44 +86,5 @@ describe('toDocumentRgba', () => {
     const { figmaCtx } = doc('DISPLAY_P3');
     const out = toDocumentRgba(figmaCtx, { r: 0.8, g: 0.4, b: 0.2, a: 0.5, space: 'SRGB' }, 'x');
     expect(out).toMatchObject({ ...P3_OF_SRGB_ORANGE, a: 0.5 });
-  });
-});
-
-describe('toFigmaEffect', () => {
-  it('converts a shadow colour that names its space', () => {
-    const { figmaCtx } = doc('DISPLAY_P3');
-    const effect = toFigmaEffect(
-      {
-        type: 'DROP_SHADOW',
-        visible: true,
-        radius: 4,
-        color: { r: 0.8, g: 0.4, b: 0.2, a: 0.25, space: 'SRGB' } as never,
-        offset: { x: 0, y: 2 },
-      },
-      figmaCtx,
-    ) as DropShadowEffect;
-    expect(effect.color).toMatchObject({ ...P3_OF_SRGB_ORANGE, a: 0.25 });
-  });
-
-  it('writes a shadow colour with no space exactly as before', () => {
-    const effect = toFigmaEffect(
-      {
-        type: 'INNER_SHADOW',
-        visible: true,
-        radius: 2,
-        color: { r: 1, g: 1, b: 1, a: 1 },
-        offset: { x: 0, y: 0 },
-      },
-      untouchable,
-    );
-    expect(effect).toEqual({
-      type: 'INNER_SHADOW',
-      visible: true,
-      radius: 2,
-      color: { r: 1, g: 1, b: 1, a: 1 },
-      offset: { x: 0, y: 0 },
-      spread: 0,
-      blendMode: 'NORMAL',
-    });
   });
 });

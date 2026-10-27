@@ -1,7 +1,7 @@
 import type { GetMetadataResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { documentColorProfile } from './color-profile.js';
+import { documentColorProfile } from '../features/color-space.js';
 
 export const createGetMetadataHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>

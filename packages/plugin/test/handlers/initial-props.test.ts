@@ -162,7 +162,7 @@ describe('create_* initial style', () => {
     const { node, ctx } = setup(frameNode, 'FRAME');
     await expect(
       createCreateFrameHandler(ctx)({ fills: [SOLID], cornerRadius: -3 }),
-    ).rejects.toThrow(/cornerRadius — .*non-negative.*removed/s);
+    ).rejects.toThrow(/cornerRadius — .*radius: Too small.*removed/s);
     expect(node.remove).toHaveBeenCalled();
   });
 

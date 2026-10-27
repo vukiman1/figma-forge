@@ -21,7 +21,7 @@
  * only what differs from the snapshot, in an order that keeps every write valid.
  */
 
-import { writePaints } from './paints.js';
+import { writePaints } from '../features/paint/write-paints.js';
 import type { TextLike } from './text-like.js';
 
 type Bag = Record<string, unknown>;

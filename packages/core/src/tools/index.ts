@@ -102,6 +102,7 @@ export * from './read/scan-text-nodes.js';
 export * from './read/search-nodes.js';
 export * from './shared/animation-style-schema.js';
 export * from './shared/binding-schema.js';
+export * from './shared/blend-mode-schema.js';
 export * from './shared/color-space-schema.js';
 export * from './shared/effect-schema.js';
 export * from './shared/font-name-schema.js';

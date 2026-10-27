@@ -1,9 +1,9 @@
-import type { CreateResult, MutateResult, SerializedPaint } from '@figma-forge/core';
+import type { CreateResult, MutateResult, FillPaintInput } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaPaintsBound } from './bindings.js';
+import { toFigmaPaintsBound } from '../features/paint/bound-paints.js';
+import { writePaints } from '../features/paint/write-paints.js';
 import { toFigmaFontName } from './convert.js';
-import { writePaints } from './paints.js';
 
 /** What figma.createTextPath accepts (anything else it refuses). */
 const PATH_SOURCES = new Set(['VECTOR', 'LINE', 'RECTANGLE', 'ELLIPSE', 'POLYGON', 'STAR']);
@@ -126,7 +126,7 @@ export const createCreateTextPathHandler =
     const fills =
       p.fills === undefined
         ? undefined
-        : await toFigmaPaintsBound(figmaCtx, p.fills as SerializedPaint[], tool);
+        : await toFigmaPaintsBound(figmaCtx, p.fills as FillPaintInput[], tool);
     if (start.segment !== undefined && start.segment > 0) {
       const count = segmentsOf(figmaCtx, source);
       if (start.segment >= count) {

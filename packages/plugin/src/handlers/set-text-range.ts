@@ -1,7 +1,7 @@
-import type { MutateResult, SerializedLineHeight, SerializedPaint } from '@figma-forge/core';
+import type { FillPaintInput, MutateResult, SerializedLineHeight } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaPaintsBound } from './bindings.js';
+import { toFigmaPaintsBound } from '../features/paint/bound-paints.js';
 import { toFigmaFontName, toFigmaLineHeight } from './convert.js';
 import { isTextLike, NOT_ON_A_PATH, unsupportedOnPath } from './text-like.js';
 
@@ -10,7 +10,7 @@ interface RangeInput {
   end: number;
   fontName?: Record<string, unknown>;
   fontSize?: number;
-  fills?: SerializedPaint[];
+  fills?: FillPaintInput[];
   textDecoration?: string;
   textCase?: string;
   lineHeight?: SerializedLineHeight;

@@ -89,3 +89,6 @@ export const fillPaintItemSchema = paintItemSchema
       .optional(),
   })
   .loose();
+
+export type PaintInput = z.infer<typeof paintItemSchema>;
+export type FillPaintInput = z.infer<typeof fillPaintItemSchema>;

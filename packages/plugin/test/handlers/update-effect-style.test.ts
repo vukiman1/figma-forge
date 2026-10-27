@@ -31,7 +31,9 @@ describe('update_effect_style handler', () => {
     })) as StyleResult;
 
     expect(style.name).toBe('Elevation/Card');
-    expect(style.effects).toEqual([{ type: 'LAYER_BLUR', visible: true, radius: 8 }]);
+    expect(style.effects).toEqual([
+      { type: 'LAYER_BLUR', blurType: 'NORMAL', visible: true, radius: 8 },
+    ]);
     expect(style.description).toBe('keep'); // omitted → unchanged
     expect(result).toEqual({ ok: true, styleId: 'E:0', name: 'Elevation/Card' });
   });

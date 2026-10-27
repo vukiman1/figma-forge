@@ -1,3 +1,4 @@
+import { writePaints } from '../features/paint/write-paints.js';
 import {
   type BindingSnapshot,
   captureBindings,
@@ -9,7 +10,6 @@ import {
   same,
   type TextSnapshot,
 } from './batch-snapshot.js';
-import { writePaints } from './paints.js';
 import { isTextLike } from './text-like.js';
 
 /**

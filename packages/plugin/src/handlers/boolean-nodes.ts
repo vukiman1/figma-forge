@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { writePaints } from './paints.js';
+import { writePaints } from '../features/paint/write-paints.js';
 
 type Operation = 'UNION' | 'SUBTRACT' | 'INTERSECT' | 'EXCLUDE';
 const OPERATIONS = new Set<string>(['UNION', 'SUBTRACT', 'INTERSECT', 'EXCLUDE']);

@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetBlendModeHandler } from '../../src/handlers/set-blend-mode.js';
+import { createSetBlendModeHandler } from '../../../src/features/paint/set-blend-mode.handler.js';
 
 const fakeFigma = (lookup: Record<string, unknown>): typeof figma =>
   ({ getNodeByIdAsync: async (id: string) => lookup[id] ?? null }) as unknown as typeof figma;

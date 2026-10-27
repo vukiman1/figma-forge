@@ -1,7 +1,7 @@
-import type { SerializedEffect, StyleResult } from '@figma-forge/core';
+import type { EffectInput, StyleResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaEffectsBound } from './bindings.js';
+import { toFigmaEffectsBound } from '../features/paint/bound-effects.js';
 
 export const createCreateEffectStyleHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
@@ -16,7 +16,7 @@ export const createCreateEffectStyleHandler =
     // Bindings resolve first, so a bad variable id fails before a half-built style exists.
     const effects = await toFigmaEffectsBound(
       figmaCtx,
-      p.effects as SerializedEffect[],
+      p.effects as EffectInput[],
       'create_effect_style',
     );
 

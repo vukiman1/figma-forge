@@ -1,8 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { documentColorProfile } from './color-profile.js';
-import { toDocumentRgb } from './convert.js';
+import { documentColorProfile, toDocumentRgb } from '../features/color-space.js';
 import { placeNode } from './place.js';
 
 // Every imported colour goes through the one wire → document conversion, as sRGB.

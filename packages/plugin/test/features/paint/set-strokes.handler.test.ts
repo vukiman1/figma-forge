@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSetStrokesHandler } from '../../src/handlers/set-strokes.js';
+import { createSetStrokesHandler } from '../../../src/features/paint/set-strokes.handler.js';
 
 const fakeFigma = (
   lookup: Record<string, unknown>,
@@ -58,7 +58,6 @@ describe('set_strokes handler', () => {
 
     expect(node.strokeAlign).toBe('INSIDE');
     expect(node.dashPattern).toEqual([4, 2]);
-    // uniform weight applied, then the per-side override wins for the bottom edge
     expect(node.strokeBottomWeight).toBe(2);
     expect(node.strokeTopWeight).toBe(0);
   });
@@ -144,10 +143,10 @@ describe('set_strokes handler', () => {
   });
 
   it.each([
-    [{ strokeCap: 'ARROW' }, 'strokeCap must be one of'],
-    [{ strokeJoin: 'SHARP' }, 'strokeJoin must be MITER, BEVEL or ROUND'],
-    [{ strokeMiterLimit: 0.5 }, 'between 1 and 16'],
-    [{ strokeMiterLimit: 17 }, 'between 1 and 16'],
+    [{ strokeCap: 'ARROW' }, 'strokeCap: Invalid option'],
+    [{ strokeJoin: 'SHARP' }, 'strokeJoin: Invalid option'],
+    [{ strokeMiterLimit: 0.5 }, 'strokeMiterLimit: Too small'],
+    [{ strokeMiterLimit: 17 }, 'strokeMiterLimit: Too big'],
   ])('refuses %j before the paints are written', async (extra, message) => {
     const node = { id: '1:1', strokes: [] as unknown, strokeCap: 'NONE', strokeMiterLimit: 4 };
     await expect(

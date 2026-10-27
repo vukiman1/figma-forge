@@ -1,7 +1,7 @@
-import type { SerializedPaint, StyleResult } from '@figma-forge/core';
+import type { FillPaintInput, StyleResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../dispatcher.js';
-import { toFigmaPaintsBound } from './bindings.js';
+import { toFigmaPaintsBound } from '../features/paint/bound-paints.js';
 
 export const createUpdatePaintStyleHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
@@ -25,7 +25,7 @@ export const createUpdatePaintStyleHandler =
     if (Array.isArray(p.paints)) {
       ps.paints = await toFigmaPaintsBound(
         figmaCtx,
-        p.paints as SerializedPaint[],
+        p.paints as FillPaintInput[],
         'update_paint_style',
       );
     }

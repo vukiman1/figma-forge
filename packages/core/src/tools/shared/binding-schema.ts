@@ -17,3 +17,5 @@ export const textStyleBindingsSchema = z
       'one, fontWeight a FLOAT. Pass null for a field to unbind it; omit a field to leave it as it ' +
       'is. A bound field wins over a literal passed for the same field in this call.',
   );
+
+export type BoundVariablesInput = z.infer<typeof boundVariablesSchema>;
