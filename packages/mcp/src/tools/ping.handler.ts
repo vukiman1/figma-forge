@@ -1,6 +1,8 @@
 import { dispatchTargeted } from '../dispatch.js';
 import type { Follower } from '../election/follower.js';
 import { type Node, NodeRole } from '../election/node.js';
+import type { PluginInstallResult } from '../plugin-install/install-plugin.js';
+import { pluginSetupHint } from '../plugin-install/setup-hint.js';
 import { getFileTarget } from '../routing/target.js';
 
 export type PingHop = 'server-only' | 'e2e';
@@ -85,6 +87,7 @@ export interface PingResult {
   sessions?: PingSessionsInfo;
   plugin: unknown | null;
   dispatchError?: string;
+  pluginSetup?: string;
 }
 
 export interface PingContext {
@@ -94,6 +97,7 @@ export interface PingContext {
   /** This process's build stamp (see build-id.ts); defaults to 0 (unbundled). */
   buildId?: number;
   log?: (msg: string) => void;
+  pluginInstall?: Promise<PluginInstallResult>;
 }
 
 const serverInfo = (ctx: PingContext): PingServerInfo => ({
@@ -104,7 +108,7 @@ const serverInfo = (ctx: PingContext): PingServerInfo => ({
   buildId: ctx.buildId ?? 0,
 });
 
-export const handlePing = async (ctx: PingContext): Promise<PingResult> => {
+const probe = async (ctx: PingContext): Promise<PingResult> => {
   const server = serverInfo(ctx);
   const target = getFileTarget();
 
@@ -228,6 +232,13 @@ export const handlePing = async (ctx: PingContext): Promise<PingResult> => {
     ctx.log?.(`[ping] dispatch failed, falling back to server-only: ${dispatchError}`);
     return { ok: true, hop: 'server-only', server: followerServer, plugin: null, dispatchError };
   }
+};
+
+export const handlePing = async (ctx: PingContext): Promise<PingResult> => {
+  const result = await probe(ctx);
+  const isPluginMissing = result.plugin === null && result.server.portConflict === undefined;
+  if (!isPluginMissing || ctx.pluginInstall === undefined) return result;
+  return { ...result, pluginSetup: pluginSetupHint(await ctx.pluginInstall) };
 };
 
 export const formatPingResult = (result: PingResult): string => JSON.stringify(result, null, 2);

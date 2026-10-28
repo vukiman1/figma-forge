@@ -1,6 +1,6 @@
 {
   "name": "@figma-forge/mcp",
-  "version": "0.7.0",
+  "version": "0.1.0",
   "description": "Free, two-way Figma MCP server. Turn designs into framework-aware code, and push code back to the canvas. Works with Claude Code, Cursor, Codex, and any MCP client.",
   "keywords": [
     "claude-code",
@@ -20,7 +20,7 @@
   "homepage": "https://github.com/vukiman1/figma-forge#readme",
   "bugs": "https://github.com/vukiman1/figma-forge/issues",
   "license": "MIT",
-  "author": "Roya <a78945612385238@gmail.com>",
+  "author": "vukiman1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vukiman1/figma-forge.git",
@@ -31,6 +31,7 @@
   },
   "files": [
     "dist",
+    "plugin",
     "README.md",
     "LICENSE"
   ],
@@ -38,6 +39,7 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
+    "prepack": "node ../../scripts/pack-mcp-assets.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
@@ -56,6 +58,6 @@
     "tsdown": "^0.23.2"
   },
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^24.11.0 || >=26.0.0"
   }
 }

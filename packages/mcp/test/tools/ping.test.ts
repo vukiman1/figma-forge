@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import type { Follower } from '../../src/election/follower.js';
 import { portConflictMessage } from '../../src/election/leader-lock.js';
 import { type Node, NodeRole } from '../../src/election/node.js';
+import { PluginInstallStatus } from '../../src/plugin-install/install-plugin.js';
 import { handlePing } from '../../src/tools/ping.handler.js';
 import { toToolDefinition } from '../tool-schema.js';
 
@@ -49,6 +50,29 @@ describe('ping tool', () => {
     expect(result.server.role).toBe(NodeRole.Leader);
     expect(result.server.port).toBe(3055);
     expect(result.sessions?.connectedCount).toBe(0);
+  });
+
+  it('tells the agent how to import the plugin when none is connected', async () => {
+    const node = makeNode({
+      role: NodeRole.Leader,
+      isLeader: () => true,
+      getLeader: () =>
+        ({
+          port: 3055,
+          relay: { sessions: { connected: () => [] } },
+          http: undefined as never,
+        }) as unknown as ReturnType<Node['getLeader']>,
+    });
+    const result = await handlePing({
+      node,
+      follower: makeFollower({}),
+      serverVersion: '1.0.0',
+      pluginInstall: Promise.resolve({
+        status: PluginInstallStatus.Installed,
+        manifestPath: '/Users/me/Figma Forge/manifest.json',
+      }),
+    });
+    expect(result.pluginSetup).toContain('/Users/me/Figma Forge/manifest.json');
   });
 
   it('surfaces a portConflict warning when the node is conflicted', async () => {

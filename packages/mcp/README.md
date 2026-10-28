@@ -19,11 +19,14 @@ Add it to your MCP client config (e.g. Claude Code's `.mcp.json`):
 }
 ```
 
-The server talks to the Figma Forge Figma plugin running in your Figma app. See the [main repository](https://github.com/vukiman1/figma-forge) for the full setup (installing the plugin, connecting, and the available skills).
+The plugin ships inside this package. Each time the server starts it copies the plugin to `~/Figma Forge/`, updating it when the server is newer. Import it once in the Figma desktop app: **Plugins → Development → Import plugin from manifest…** and pick `~/Figma Forge/manifest.json`. Then run **Figma Forge** in your file and wait for **Connected**. If the plugin is not connected, the `ping` tool repeats these steps.
+
+Set `FIGMA_FORGE_PLUGIN_DIR` to copy the plugin somewhere else.
 
 ## Requirements
 
-- Node.js 20.19+ or 22.12+ (the server runs via `npx` as its own process, independent of your project's Node version)
+- Node.js 24.11+ (the server runs via `npx` as its own process, independent of your project's Node version)
+- The Figma desktop app (the browser version cannot import plugins)
 
 ## Links
 

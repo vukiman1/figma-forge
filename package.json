@@ -15,7 +15,7 @@
   },
   "type": "module",
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "pnpm -r run build && node scripts/pack-mcp-assets.ts",
     "clean": "pnpm -r exec rm -rf dist *.tsbuildinfo",
     "comments:check": "node scripts/check-comments.ts --check 'scripts/*.ts' 'packages/core/**/*.ts' 'packages/server/**/*.ts' 'packages/plugin/**/*.ts'",
     "comments:report": "node scripts/check-comments.ts --report 'packages/**/*.ts'",

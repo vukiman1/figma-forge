@@ -1,4 +1,7 @@
 // Must stay the first import: the crash guard has to be in place before any other module runs.
+import { homedir } from 'node:os';
+import { fileURLToPath } from 'node:url';
+
 import {
   ANALYZE_PROJECT_TOOL_NAME,
   BATCH_TOOL_NAME,
@@ -46,6 +49,12 @@ import { Node, NodeRole } from './election/node.js';
 import { SERVER_INSTRUCTIONS } from './instructions.js';
 import { wireShutdown } from './lifecycle.js';
 import { normalizeIdArgs } from './node-id.js';
+import {
+  installPlugin,
+  PLUGIN_DIR_ENV,
+  resolvePluginInstallDir,
+} from './plugin-install/install-plugin.js';
+import { describePluginInstall } from './plugin-install/setup-hint.js';
 import { PROMPTS } from './prompts/registry.js';
 import { handleAnalyzeProject } from './tools/analyze-project.handler.js';
 import { annotationsFor } from './tools/annotations.js';
@@ -120,6 +129,13 @@ node.onRoleChange(role => {
 
 await election.start();
 
+const pluginInstall = installPlugin({
+  bundleDir: fileURLToPath(new URL('../plugin/', import.meta.url)),
+  installDir: resolvePluginInstallDir(process.env[PLUGIN_DIR_ENV], homedir()),
+  version: SERVER_VERSION,
+});
+void pluginInstall.then(result => log(describePluginInstall(result)));
+
 type ToolHandler = (args: Record<string, unknown>) => Promise<CallToolResult>;
 
 const dispatchCtx = { node, follower, log };
@@ -174,6 +190,7 @@ const SPECIAL_HANDLERS: Record<string, ToolHandler> = {
             serverVersion: SERVER_VERSION,
             buildId: BUILD_ID,
             log,
+            pluginInstall,
           }),
         ),
       },

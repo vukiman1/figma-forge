@@ -6,33 +6,43 @@ Figma Forge is a hard fork of [Figwright](https://github.com/awdr74100/figwright
 
 ## Setup
 
-You need Node.js 24.11+, pnpm 12 and the Figma desktop app.
+You need Node.js 24.11+ and the Figma desktop app.
 
-1. Build from source:
+1. Add the server to your MCP client:
 
    ```bash
-   pnpm install && pnpm build
+   claude mcp add figma-forge -- npx -y @figma-forge/mcp@latest
    ```
 
-2. Add the server to your MCP client:
+   Other clients take the same command in their config:
 
    ```json
    {
      "mcpServers": {
        "figma-forge": {
-         "command": "node",
-         "args": ["/path/to/figma-forge/packages/mcp/dist/index.mjs"]
+         "command": "npx",
+         "args": ["-y", "@figma-forge/mcp@latest"]
        }
      }
    }
    ```
 
-3. In Figma, go to **Plugins → Development → Import plugin from manifest…** and pick `packages/plugin/manifest.json`. Open **Figma Forge** and wait for the panel to show **Connected**.
-4. Ask your agent to run `ping`.
+2. Start your MCP client once. The server copies the plugin to `~/Figma Forge/`.
+3. In Figma, go to **Plugins → Development → Import plugin from manifest…** and pick `~/Figma Forge/manifest.json`. You do this once; later server versions update the files in place.
+4. Run **Figma Forge** in your file and wait for the panel to show **Connected**.
+5. Ask your agent to run `ping`. If the plugin is not connected, `ping` says what is missing.
 
-The relay listens on `127.0.0.1:3056`.
+The relay listens on `127.0.0.1:3056`. Set `FIGMA_FORGE_PLUGIN_DIR` to copy the plugin somewhere else.
 
 ## Development
+
+Build from source with pnpm 12:
+
+```bash
+pnpm install && pnpm build
+```
+
+Point your MCP client at `node /path/to/figma-forge/packages/mcp/dist/index.mjs`, and import `packages/plugin/manifest.json` in Figma so plugin rebuilds take effect without a version bump.
 
 Run the same checks CI runs:
 
