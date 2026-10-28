@@ -24,6 +24,7 @@ import { createRemoveAnimationStyleHandler } from '../features/motion/remove-ani
 import { createRemoveManualKeyframeTrackHandler } from '../features/motion/remove-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../features/motion/set-timeline-duration.handler.js';
 import { createBatchRenameNodesHandler } from '../features/nodes/batch-rename-nodes.handler.js';
+import { createBooleanNodesHandler } from '../features/nodes/boolean-nodes.handler.js';
 import { createCloneNodeHandler } from '../features/nodes/clone-node.handler.js';
 import { createCreateEllipseHandler } from '../features/nodes/create-ellipse.handler.js';
 import { createCreateFrameHandler } from '../features/nodes/create-frame.handler.js';
@@ -31,6 +32,7 @@ import { createCreateRectangleHandler } from '../features/nodes/create-rectangle
 import { createCreateSectionHandler } from '../features/nodes/create-section.handler.js';
 import { createCreateShapeHandler } from '../features/nodes/create-shape.handler.js';
 import { createDeleteNodesHandler } from '../features/nodes/delete-nodes.handler.js';
+import { createFlattenNodesHandler } from '../features/nodes/flatten-nodes.handler.js';
 import { createFlipNodesHandler } from '../features/nodes/flip-nodes.handler.js';
 import { createGroupNodesHandler } from '../features/nodes/group-nodes.handler.js';
 import { createImportImageHandler } from '../features/nodes/import-image.handler.js';
@@ -40,9 +42,13 @@ import { createMoveNodesHandler } from '../features/nodes/move-nodes.handler.js'
 import { createRenameNodeHandler } from '../features/nodes/rename-node.handler.js';
 import { createReorderNodesHandler } from '../features/nodes/reorder-nodes.handler.js';
 import { createReparentNodesHandler } from '../features/nodes/reparent-nodes.handler.js';
+import { createRepeatNodesHandler } from '../features/nodes/repeat-nodes.handler.js';
+import { createResizeNodesHandler } from '../features/nodes/resize-nodes.handler.js';
 import { createRotateNodesHandler } from '../features/nodes/rotate-nodes.handler.js';
+import { createSetArcHandler } from '../features/nodes/set-arc.handler.js';
 import { createSetMaskHandler } from '../features/nodes/set-mask.handler.js';
 import { createSetPositionHandler } from '../features/nodes/set-position.handler.js';
+import { createSetRepeatHandler } from '../features/nodes/set-repeat.handler.js';
 import { createSetVisibleHandler } from '../features/nodes/set-visible.handler.js';
 import { createUngroupNodesHandler } from '../features/nodes/ungroup-nodes.handler.js';
 import { createUnlockNodesHandler } from '../features/nodes/unlock-nodes.handler.js';
@@ -96,11 +102,9 @@ import { withInstanceIdLookup } from '../node-lookup.js';
 import { createAddPageHandler } from './add-page.js';
 import { createAlignNodesHandler } from './align-nodes.js';
 import { createBatchHandler } from './batch.js';
-import { createBooleanNodesHandler } from './boolean-nodes.js';
 import { createDeletePageHandler } from './delete-page.js';
 import { createExportPdfHandler } from './export-pdf.js';
 import { createExportVideoHandler } from './export-video.js';
-import { createFlattenNodesHandler } from './flatten-nodes.js';
 import { createGetAnnotationsHandler } from './get-annotations.js';
 import { createGetDesignContextHandler } from './get-design-context.js';
 import { createGetDocumentHandler } from './get-document.js';
@@ -116,13 +120,10 @@ import { createListFilesHandler } from './list-files.js';
 import { createNavigateToPageHandler } from './navigate-to-page.js';
 import { createPingHandler } from './ping.js';
 import { createRenamePageHandler } from './rename-page.js';
-import { createRepeatNodesHandler, createSetRepeatHandler } from './repeat.js';
-import { createResizeNodesHandler } from './resize-nodes.js';
 import { createSaveImageFillsHandler } from './save-image-fills.js';
 import { createScanNodesByTypesHandler } from './scan-nodes-by-types.js';
 import { createScanTextNodesHandler } from './scan-text-nodes.js';
 import { createSearchNodesHandler } from './search-nodes.js';
-import { createSetArcHandler } from './set-arc.js';
 import {
   createCreateVectorHandler,
   createGetVectorHandler,

@@ -9,7 +9,7 @@ export const setRepeatParams = z.object({
   nodeId: z.string().describe('The repeat group (TRANSFORM_GROUP)'),
   modifiers: z
     .array(repeatModifierSchema)
-    .max(2)
+    .max(2, { error: 'a repeat group takes at most 2 modifiers' })
     .describe('0–2 modifiers; the second repeats everything the first drew'),
 });
 

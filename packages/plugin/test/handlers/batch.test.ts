@@ -23,7 +23,9 @@ import { createMoveNodesHandler } from '../../src/features/nodes/move-nodes.hand
 import { createRenameNodeHandler } from '../../src/features/nodes/rename-node.handler.js';
 import { createReorderNodesHandler } from '../../src/features/nodes/reorder-nodes.handler.js';
 import { createReparentNodesHandler } from '../../src/features/nodes/reparent-nodes.handler.js';
+import { createRepeatNodesHandler } from '../../src/features/nodes/repeat-nodes.handler.js';
 import { createSetPositionHandler } from '../../src/features/nodes/set-position.handler.js';
+import { createSetRepeatHandler } from '../../src/features/nodes/set-repeat.handler.js';
 import { createSetVisibleHandler } from '../../src/features/nodes/set-visible.handler.js';
 import { createSetComplexStrokeHandler } from '../../src/features/paint/set-complex-stroke.handler.js';
 import { createSetCornerRadiusHandler } from '../../src/features/paint/set-corner-radius.handler.js';
@@ -48,7 +50,6 @@ import { createUpdateVariableCollectionHandler } from '../../src/features/variab
 import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
 import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
-import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/handlers/repeat.js';
 import {
   createCreateVectorHandler,
   createOutlineStrokeHandler,

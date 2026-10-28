@@ -6,7 +6,10 @@ export const BOOLEAN_NODES_TOOL_NAME = 'boolean_nodes';
 
 export const booleanNodesParams = z.object({
   operation: z.enum(['UNION', 'SUBTRACT', 'INTERSECT', 'EXCLUDE']),
-  nodeIds: z.array(z.string()).min(2).describe('Shapes to combine (2 or more, one parent)'),
+  nodeIds: z
+    .array(z.string())
+    .refine(ids => new Set(ids).size >= 2, { error: 'must name at least 2 distinct nodes' })
+    .describe('Shapes to combine (2 or more, one parent)'),
   name: z.string().optional().describe('Name for the resulting layer'),
 });
 

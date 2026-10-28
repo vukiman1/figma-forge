@@ -9,8 +9,8 @@ export const repeatNodesParams = z.object({
   nodeIds: z.array(z.string()).min(1).describe('Layers to repeat (one parent)'),
   modifiers: z
     .array(repeatModifierSchema)
-    .min(1)
-    .max(2)
+    .min(1, { error: 'give at least one modifier — that is what repeats' })
+    .max(2, { error: 'a repeat group takes at most 2 modifiers' })
     .describe('1 or 2 modifiers; the second repeats everything the first drew'),
   name: z.string().optional().describe('Name for the repeat group'),
 });
