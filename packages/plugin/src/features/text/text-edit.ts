@@ -1,4 +1,4 @@
-import { SEGMENT_FIELDS } from '../../handlers/batch-snapshot.js';
+import { SEGMENT_FIELDS } from '../batch/snapshot/text-fields.js';
 import type { TextLike } from './text-like.js';
 
 export const replaceRange = (

@@ -4,6 +4,10 @@ import type { BatchResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { SandboxHandlers } from '../../src/dispatcher.js';
+import {
+  SEGMENT_FIELDS,
+  TEXT_RESTORED_FIELDS,
+} from '../../src/features/batch/snapshot/text-fields.js';
 import { createAddComponentPropertyHandler } from '../../src/features/components/add-component-property.handler.js';
 import { createCombineAsVariantsHandler } from '../../src/features/components/combine-as-variants.handler.js';
 import { createCreateComponentHandler } from '../../src/features/components/create-component.handler.js';
@@ -51,7 +55,6 @@ import { createUpdateVariableCollectionHandler } from '../../src/features/variab
 import { createCreateVectorHandler } from '../../src/features/vector/create-vector.handler.js';
 import { createOutlineStrokeHandler } from '../../src/features/vector/outline-stroke.handler.js';
 import { createSetVectorHandler } from '../../src/features/vector/set-vector.handler.js';
-import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
 import { createIdempotencyCache, idempotent } from '../../src/idempotency.js';
 import { makeFlowsFigma } from '../features/prototype/flows-fake.js';

@@ -1,15 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { captureOverrideGuard, restoreOverrideGuard } from '../../src/handlers/batch-overrides.js';
+import { captureOverrideGuard } from '../../../../src/features/batch/overrides/capture-guard.js';
+import { restoreOverrideGuard } from '../../../../src/features/batch/overrides/restore-guard.js';
 
 type Override = { id: string; overriddenFields: string[] };
 type Node = Record<string, unknown> & { id: string };
 
-/**
- * An instance that behaves like Figma's where the guard depends on it (measured): writing a
- * sublayer field — even its current value — marks it overridden; removeOverrides() puts every
- * sublayer back to its main's values, clears the list, and reverts nested swaps.
- */
 const makeInstance = () => {
   let overrides: Override[] = [];
   const mark = (id: string, field: string): void => {
@@ -60,7 +56,6 @@ const makeInstance = () => {
     getNodeByIdAsync: async (id: string) => store.get(id) ?? null,
     variables: { getVariableByIdAsync: async (id: string) => ({ id }) },
   } as unknown as typeof figma;
-  /** Record an override of a field the guard has no writer for (as Figma would list it). */
   const markRaw = (id: string, field: string): void => mark(id, field);
   return { instance, sublayer, store, figmaCtx, markRaw };
 };
@@ -70,11 +65,11 @@ describe('instance override guard', () => {
     const { instance, sublayer, figmaCtx } = makeInstance();
     const a = sublayer('I;1', { fills: ['red'], name: 'A' });
     const b = sublayer('I;2', { fills: ['red'], name: 'B' });
-    b.name = 'Renamed'; // an override the instance already had
+    b.name = 'Renamed';
 
     const guards = await captureOverrideGuard(figmaCtx, ['I;1']);
-    a.fills = ['blue']; // the op
-    a.fills = ['red']; // the value restore — right value, but now marked overridden
+    a.fills = ['blue'];
+    a.fills = ['red'];
     expect(instance.overrides).toContainEqual({ id: 'I;1', overriddenFields: ['fills'] });
 
     const note = await restoreOverrideGuard(figmaCtx, guards);
@@ -96,7 +91,6 @@ describe('instance override guard', () => {
   });
 
   it('never resets an instance carrying an override it cannot re-apply — it names the residue', async () => {
-    // Resetting would wipe the vector edit with no way to put it back; the residue is the lesser harm.
     const { instance, sublayer, figmaCtx, markRaw } = makeInstance();
     const a = sublayer('I;1', { fills: ['red'] });
     sublayer('I;2', { fills: ['red'] });
@@ -118,7 +112,7 @@ describe('instance override guard', () => {
     const main2 = { id: 'M2', type: 'COMPONENT' };
     store.set('M1', main1);
     store.set('M2', main2);
-    let main: { id: string } = main2; // swapped before the batch
+    let main: { id: string } = main2;
     const nested: Node = {
       id: 'I;3',
       type: 'INSTANCE',
@@ -127,7 +121,7 @@ describe('instance override guard', () => {
         main = c;
       }),
       reset: () => {
-        main = main1; // removeOverrides reverts the swap
+        main = main1;
       },
     };
     store.set('I;3', nested);

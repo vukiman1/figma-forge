@@ -2,6 +2,45 @@ import type { BatchResult, FlowStartingPoint } from '@figma-forge/core';
 
 import type { SandboxHandlers, SandboxToolHandler } from '../dispatcher.js';
 import {
+  captureOverrideGuard,
+  type InstanceGuard,
+} from '../features/batch/overrides/capture-guard.js';
+import { restoreOverrideGuard } from '../features/batch/overrides/restore-guard.js';
+import {
+  type BindingSnapshot,
+  captureBindings,
+  rebind,
+  unbindAdded,
+} from '../features/batch/snapshot/bindings.js';
+import {
+  captureGeometry,
+  type GeometrySnapshot,
+  restoreGeometry,
+} from '../features/batch/snapshot/geometry.js';
+import {
+  captureLayoutScope,
+  type LayoutScope,
+  restoreLayoutDrift,
+} from '../features/batch/snapshot/layout-scope.js';
+import {
+  captureOrder,
+  capturePlacement,
+  type Placement,
+  restoreOrder,
+} from '../features/batch/snapshot/order.js';
+import {
+  captureProps,
+  type PropsSnapshot,
+  restoreProps,
+} from '../features/batch/snapshot/props.js';
+import {
+  captureText,
+  loadFonts,
+  type TextSnapshot,
+} from '../features/batch/snapshot/text-capture.js';
+import { restoreText } from '../features/batch/snapshot/text-restore.js';
+import { same, writeIfDifferent } from '../features/batch/snapshot/values.js';
+import {
   propertyDisplayName,
   resolveComponentOwner,
 } from '../features/components/component-owner.js';
@@ -13,36 +52,6 @@ import { resolveSharedParent } from '../features/nodes/shared-parent.js';
 import { readFlows, sameFlows } from '../features/prototype/flows.js';
 import { findReplacePlan } from '../features/text/find-replace-text.handler.js';
 import { isTextLike, type TextLike } from '../features/text/text-like.js';
-import {
-  captureOverrideGuard,
-  type InstanceGuard,
-  restoreOverrideGuard,
-} from './batch-overrides.js';
-import {
-  type BindingSnapshot,
-  captureBindings,
-  captureGeometry,
-  captureLayoutScope,
-  captureOrder,
-  capturePlacement,
-  captureProps,
-  captureText,
-  type GeometrySnapshot,
-  type LayoutScope,
-  loadFonts,
-  type Placement,
-  type PropsSnapshot,
-  rebind,
-  restoreGeometry,
-  restoreLayoutDrift,
-  restoreOrder,
-  restoreProps,
-  restoreText,
-  same,
-  type TextSnapshot,
-  unbindAdded,
-  writeIfDifferent,
-} from './batch-snapshot.js';
 
 /**
  * Atomic batch: apply several invertible write ops as a unit. Two phases —
