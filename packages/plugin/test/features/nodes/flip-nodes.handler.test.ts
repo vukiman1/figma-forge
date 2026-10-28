@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createFlipNodesHandler } from '../../../src/features/nodes/flip-nodes.handler.js';
 import { flipped } from '../../../src/features/nodes/flip-transform.js';
-import { orientationOf } from '../../../src/orientation.js';
+import { orientationOf } from '../../../src/geometry/orientation.js';
 
 const apply = ([[a, c, e], [b, d, f]]: Transform, x: number, y: number) => [
   a * x + c * y + e,

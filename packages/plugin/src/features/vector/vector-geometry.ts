@@ -1,7 +1,7 @@
 import { pickDefined, type vectorNetworkSchema, type vectorPathsSchema } from '@figma-forge/core';
 import type { z } from 'zod';
 
-import { toFigmaPathData } from '../../svg-path.js';
+import { toFigmaPathData } from '../../geometry/svg-path/svg-path.js';
 import { errorMessage } from '../error-message.js';
 import { toFigmaPaintsBound } from '../paint/bound-paints.js';
 

@@ -1,5 +1,11 @@
+import {
+  type Vector,
+  compose,
+  invert,
+  applyToVector,
+  linearPartOf,
+} from '../../geometry/affine.js';
 import { errorMessage } from '../error-message.js';
-import { composeMaps, invertMap, linearPartOf, mapVector, type Vector } from './linear-map.js';
 import type { PlacedNode } from './node-box.js';
 
 export interface Move {
@@ -9,10 +15,10 @@ export interface Move {
 }
 
 const toCoordinateParent = (node: PlacedNode, canvasDelta: Vector): Vector => {
-  const relative = invertMap(linearPartOf(node.relativeTransform));
+  const relative = invert(linearPartOf(node.relativeTransform));
   if (relative === null) return canvasDelta;
-  const parentSpace = invertMap(composeMaps(linearPartOf(node.absoluteTransform), relative));
-  return parentSpace === null ? canvasDelta : mapVector(parentSpace, canvasDelta);
+  const parentSpace = invert(compose(linearPartOf(node.absoluteTransform), relative));
+  return parentSpace === null ? canvasDelta : applyToVector(parentSpace, canvasDelta);
 };
 
 export const planMove = (node: SceneNode & PlacedNode, canvasDelta: Vector): Move | null => {

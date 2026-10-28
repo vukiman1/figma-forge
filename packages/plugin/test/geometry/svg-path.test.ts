@@ -1,22 +1,20 @@
 import { describe, expect, it } from 'vitest';
 
-import { toFigmaPathData } from '../src/svg-path.js';
+import { toFigmaPathData } from '../../src/geometry/svg-path/svg-path.js';
 
-/** The dialect Figma's vectorPaths setter accepts: absolute M / L / C / Q / Z, space-separated. */
+type Segment = readonly [command: string, numbers: readonly number[]];
+
 const FIGMA_DIALECT = /^[MLCQZ](?: -?\d+(?:\.\d+)?)*(?: [MLCQZ](?: -?\d+(?:\.\d+)?)*)*$/;
 
-/** The numbers after each command, for comparing geometry rather than spelling. */
-const parse = (d: string): [string, number[]][] =>
+const segmentsOf = (d: string): Segment[] =>
   d
     .split(/ (?=[MLCQZ])/)
-    .map(part => [part[0]!, part.slice(1).trim().split(' ').filter(Boolean).map(Number)]);
+    .map(part => [part.charAt(0), part.slice(1).trim().split(' ').filter(Boolean).map(Number)]);
 
-const close = (a: [string, number[]][], b: [string, number[]][]): void => {
-  expect(a.map(([c]) => c)).toEqual(b.map(([c]) => c));
-  a.forEach(([, nums], i) => {
-    nums.forEach((n, j) => expect(n).toBeCloseTo(b[i]![1][j]!, 5));
-  });
-};
+const approximately = (segments: readonly Segment[]): unknown[] =>
+  segments.map(([command, numbers]) => [command, numbers.map(n => expect.closeTo(n, 5))]);
+
+const lastPointOf = (d: string): readonly number[] => segmentsOf(d).at(-1)?.[1].slice(-2) ?? [];
 
 describe('toFigmaPathData', () => {
   it('leaves Figma’s own form as it is', () => {
@@ -55,22 +53,32 @@ describe('toFigmaPathData', () => {
     expect(toFigmaPathData('M 0 0 T 10 0')).toBe('M 0 0 Q 0 0 10 0');
   });
 
+  it('reflects only a handle of the same curve family: S after Q starts at the current point', () => {
+    expect(toFigmaPathData('M 0 0 Q 5 10 10 0 S 20 0 30 0')).toBe(
+      'M 0 0 Q 5 10 10 0 C 10 0 20 0 30 0',
+    );
+  });
+
   it('starts a command after Z where the closed subpath began', () => {
     expect(toFigmaPathData('M 2 2 h 20 v 20 z l 3 3 Z m 1 1 l 1 0')).toBe(
       'M 2 2 L 22 2 L 22 22 Z M 2 2 L 5 5 Z M 3 3 L 4 3',
     );
   });
 
-  it('turns a half-circle arc into two quarter-turn cubics on the circle', () => {
+  it('rewrites an arc as cubic Béziers of at most a quarter turn each, on the circle', () => {
     const k = 10 * 0.5522847498;
-    close(parse(toFigmaPathData('M 0 0 A 10 10 0 0 1 20 0')), [
-      ['M', [0, 0]],
-      ['C', [0, -k, 10 - k, -10, 10, -10]],
-      ['C', [10 + k, -10, 20, -k, 20, 0]],
-    ]);
-    // The other sweep goes round the other side.
-    const below = parse(toFigmaPathData('M 0 0 A 10 10 0 0 0 20 0'));
-    expect(below[1]![1][5]).toBeCloseTo(10, 5);
+    expect(segmentsOf(toFigmaPathData('M 0 0 A 10 10 0 0 1 20 0'))).toEqual(
+      approximately([
+        ['M', [0, 0]],
+        ['C', [0, -k, 10 - k, -10, 10, -10]],
+        ['C', [10 + k, -10, 20, -k, 20, 0]],
+      ]),
+    );
+  });
+
+  it('sends an arc with the other sweep flag round the other side of the chord', () => {
+    const below = segmentsOf(toFigmaPathData('M 0 0 A 10 10 0 0 0 20 0'));
+    expect(below[1]?.[1][5]).toBeCloseTo(10, 5);
   });
 
   it('reads compact arc flags, as minified icon paths write them', () => {
@@ -78,33 +86,36 @@ describe('toFigmaPathData', () => {
     expect(toFigmaPathData('M0 0a1 1 0 0010 0')).toBe(toFigmaPathData('M0 0 a 1 1 0 0 0 10 0'));
   });
 
-  it('ends every arc exactly on its end point, radii scaled up when too small to reach it', () => {
-    for (const d of [
-      'M 0 0 A 1 1 0 0 1 20 0',
-      'M 3 4 a 7 3 30 1 0 -9 11',
-      'M 0 0 A 5 9 -45 1 1 4 4',
-    ]) {
-      const out = parse(toFigmaPathData(d));
-      const last = out.at(-1)![1];
-      const end = d.startsWith('M 3 4') ? [-6, 15] : d.includes('20 0') ? [20, 0] : [4, 4];
-      expect(last.at(-2)).toBeCloseTo(end[0]!, 6);
-      expect(last.at(-1)).toBeCloseTo(end[1]!, 6);
-      expect(out.length).toBeGreaterThan(2);
-    }
+  it.each([
+    ['M 0 0 A 1 1 0 0 1 20 0', 20, 0],
+    ['M 3 4 a 7 3 30 1 0 -9 11', -6, 15],
+    ['M 0 0 A 5 9 -45 1 1 4 4', 4, 4],
+  ])('ends the arc %j exactly on its end point', (d, endX, endY) => {
+    const out = toFigmaPathData(d);
+    const [x, y] = lastPointOf(out);
+    expect(x).toBeCloseTo(endX, 6);
+    expect(y).toBeCloseTo(endY, 6);
+    expect(segmentsOf(out).length).toBeGreaterThan(2);
   });
 
-  it('keeps every point of a three-quarter arc on its circle', () => {
-    const out = parse(toFigmaPathData('M 10 0 A 10 10 0 1 1 0 -10'));
+  it('scales up arc radii too small to reach the end point, as SVG 1.1 F.6.6 prescribes', () => {
+    expect(toFigmaPathData('M 0 0 A 1 1 0 0 1 20 0')).toBe(
+      toFigmaPathData('M 0 0 A 10 10 0 0 1 20 0'),
+    );
+  });
+
+  it('keeps every point of a three-quarter arc within 0.027% of the radius from its circle', () => {
+    const out = segmentsOf(toFigmaPathData('M 10 0 A 10 10 0 1 1 0 -10'));
     let [px, py] = [10, 0];
     for (const [, c] of out.slice(1)) {
+      const [x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0] = c;
       for (let t = 0; t <= 1; t += 1 / 16) {
         const m = 1 - t;
-        const x = m ** 3 * px + 3 * m * m * t * c[0]! + 3 * m * t * t * c[2]! + t ** 3 * c[4]!;
-        const y = m ** 3 * py + 3 * m * m * t * c[1]! + 3 * m * t * t * c[3]! + t ** 3 * c[5]!;
-        // A quarter-turn cubic strays at most 0.027% of the radius.
+        const x = m ** 3 * px + 3 * m * m * t * x1 + 3 * m * t * t * x2 + t ** 3 * x3;
+        const y = m ** 3 * py + 3 * m * m * t * y1 + 3 * m * t * t * y2 + t ** 3 * y3;
         expect(Math.abs(Math.hypot(x, y) - 10)).toBeLessThan(10 * 2.8e-4);
       }
-      [px, py] = [c[4]!, c[5]!];
+      [px, py] = [x3, y3];
     }
     expect(out).toHaveLength(4);
   });
@@ -118,6 +129,23 @@ describe('toFigmaPathData', () => {
     const out = toFigmaPathData('M 1e-9 -0 L 1e14 0.0000001 a 3 3 0 0 1 6 0 s 1 1 2 0 t 4 0');
     expect(out).toMatch(FIGMA_DIALECT);
     expect(out.startsWith('M 0 0 L')).toBe(true);
+  });
+
+  it('rounds to six decimals, far below a pixel', () => {
+    expect(toFigmaPathData('M 0.1234567 -2.0000004')).toBe('M 0.123457 -2');
+  });
+
+  it('refuses a number past 1e15, which would print in exponent form Figma cannot read', () => {
+    expect(toFigmaPathData('M 0 0 L 999999999999999 0')).toBe('M 0 0 L 999999999999999 0');
+    expect(() => toFigmaPathData('M 0 0 L 1e15 0')).toThrow(
+      new RangeError('coordinate 1000000000000000 is out of range'),
+    );
+  });
+
+  it('allows at most one comma between numbers', () => {
+    expect(() => toFigmaPathData('M 0 0 L 1,,2')).toThrow(
+      new SyntaxError('expected a number at character 10 (",2")'),
+    );
   });
 
   it.each([

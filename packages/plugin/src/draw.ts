@@ -5,6 +5,15 @@ import type {
   SerializedVariableWidthStroke,
 } from '@figma-forge/core';
 
+import {
+  type Affine,
+  applyToPoint,
+  compose,
+  IDENTITY,
+  invert,
+  translation,
+} from './geometry/affine.js';
+
 // Figma Draw reads: repeat groups, brush / dynamic / variable-width strokes, and the box those paint
 // into. Every rule here was measured against what Figma itself draws (its SVG export spells each
 // copy of a repeat group out as a `<use transform>`), not taken from the typings — which describe
@@ -16,52 +25,12 @@ const round2 = (v: number): number => {
 };
 const round4 = (v: number): number => Math.round(v * 1e4) / 1e4;
 
-/** An affine map as Figma writes one: [[a, c, e], [b, d, f]] — x' = a·x + c·y + e. */
-export type Affine = readonly [
-  readonly [number, number, number],
-  readonly [number, number, number],
-];
-
 interface Box {
   minX: number;
   minY: number;
   maxX: number;
   maxY: number;
 }
-
-const IDENTITY: Affine = [
-  [1, 0, 0],
-  [0, 1, 0],
-];
-
-export const compose = (outer: Affine, inner: Affine): Affine => {
-  const [[a1, c1, e1], [b1, d1, f1]] = outer;
-  const [[a2, c2, e2], [b2, d2, f2]] = inner;
-  return [
-    [a1 * a2 + c1 * b2, a1 * c2 + c1 * d2, a1 * e2 + c1 * f2 + e1],
-    [b1 * a2 + d1 * b2, b1 * c2 + d1 * d2, b1 * e2 + d1 * f2 + f1],
-  ];
-};
-
-export const invert = (m: Affine): Affine | null => {
-  const [[a, c, e], [b, d, f]] = m;
-  const det = a * d - b * c;
-  if (!Number.isFinite(det) || Math.abs(det) < 1e-12) return null;
-  return [
-    [d / det, -c / det, (c * f - d * e) / det],
-    [-b / det, a / det, (b * e - a * f) / det],
-  ];
-};
-
-const apply = (m: Affine, x: number, y: number): [number, number] => [
-  m[0][0] * x + m[0][1] * y + m[0][2],
-  m[1][0] * x + m[1][1] * y + m[1][2],
-];
-
-const translation = (x: number, y: number): Affine => [
-  [1, 0, x],
-  [0, 1, y],
-];
 
 /** A clockwise turn (y points down) of `deg` about (cx, cy) — SVG's and CSS's `rotate()`. */
 const turnAbout = (deg: number, cx: number, cy: number): Affine => {
@@ -82,10 +51,10 @@ const turnAbout = (deg: number, cx: number, cy: number): Affine => {
 
 const boxOf = (m: Affine, box: Box): Box => {
   const corners = [
-    apply(m, box.minX, box.minY),
-    apply(m, box.maxX, box.minY),
-    apply(m, box.minX, box.maxY),
-    apply(m, box.maxX, box.maxY),
+    applyToPoint(m, [box.minX, box.minY]),
+    applyToPoint(m, [box.maxX, box.minY]),
+    applyToPoint(m, [box.minX, box.maxY]),
+    applyToPoint(m, [box.maxX, box.maxY]),
   ];
   return {
     minX: Math.min(...corners.map(p => p[0])),
@@ -103,6 +72,8 @@ const union = (boxes: readonly Box[]): Box => ({
 });
 
 /** Copies a repeat group may spell out before its transforms stop being worth their bytes. */
+export type { Affine };
+
 export const MAX_REPEAT_TRANSFORMS = 100;
 
 /** A repeat group's child as the serializer sees it: its size and where it sits on the canvas. */

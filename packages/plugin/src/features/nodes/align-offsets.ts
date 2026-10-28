@@ -1,8 +1,8 @@
 import type { alignNodesParams } from '@figma-forge/core';
 import type { z } from 'zod';
 
+import { type Vector, applyToVector } from '../../geometry/affine.js';
 import type { AlignTarget } from './align-target.js';
-import { mapVector, type Vector } from './linear-map.js';
 import type { Box } from './node-box.js';
 
 type AlignParams = z.output<typeof alignNodesParams>;
@@ -39,7 +39,7 @@ export const alignmentOffset = (
   if (reference === null) return [0, 0];
   const dx = offsetAlong(edges.horizontal, horizontalSpan(reference), horizontalSpan(target.box));
   const dy = offsetAlong(edges.vertical, verticalSpan(reference), verticalSpan(target.box));
-  return mapVector(target.space, [dx, dy]);
+  return applyToVector(target.space, [dx, dy]);
 };
 
 const distributedStarts = (spans: readonly Span[]): number[] => {

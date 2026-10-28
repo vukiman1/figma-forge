@@ -1,5 +1,4 @@
-import type { LinearMap, Vector } from './linear-map.js';
-import { mapVector } from './linear-map.js';
+import { type Affine, type Vector, applyToVector } from '../../geometry/affine.js';
 
 export interface Box {
   readonly x: number;
@@ -40,7 +39,7 @@ export const unionOf = (boxes: readonly Box[]): Box =>
     ]),
   );
 
-export const boxInSpace = (node: PlacedNode, toSpace: LinearMap, origin: Vector): Box => {
+export const boxInSpace = (node: PlacedNode, toSpace: Affine, origin: Vector): Box => {
   const t = node.absoluteTransform;
   const corners: readonly Vector[] = [
     [0, 0],
@@ -50,7 +49,7 @@ export const boxInSpace = (node: PlacedNode, toSpace: LinearMap, origin: Vector)
   ];
   return boxAround(
     corners.map(([cx, cy]) =>
-      mapVector(toSpace, [
+      applyToVector(toSpace, [
         t[0][0] * cx + t[0][1] * cy + t[0][2] - origin[0],
         t[1][0] * cx + t[1][1] * cy + t[1][2] - origin[1],
       ]),

@@ -1,19 +1,19 @@
 import { ALIGN_NODES_TOOL_NAME as TOOL } from '@figma-forge/core';
 
-import { hasField } from '../require-node.js';
 import {
-  IDENTITY_MAP,
-  invertMap,
-  type LinearMap,
+  type Affine,
+  IDENTITY,
+  invert,
   linearPartOf,
   translationOf,
-} from './linear-map.js';
+} from '../../geometry/affine.js';
+import { hasField } from '../require-node.js';
 import { type Box, boxInSpace, isPlaced, type PlacedNode } from './node-box.js';
 
 export interface AlignTarget {
   readonly node: SceneNode & PlacedNode;
   readonly box: Box;
-  readonly space: LinearMap;
+  readonly space: Affine;
   readonly parentBounds: Box | null;
   readonly canvasBox: Box;
 }
@@ -73,7 +73,7 @@ const measureInParent = (node: SceneNode & PlacedNode, canvasBox: Box): AlignTar
     );
   }
   const space = linearPartOf(parent.absoluteTransform);
-  const toSpace = invertMap(space);
+  const toSpace = invert(space);
   if (toSpace === null) {
     throw new Error(`${TOOL}: parent ${parent.id} is scaled to zero, so has no axes`);
   }
@@ -95,7 +95,7 @@ export const toAlignTarget = (
     throw new Error(`${TOOL}: node ${node.id} is a ${node.type}, which has no position to align`);
   }
   requireMovable(node, ids);
-  const canvasBox = boxInSpace(node, IDENTITY_MAP, [0, 0]);
+  const canvasBox = boxInSpace(node, IDENTITY, [0, 0]);
   if (!isMeasuredOnCanvas) return measureInParent(node, canvasBox);
-  return { node, box: canvasBox, space: IDENTITY_MAP, parentBounds: null, canvasBox };
+  return { node, box: canvasBox, space: IDENTITY, parentBounds: null, canvasBox };
 };

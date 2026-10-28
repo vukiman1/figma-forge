@@ -1,13 +1,8 @@
-import { type Affine, compose, invert } from '../../draw.js';
+import { type Affine, compose, invert, toTransform } from '../../geometry/affine.js';
 import { outlineAnchor } from './outline-anchor.js';
 
 const SAME_PAINTED_SIZE_TOLERANCE = 0.5;
 const NEGLIGIBLE_OFFSET = 0.01;
-
-const toTransform = ([[a, c, e], [b, d, f]]: Affine): Transform => [
-  [a, c, e],
-  [b, d, f],
-];
 
 const childSpaceOf = (node: SceneNode): Affine | null => {
   const relative = invert(node.relativeTransform);

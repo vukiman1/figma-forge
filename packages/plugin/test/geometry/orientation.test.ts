@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { boundingBoxOf, orientationOf } from '../src/orientation.js';
+import { boundingBoxOf, orientationOf } from '../../src/geometry/orientation.js';
 
-/** Figma's transform for a turn of `deg` (counter-clockwise), mirrored when `flip`. */
 const figma = (deg: number, flip = false): Transform => {
   const t = (deg * Math.PI) / 180;
   const [a, b, c, d] = [Math.cos(t), -Math.sin(t), Math.sin(t), Math.cos(t)];
-  // A flip reverses the node's own y axis: the second column changes sign.
   return flip
     ? [
         [a, -c, 5],
@@ -45,7 +43,6 @@ describe('orientationOf', () => {
       width: 116.6,
       height: 101.96,
     });
-    // Flipped top to bottom: the box hangs above its origin.
     expect(boundingBoxOf(figma(0, true), 50, 30)).toEqual({ x: 0, y: -30, width: 50, height: 30 });
   });
 });

@@ -30,8 +30,8 @@ import {
   serializeComplexStroke,
   serializeVariableWidthStroke,
 } from './draw.js';
-import { cssAngleFromGradientTransform } from './gradient-angle.js';
-import { boundingBoxOf, orientationOf } from './orientation.js';
+import { cssAngleFromGradientTransform } from './geometry/gradient-angle.js';
+import { boundingBoxOf, orientationOf } from './geometry/orientation.js';
 import { cssProgressiveBlurLayers } from './progressive-blur.js';
 import { TimeSlice } from './runtime/cooperative.js';
 import { flattenForest } from './traverse.js';
