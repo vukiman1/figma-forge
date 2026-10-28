@@ -11,6 +11,7 @@ import { createGetComponentApiHandler } from '../features/components/get-compone
 import { createGetLocalComponentsHandler } from '../features/components/get-local-components.handler.js';
 import { createSetInstancePropertiesHandler } from '../features/components/set-instance-properties.handler.js';
 import { createSwapComponentHandler } from '../features/components/swap-component.handler.js';
+import { createGetDesignContextHandler } from '../features/design-context/get-design-context.handler.js';
 import { createExportPdfHandler } from '../features/export/export-pdf.handler.js';
 import { createExportVideoHandler } from '../features/export/export-video.handler.js';
 import { createGetScreenshotHandler } from '../features/export/get-screenshot.handler.js';
@@ -127,7 +128,6 @@ import { createSetVectorHandler } from '../features/vector/set-vector.handler.js
 import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
 import { createBatchHandler } from './batch.js';
-import { createGetDesignContextHandler } from './get-design-context.js';
 
 /**
  * Build the full sandbox handler map. Read handlers run as-is; write handlers are wrapped with

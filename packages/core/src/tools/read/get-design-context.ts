@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { DETAIL_LEVELS } from '../../design-context/budget.js';
+import { budgetArgShape } from '../shared/injected-args-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_DESIGN_CONTEXT_TOOL_NAME = 'get_design_context';
@@ -24,6 +25,8 @@ export const getDesignContextParams = z.object({
     .describe('Collapse repeated instances of the same main component (default true)')
     .optional(),
 });
+
+export const getDesignContextSandboxParams = getDesignContextParams.extend(budgetArgShape);
 
 export const getDesignContextTool: ToolSpec = {
   name: GET_DESIGN_CONTEXT_TOOL_NAME,

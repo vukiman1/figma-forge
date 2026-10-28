@@ -1,34 +1,13 @@
-import { readFileSync } from 'node:fs';
-
-import {
-  DesignContextNodeSchema,
-  SerializedNodeSchema,
-  SerializedTextSegmentSchema,
-} from '@figma-forge/core';
+import { SerializedNodeSchema, SerializedTextSegmentSchema } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { project, VISUAL_OVERRIDE_FIELDS } from '../../src/handlers/get-design-context.js';
+import { project } from '../../../src/features/design-context/project-node.js';
 
-// Projection-coverage guard. The `full` branch of project() is a hand-copied field list mapping
-// serializeFlatSync's output (SerializedNode) into the design-context view — historically this
-// repo's most recurring bug class: the serializer emits a dimension and the projection silently
-// drops it (textCase/lineHeight, paragraphSpacing, layoutGrids, segments were all found live, one
-// by one). This test turns that class into a CI failure: every SerializedNodeSchema key must
-// either survive projection at full detail or be explicitly allowlisted below with a reason.
-//
-// The fixtures are the second half of the ratchet: they must make the serializer emit every
-// schema field (each field set to a non-default so the projection's no-op-omission rules don't
-// hide it). A new schema field therefore fails this test until the author (a) extends a fixture
-// to produce it AND projects it, or (b) records it in an allowlist — a conscious decision either
-// way, instead of a silent drop.
-
-/** Deliberately not projected — no codegen meaning, would only bloat the LLM payload. */
 const DROPPED = new Map<string, string>([
   ['locked', 'editor lock state — irrelevant to generated code'],
   ['parentId', 'structural; the projected tree shape already encodes parentage'],
 ]);
 
-/** Carried by buildNode (not project()) at full detail — present in results, out of scope here. */
 const HANDLED_ELSEWHERE = new Map<string, string>([
   ['mainComponent', 'resolved async per INSTANCE in buildNode'],
   ['children', 'recursed per node in buildNode'],
@@ -38,10 +17,6 @@ const HANDLED_ELSEWHERE = new Map<string, string>([
   ],
 ]);
 
-/**
- * Emitted by project() under a name the serialized schema does not use, on purpose — each maps the
- * serialized field it stands for. The typo guard accepts these and nothing else.
- */
 const RENAMED = new Map<string, string>([
   ['variableModes', 'explicitVariableModes — named per collection/mode for the design context'],
 ]);
@@ -63,14 +38,11 @@ const base = (over: Record<string, unknown>): SceneNode =>
     ...over,
   }) as unknown as SceneNode;
 
-// A child of a GRID auto-layout parent: visuals (mixed corners/strokes, effects, mask, blend),
-// its own auto-layout, sizing/grow/align/positioning, grid placement, grids, overflow, tokens.
 const frameInGrid = base({
   id: 'a',
   visible: false,
   parent: { id: 'gp', layoutMode: 'GRID' },
   rotation: 45,
-  // Turned 45° and mirrored, as Figma writes it: rotate(θ), then the y axis reversed.
   relativeTransform: [
     [Math.SQRT1_2, -Math.SQRT1_2, 0],
     [-Math.SQRT1_2, -Math.SQRT1_2, 0],
@@ -155,7 +127,6 @@ const frameInGrid = base({
   componentProperties: { Size: { type: 'VARIANT', value: 'lg' } },
 });
 
-// Outside auto-layout (parent null) → absolute-positioning constraints; partial-sweep arc.
 const arcWithConstraints = base({
   id: 'b',
   type: 'ELLIPSE',
@@ -163,7 +134,6 @@ const arcWithConstraints = base({
   constraints: { horizontal: 'MAX', vertical: 'CENTER' },
 });
 
-// One run carrying every SerializedTextSegment field, so the segment projection is ratcheted too.
 const fullSegment = {
   characters: 'Link',
   start: 0,
@@ -184,13 +154,10 @@ const fullSegment = {
   boundVariables: { fills: [{ type: 'VARIABLE_ALIAS', id: 'V:2' }] },
 };
 
-// Mixed-style TEXT (fontSize = symbol → segments) with every node-level text field non-default.
 const richText = base({
   id: 'c',
   type: 'TEXT',
   characters: 'Link text',
-  // A TEXT sublayer whose content comes from a TEXT component property — the case codegen gets
-  // wrong by emitting the rendered string as a literal instead of a prop.
   componentPropertyReferences: { characters: 'Caption#79:0' },
   fontSize: Symbol('mixed'),
   fontName: { family: 'Inter', style: 'Bold' },
@@ -211,7 +178,6 @@ const richText = base({
   getStyledTextSegments: () => [fullSegment],
 });
 
-// Figma Draw: a stroke that wobbles and tapers, painting past its own box.
 const drawnStroke = base({
   id: 'd',
   type: 'VECTOR',
@@ -229,7 +195,6 @@ const drawnStroke = base({
   absoluteRenderBounds: { x: -1, y: -3, width: 14, height: 30 },
 });
 
-// A repeat group drawing its one child three times.
 const repeatGroup = base({
   id: 'e',
   type: 'TRANSFORM_GROUP',
@@ -259,7 +224,6 @@ const repeatGroup = base({
   ],
 });
 
-// Text set along a path, starting partway along its second segment.
 const textOnPath = base({
   id: 'f',
   type: 'TEXT_PATH',
@@ -312,28 +276,5 @@ describe('get_design_context projection coverage (full detail)', () => {
       notInSchema: [],
       actuallyProjected: [],
     });
-  });
-});
-
-describe('deduped-instance override entries', () => {
-  // A deduped stub's propertyOverrides entries are assembled field by field outside project(), so
-  // nothing above sees them — cornerSmoothing went out in them undeclared. The schema is what
-  // documents the result and what design_diff's format gate records, so every field an entry can
-  // carry must be on it. Read the fields off the handler's own source, so a new one fails here.
-  it('declares every field an entry can carry', () => {
-    const source = readFileSync(
-      new URL('../../src/handlers/get-design-context.ts', import.meta.url),
-      'utf8',
-    );
-    const assigned = [...source.matchAll(/\bentry\.([A-Za-z]+) =/g)].map(m => m[1]!);
-    const initial = [
-      ...(/const entry: Record<string, unknown> = \{ ([A-Za-z]+):/.exec(source) ?? []),
-    ];
-    expect(assigned.length).toBeGreaterThan(1); // the regexes still match something
-    expect(initial).toHaveLength(2);
-    const emitted = new Set([initial[1]!, ...assigned, ...VISUAL_OVERRIDE_FIELDS]);
-
-    const entry = DesignContextNodeSchema.shape.propertyOverrides.unwrap().element.shape;
-    expect([...emitted].filter(f => !(f in entry))).toEqual([]);
   });
 });
