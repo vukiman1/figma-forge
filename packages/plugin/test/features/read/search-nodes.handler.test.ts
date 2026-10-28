@@ -1,11 +1,9 @@
 import type { SearchNodesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSearchNodesHandler } from '../../src/handlers/search-nodes.js';
+import { createSearchNodesHandler } from '../../../src/features/read/search-nodes.handler.js';
 
-// Every Date.now() read advances a fake clock by 1ms, so a time slice ends after a fixed number of
-// reads instead of after however much work this machine fits into 40 real milliseconds.
-const tickingClock = (): { mockRestore: () => void } => {
+const clockAdvancingOneMsPerRead = (): { mockRestore: () => void } => {
   let now = 0;
   return vi.spyOn(Date, 'now').mockImplementation(() => (now += 1));
 };
@@ -153,7 +151,7 @@ describe('search_nodes handler', () => {
       }),
     );
     const handler = createSearchNodesHandler(fakeFigma(instances));
-    const clock = tickingClock();
+    const clock = clockAdvancingOneMsPerRead();
     try {
       let finished = false;
       const read = Promise.resolve(handler({ type: 'INSTANCE' })).then(result => {

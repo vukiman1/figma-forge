@@ -80,6 +80,13 @@ import { createGetReactionsHandler } from '../features/prototype/get-reactions.h
 import { createRemoveReactionsHandler } from '../features/prototype/remove-reactions.handler.js';
 import { createSetReactionsHandler } from '../features/prototype/set-reactions.handler.js';
 import { createUpdateFlowsHandler } from '../features/prototype/update-flows.handler.js';
+import { createGetAnnotationsHandler } from '../features/read/get-annotations.handler.js';
+import { createGetFontsHandler } from '../features/read/get-fonts.handler.js';
+import { createGetNodeHandler } from '../features/read/get-node.handler.js';
+import { createGetNodesInfoHandler } from '../features/read/get-nodes-info.handler.js';
+import { createScanNodesByTypesHandler } from '../features/read/scan-nodes-by-types.handler.js';
+import { createScanTextNodesHandler } from '../features/read/scan-text-nodes.handler.js';
+import { createSearchNodesHandler } from '../features/read/search-nodes.handler.js';
 import { createApplyStyleToNodeHandler } from '../features/styles/apply-style-to-node.handler.js';
 import { createCreateEffectStyleHandler } from '../features/styles/create-effect-style.handler.js';
 import { createCreateGridStyleHandler } from '../features/styles/create-grid-style.handler.js';
@@ -120,14 +127,7 @@ import { createSetVectorHandler } from '../features/vector/set-vector.handler.js
 import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
 import { createBatchHandler } from './batch.js';
-import { createGetAnnotationsHandler } from './get-annotations.js';
 import { createGetDesignContextHandler } from './get-design-context.js';
-import { createGetFontsHandler } from './get-fonts.js';
-import { createGetNodeHandler } from './get-node.js';
-import { createGetNodesInfoHandler } from './get-nodes-info.js';
-import { createScanNodesByTypesHandler } from './scan-nodes-by-types.js';
-import { createScanTextNodesHandler } from './scan-text-nodes.js';
-import { createSearchNodesHandler } from './search-nodes.js';
 
 /**
  * Build the full sandbox handler map. Read handlers run as-is; write handlers are wrapped with

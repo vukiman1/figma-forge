@@ -5,7 +5,7 @@ import type { ToolSpec } from '../tool-spec.js';
 export const SCAN_NODES_BY_TYPES_TOOL_NAME = 'scan_nodes_by_types';
 
 export const scanNodesByTypesParams = z.object({
-  types: z.array(z.string()).describe('Node types to match, e.g. ["FRAME", "COMPONENT"]'),
+  types: z.array(z.string()).min(1).describe('Node types to match, e.g. ["FRAME", "COMPONENT"]'),
   root: z.string().describe('Node id to scope the scan; omit for the current page').optional(),
 });
 

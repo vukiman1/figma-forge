@@ -1,11 +1,9 @@
 import type { ScanTextNodesResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createScanTextNodesHandler } from '../../src/handlers/scan-text-nodes.js';
+import { createScanTextNodesHandler } from '../../../src/features/read/scan-text-nodes.handler.js';
 
-// Every Date.now() read advances a fake clock by 1ms, so a time slice ends after a fixed number of
-// reads instead of after however much work this machine fits into 40 real milliseconds.
-const tickingClock = (): { mockRestore: () => void } => {
+const clockAdvancingOneMsPerRead = (): { mockRestore: () => void } => {
   let now = 0;
   return vi.spyOn(Date, 'now').mockImplementation(() => (now += 1));
 };
@@ -92,7 +90,7 @@ describe('scan_text_nodes handler', () => {
       fake(`2:${index}`, 'TEXT', { fontName, fontSize: 14, characters: `Text ${index}` }),
     );
     const handler = createScanTextNodesHandler(fakeFigma(texts));
-    const clock = tickingClock();
+    const clock = clockAdvancingOneMsPerRead();
     try {
       let finished = false;
       const read = Promise.resolve(handler({})).then(result => {
@@ -116,7 +114,6 @@ describe('scan_text_nodes handler', () => {
   });
 
   it('stops at what one result can carry and says how many matched in all', async () => {
-    // 1 MiB of text per node: the limit (just under 10 MiB) is certainly passed by the tenth.
     const texts = Array.from({ length: 40 }, (_, index) =>
       fake(`2:${index}`, 'TEXT', { characters: 'x'.repeat(1024 * 1024) }),
     );

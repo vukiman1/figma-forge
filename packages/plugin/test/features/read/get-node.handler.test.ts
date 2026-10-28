@@ -1,7 +1,7 @@
 import type { GetNodeResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetNodeHandler } from '../../src/handlers/get-node.js';
+import { createGetNodeHandler } from '../../../src/features/read/get-node.handler.js';
 
 const fake = (overrides: Record<string, unknown> = {}): SceneNode =>
   ({
@@ -36,10 +36,10 @@ describe('get_node handler', () => {
     expect(result).toEqual({ node: null });
   });
 
-  it('serializes a SceneNode subtree (含 children)', async () => {
+  it('serializes a SceneNode subtree with its children', async () => {
     const child = fake({ id: '1:3', parent: { id: '1:2' } });
     const node = fake({ id: '1:2', type: 'FRAME', children: [child] });
-    const handler = createGetNodeHandler(fakeFigma({ '1:2': node as unknown as BaseNode }));
+    const handler = createGetNodeHandler(fakeFigma({ '1:2': node }));
     const result = (await handler({ nodeId: '1:2' })) as GetNodeResult;
     expect(result.node?.id).toBe('1:2');
     expect(result.node?.children?.[0]?.id).toBe('1:3');

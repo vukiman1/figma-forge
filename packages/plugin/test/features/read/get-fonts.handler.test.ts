@@ -1,7 +1,7 @@
 import type { GetFontsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetFontsHandler } from '../../src/handlers/get-fonts.js';
+import { createGetFontsHandler } from '../../../src/features/read/get-fonts.handler.js';
 
 const text = (id: string, fontName: unknown, children?: SceneNode[]): SceneNode =>
   ({ id, name: id, type: 'TEXT', fontName, children }) as unknown as SceneNode;
@@ -47,8 +47,6 @@ describe('get_fonts handler', () => {
   });
 
   it("keeps a variable family's axis values apart instead of folding them onto one row", async () => {
-    // Same named instance, different rendered weight — collapsing these would report "8 uses of
-    // Inter Regular" for a page whose headings and body are visibly different type.
     const page = [
       text('1', { family: 'Inter', style: 'Regular', variationSettings: { wght: 400 } }),
       text('2', { family: 'Inter', style: 'Regular', variationSettings: { wght: 400 } }),
@@ -88,7 +86,6 @@ describe('get_fonts handler', () => {
         family === 'Inter' ? ['wght', 'slnt'] : null,
     } as unknown as typeof figma;
     const result = (await createGetFontsHandler(figmaCtx)(undefined)) as GetFontsResult;
-    // Keyed by family, listed once — and a static family is absent rather than present-and-empty.
     expect(result.variationAxes).toEqual({ Inter: ['wght', 'slnt'] });
   });
 
@@ -100,8 +97,6 @@ describe('get_fonts handler', () => {
   });
 
   it('skips a family the editor cannot resolve rather than failing the whole read', async () => {
-    // A document with a missing font names a family this editor does not have; the API throws for
-    // it. The other families still have to come back.
     const page = [
       text('1', { family: 'Inter', style: 'Regular' }),
       text('2', { family: 'GhostFace', style: 'Regular' }),

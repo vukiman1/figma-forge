@@ -1,7 +1,7 @@
 import type { GetAnnotationsResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetAnnotationsHandler } from '../../src/handlers/get-annotations.js';
+import { createGetAnnotationsHandler } from '../../../src/features/read/get-annotations.handler.js';
 
 const node = (id: string, annotations: unknown[], children?: SceneNode[]): SceneNode =>
   ({ id, name: id, type: 'FRAME', annotations, children }) as unknown as SceneNode;

@@ -1,7 +1,7 @@
 import type { GetNodesInfoResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetNodesInfoHandler } from '../../src/handlers/get-nodes-info.js';
+import { createGetNodesInfoHandler } from '../../../src/features/read/get-nodes-info.handler.js';
 
 const fake = (overrides: Record<string, unknown> = {}): SceneNode =>
   ({
@@ -26,16 +26,14 @@ const fakeFigma = (lookup: Record<string, BaseNode | null>): typeof figma =>
 describe('get_nodes_info handler', () => {
   it('throws when nodeIds is not a string[]', async () => {
     const handler = createGetNodesInfoHandler(fakeFigma({}));
-    await expect(handler({ nodeIds: 'not-array' })).rejects.toThrow(/string\[]/);
-    await expect(handler({ nodeIds: [1, 2] })).rejects.toThrow(/string\[]/);
+    await expect(handler({ nodeIds: 'not-array' })).rejects.toThrow(/nodeIds: .*expected array/);
+    await expect(handler({ nodeIds: [1, 2] })).rejects.toThrow(/nodeIds\.0: .*expected string/);
   });
 
   it('returns serialized nodes preserving input order with null for missing', async () => {
     const a = fake({ id: '1:2' });
     const c = fake({ id: '1:4' });
-    const handler = createGetNodesInfoHandler(
-      fakeFigma({ '1:2': a as unknown as BaseNode, '1:4': c as unknown as BaseNode }),
-    );
+    const handler = createGetNodesInfoHandler(fakeFigma({ '1:2': a, '1:4': c }));
     const result = (await handler({ nodeIds: ['1:2', '1:3', '1:4'] })) as GetNodesInfoResult;
     expect(result.nodes).toHaveLength(3);
     expect(result.nodes[0]?.id).toBe('1:2');
@@ -50,8 +48,6 @@ describe('get_nodes_info handler', () => {
     expect(result.nodes).toEqual([null]);
   });
 
-  // A frame of six children, each carrying a 1 MiB name: ~6 MiB serialized — one fits a result,
-  // two do not.
   const wideFrame = (id: string): SceneNode =>
     fake({
       id,
@@ -64,9 +60,7 @@ describe('get_nodes_info handler', () => {
   it('returns trees that fit one result together, unchanged', async () => {
     const big = wideFrame('1:2');
     const small = fake({ id: '1:9' });
-    const handler = createGetNodesInfoHandler(
-      fakeFigma({ '1:2': big as unknown as BaseNode, '1:9': small as unknown as BaseNode }),
-    );
+    const handler = createGetNodesInfoHandler(fakeFigma({ '1:2': big, '1:9': small }));
     const result = (await handler({ nodeIds: ['1:2', '1:9'] })) as GetNodesInfoResult;
     expect(result.nodes.map(n => n?.id)).toEqual(['1:2', '1:9']);
     expect(result.nodes[0]?.children).toHaveLength(6);
@@ -75,8 +69,8 @@ describe('get_nodes_info handler', () => {
   it('refuses trees that fit one at a time but not together, naming each', async () => {
     const handler = createGetNodesInfoHandler(
       fakeFigma({
-        '1:2': wideFrame('1:2') as unknown as BaseNode,
-        '1:3': wideFrame('1:3') as unknown as BaseNode,
+        '1:2': wideFrame('1:2'),
+        '1:3': wideFrame('1:3'),
       }),
     );
     await expect(handler({ nodeIds: ['1:2', '1:3'] })).rejects.toThrow(

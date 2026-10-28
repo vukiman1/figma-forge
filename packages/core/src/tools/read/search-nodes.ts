@@ -4,11 +4,15 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SEARCH_NODES_TOOL_NAME = 'search_nodes';
 
-export const searchNodesParams = z.object({
-  name: z.string().describe('Case-insensitive substring matched against node names').optional(),
-  type: z.string().describe('Exact node type to match, e.g. "TEXT", "FRAME"').optional(),
-  root: z.string().describe('Node id to scope the search; omit for the current page').optional(),
-});
+export const searchNodesParams = z
+  .object({
+    name: z.string().describe('Case-insensitive substring matched against node names').optional(),
+    type: z.string().describe('Exact node type to match, e.g. "TEXT", "FRAME"').optional(),
+    root: z.string().describe('Node id to scope the search; omit for the current page').optional(),
+  })
+  .refine(({ name, type }) => name !== undefined || type !== undefined, {
+    error: 'at least one of name or type is required',
+  });
 
 export const searchNodesTool: ToolSpec = {
   name: SEARCH_NODES_TOOL_NAME,

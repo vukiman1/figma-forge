@@ -5,7 +5,7 @@ import { type App, createApp, h, nextTick } from 'vue';
 import { createPluginContextEvent, type PluginContextEvent } from '../../protocol/bridge.js';
 import { createHostYield } from '../../protocol/host-yield.js';
 import { resetThrottleForTests, resumeHostYield } from '../../src/cooperative.js';
-import { createSearchNodesHandler } from '../../src/handlers/search-nodes.js';
+import { createSearchNodesHandler } from '../../src/features/read/search-nodes.handler.js';
 import { serializeTrees } from '../../src/serializer.js';
 import type { ActivityEntry, RelayClientState } from '../../ui/relay/state.js';
 
