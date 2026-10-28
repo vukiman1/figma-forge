@@ -6,65 +6,64 @@ import { resumeHostYield } from './runtime/cooperative.js';
 import { dispatchSandboxMessage } from './runtime/dispatcher.js';
 import { createPanelController } from './runtime/panel.js';
 
-const log = (msg: string): void => console.log(msg);
+const DEFAULT_MODE = 'default';
+
+const log = (message: string): void => console.log(message);
 
 const panel = createPanelController(figma);
 panel.open(__html__);
 
-// Push the current Figma context to the UI so its Context tab reflects what the plugin sees.
+const selectionDetail = (
+  node: SceneNode,
+): { id: string; name: string; type: string; width: number; height: number } => ({
+  id: node.id,
+  name: node.name,
+  type: node.type,
+  width: 'width' in node ? Math.round(node.width) : 0,
+  height: 'height' in node ? Math.round(node.height) : 0,
+});
+
+const postToPanel = (message: unknown): void => {
+  // oxlint-disable-next-line unicorn/require-post-message-target-origin -- figma.ui.postMessage takes no target origin
+  figma.ui.postMessage(message);
+};
+
 const emitContext = (): void => {
   const page = figma.currentPage;
-  const selection = page.selection.slice(0, SELECTION_DETAIL_LIMIT).map(n => ({
-    id: n.id,
-    name: n.name,
-    type: n.type,
-    width: 'width' in n ? Math.round(n.width) : 0,
-    height: 'height' in n ? Math.round(n.height) : 0,
-  }));
-  const event = createPluginContextEvent({
-    fileName: figma.root.name,
-    pageId: page.id,
-    pageName: page.name,
-    selectionCount: page.selection.length,
-    selection,
-    editorType: figma.editorType,
-    // The typings declare `mode` as always present, but it is Figma's value to supply, not ours —
-    // and a declaration is not a guarantee, which is the whole lesson of this file's editor
-    // handling. The context event is schema-validated on arrival, so an absent `mode` would fail
-    // the parse and strand the panel on "Waiting for plugin context…" — a far worse failure than
-    // not knowing how the plugin was launched. `default` is the assumption that degrades safely.
-    mode: figma.mode ?? 'default',
-    apiVersion: figma.apiVersion,
-  });
-  // figma.ui.postMessage is the Figma plugin API — there is no targetOrigin parameter
-  // eslint-disable-next-line unicorn/require-post-message-target-origin
-  figma.ui.postMessage(event);
+  postToPanel(
+    createPluginContextEvent({
+      fileName: figma.root.name,
+      pageId: page.id,
+      pageName: page.name,
+      selectionCount: page.selection.length,
+      selection: page.selection.slice(0, SELECTION_DETAIL_LIMIT).map(selectionDetail),
+      editorType: figma.editorType,
+      mode: figma.mode ?? DEFAULT_MODE,
+      apiVersion: figma.apiVersion,
+    }),
+  );
 };
 
 const handlers = createSandboxHandlers(figma);
 
-figma.ui.onmessage = (raw: unknown) => {
+const dispatchToolCall = async (raw: unknown): Promise<void> => {
+  const outcome = await dispatchSandboxMessage({
+    raw,
+    handlers,
+    editorType: figma.editorType,
+    log,
+  });
+  if (outcome.kind === 'reply') postToPanel(outcome.reply);
+};
+
+figma.ui.onmessage = (raw: unknown): void => {
   if (resumeHostYield(raw)) return;
-  // Panel control (resize / hide / reveal) is driven by the user's own clicks, not the agent, so
-  // it's carried out here and never produces a relay reply. Anything else is tool traffic.
   const control = parsePanelControl(raw);
   if (control !== null) {
     panel.apply(control);
     return;
   }
-  void (async (): Promise<void> => {
-    const outcome = await dispatchSandboxMessage({
-      raw,
-      handlers,
-      editorType: figma.editorType,
-      log,
-    });
-    if (outcome.kind === 'reply') {
-      // figma.ui.postMessage is the Figma plugin API — there is no targetOrigin parameter
-      // eslint-disable-next-line unicorn/require-post-message-target-origin
-      figma.ui.postMessage(outcome.reply);
-    }
-  })();
+  void dispatchToolCall(raw);
 };
 
 emitContext();

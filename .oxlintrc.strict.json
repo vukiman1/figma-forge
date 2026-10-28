@@ -58,7 +58,6 @@
     "packages/plugin/protocol/**",
     "packages/plugin/*.ts",
     "test/**",
-    "packages/plugin/src/*.ts",
     "packages/plugin/test/*.ts",
     "packages/plugin/test/components/**",
     "packages/plugin/test/composables/**",
