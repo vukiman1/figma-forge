@@ -1,14 +1,14 @@
-import type { GetDocumentResult } from '@figma-forge/core';
+import { GET_DOCUMENT_TOOL_NAME as TOOL, type GetDocumentResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../dispatcher.js';
-import { resultCharBudget, serializeTrees, treeTooLargeError } from '../serializer.js';
+import type { SandboxToolHandler } from '../../dispatcher.js';
+import { resultCharBudget, serializeTrees, treeTooLargeError } from '../../serializer.js';
 
 export const createGetDocumentHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
   async () => {
     const page = figmaCtx.currentPage;
     const run = await serializeTrees(page.children, resultCharBudget());
-    if (!run.complete) throw treeTooLargeError('get_document', run.total, 'page');
+    if (!run.complete) throw treeTooLargeError(TOOL, run.total, 'page');
     const result: GetDocumentResult = {
       pageId: page.id,
       pageName: page.name,

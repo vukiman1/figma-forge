@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
+import { createNavigateToPageHandler } from '../../../src/features/files/navigate-to-page.handler.js';
 
 describe('navigate_to_page handler', () => {
   it('switches the active page via setCurrentPageAsync', async () => {

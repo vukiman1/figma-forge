@@ -1,7 +1,7 @@
 import type { GetSelectionResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetSelectionHandler } from '../../src/handlers/get-selection.js';
+import { createGetSelectionHandler } from '../../../src/features/files/get-selection.handler.js';
 
 const fakeNode = (overrides: Partial<SceneNode> = {}): SceneNode =>
   ({

@@ -1,11 +1,9 @@
 import type { GetDocumentResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createGetDocumentHandler } from '../../src/handlers/get-document.js';
+import { createGetDocumentHandler } from '../../../src/features/files/get-document.handler.js';
 
-// Every Date.now() read advances a fake clock by 1ms, so a time slice ends after a fixed number of
-// reads instead of after however much work this machine fits into 40 real milliseconds.
-const tickingClock = (): { mockRestore: () => void } => {
+const clockAdvancingOneMsPerRead = (): { mockRestore: () => void } => {
   let now = 0;
   return vi.spyOn(Date, 'now').mockImplementation(() => (now += 1));
 };
@@ -64,7 +62,7 @@ describe('get_document handler', () => {
 
   it('hands the thread back to Figma before a large page is done, dropping no node', async () => {
     const children = Array.from({ length: 2_048 }, (_, i) => fake({ id: `1:${i + 2}` }));
-    const clock = tickingClock();
+    const clock = clockAdvancingOneMsPerRead();
     try {
       let finished = false;
       const read = Promise.resolve(createGetDocumentHandler(fakeFigma(children))(undefined)).then(
@@ -108,7 +106,6 @@ describe('get_document handler', () => {
   });
 
   it('refuses a page too large for one tool result instead of returning part of it', async () => {
-    // Twelve 1 MB names: more than one result can carry, whatever the rest of each node holds.
     const children = Array.from({ length: 12 }, (_, i) =>
       fake({ id: `1:${i + 2}`, name: 'x'.repeat(1024 * 1024) }),
     );

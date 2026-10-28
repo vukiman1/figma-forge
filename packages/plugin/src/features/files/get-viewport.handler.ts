@@ -1,10 +1,10 @@
 import type { GetViewportResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../dispatcher.js';
+import type { SandboxToolHandler } from '../../dispatcher.js';
 
 export const createGetViewportHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
-  async () => {
+  () => {
     const { center, zoom, bounds } = figmaCtx.viewport;
     const result: GetViewportResult = {
       center: { x: center.x, y: center.y },

@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createDeletePageHandler } from '../../src/handlers/delete-page.js';
+import { createDeletePageHandler } from '../../../src/features/files/delete-page.handler.js';
 
 const fakeFigma = (page: unknown, currentPageId: string, pageCount: number): typeof figma =>
   ({

@@ -1,7 +1,7 @@
 import type { GetPagesResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetPagesHandler } from '../../src/handlers/get-pages.js';
+import { createGetPagesHandler } from '../../../src/features/files/get-pages.handler.js';
 
 interface FakePage {
   id: string;
@@ -45,15 +45,28 @@ describe('get_pages handler', () => {
     });
   });
 
-  // Figma hands back its own objects; copying only the two documented fields keeps anything else
-  // they may carry off the wire.
-  it('copies only nodeId and name from each flow', async () => {
+  it('copies only nodeId and name from each flow, keeping the rest of Figma’s objects off the wire', async () => {
     const flow = { nodeId: '1:1', name: 'Sign up', internal: true };
     const handler = createGetPagesHandler(
       fakeFigma([{ id: 'p-1', name: 'Cover', flowStartingPoints: [flow] }]),
     );
     const result = (await handler(undefined)) as GetPagesResult;
     expect(result.pages[0]!.flows).toEqual([{ nodeId: '1:1', name: 'Sign up' }]);
+  });
+
+  it('reads flows without loading a page, whose children throw while it is unloaded', async () => {
+    const unloaded = {
+      id: 'p-1',
+      name: 'Cover',
+      flowStartingPoints: [{ nodeId: '1:1', name: 'Onboarding' }],
+      get children(): never {
+        throw new Error('The page is not loaded');
+      },
+    };
+    const result = (await createGetPagesHandler(fakeFigma([unloaded]))(
+      undefined,
+    )) as GetPagesResult;
+    expect(result.pages[0]!.flows).toEqual([{ nodeId: '1:1', name: 'Onboarding' }]);
   });
 
   it('returns empty when no pages', async () => {

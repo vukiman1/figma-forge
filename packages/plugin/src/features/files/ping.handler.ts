@@ -1,4 +1,4 @@
-import type { SandboxToolHandler } from '../dispatcher.js';
+import type { SandboxToolHandler } from '../../dispatcher.js';
 
 export const createPingHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>

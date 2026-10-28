@@ -1,16 +1,17 @@
 import type { ListFilesResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../dispatcher.js';
+import type { SandboxToolHandler } from '../../dispatcher.js';
 
 export const createListFilesHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>
-  async () => {
+  () => {
+    const { currentPage } = figmaCtx;
     const result: ListFilesResult = {
       files: [
         {
           fileKey: figmaCtx.fileKey ?? null,
           fileName: figmaCtx.root.name,
-          currentPage: { id: figmaCtx.currentPage.id, name: figmaCtx.currentPage.name },
+          currentPage: { id: currentPage.id, name: currentPage.name },
         },
       ],
     };

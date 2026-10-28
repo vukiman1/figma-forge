@@ -1,7 +1,7 @@
 import type { ListFilesResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createListFilesHandler } from '../../src/handlers/list-files.js';
+import { createListFilesHandler } from '../../../src/features/files/list-files.handler.js';
 
 const fakeFigma = (over: { fileKey?: string }): typeof figma =>
   ({

@@ -10,6 +10,7 @@ import { createCreateComponentHandler } from '../../src/features/components/crea
 import { createEditComponentPropertyHandler } from '../../src/features/components/edit-component-property.handler.js';
 import { createSetInstancePropertiesHandler } from '../../src/features/components/set-instance-properties.handler.js';
 import { createSwapComponentHandler } from '../../src/features/components/swap-component.handler.js';
+import { createNavigateToPageHandler } from '../../src/features/files/navigate-to-page.handler.js';
 import { createSetAutoLayoutHandler } from '../../src/features/layout/set-auto-layout.handler.js';
 import { createApplyAnimationStyleHandler } from '../../src/features/motion/apply-animation-style.handler.js';
 import { createApplyManualKeyframeTrackHandler } from '../../src/features/motion/apply-manual-keyframe-track.handler.js';
@@ -52,7 +53,6 @@ import { createOutlineStrokeHandler } from '../../src/features/vector/outline-st
 import { createSetVectorHandler } from '../../src/features/vector/set-vector.handler.js';
 import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
-import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
 import { createIdempotencyCache, idempotent } from '../../src/idempotency.js';
 import { makeFlowsFigma } from '../features/prototype/flows-fake.js';
 

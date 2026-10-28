@@ -1,7 +1,7 @@
 import type { MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createRenamePageHandler } from '../../src/handlers/rename-page.js';
+import { createRenamePageHandler } from '../../../src/features/files/rename-page.handler.js';
 
 const fakeFigma = (page: unknown): typeof figma =>
   ({ getNodeByIdAsync: async () => page }) as unknown as typeof figma;

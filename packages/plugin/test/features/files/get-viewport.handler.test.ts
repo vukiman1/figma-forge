@@ -1,7 +1,7 @@
 import type { GetViewportResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetViewportHandler } from '../../src/handlers/get-viewport.js';
+import { createGetViewportHandler } from '../../../src/features/files/get-viewport.handler.js';
 
 describe('get_viewport handler', () => {
   it('returns center / zoom / bounds from figma.viewport', async () => {

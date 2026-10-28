@@ -1,7 +1,7 @@
 import type { GetMetadataResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createGetMetadataHandler } from '../../src/handlers/get-metadata.js';
+import { createGetMetadataHandler } from '../../../src/features/files/get-metadata.handler.js';
 
 const fakeFigma = (input: {
   fileName: string;
@@ -42,11 +42,7 @@ describe('get_metadata handler', () => {
     });
   });
 
-  // This is the call an agent already makes to orient itself, and the editor decides which half of
-  // the toolset is even available — Dev Mode rejects every write, FigJam has no components,
-  // variables or styles. Reporting it here is what lets an agent plan instead of discover that by
-  // failing.
-  it('reports the editor the file is open in', async () => {
+  it('reports the editor the file is open in, so an agent can plan around what Dev Mode and FigJam refuse', async () => {
     const handler = createGetMetadataHandler(
       fakeFigma({
         fileName: 'Handoff',
@@ -62,8 +58,6 @@ describe('get_metadata handler', () => {
     expect(result).toMatchObject({ editorType: 'dev', mode: 'inspect' });
   });
 
-  // `figma.mode` is typed as always present, but it is Figma's value to supply. An absent one must
-  // degrade to the ordinary case rather than travel onward as undefined.
   it('falls back to default when the runtime reports no mode', async () => {
     const handler = createGetMetadataHandler(
       fakeFigma({ fileName: 'Old Client', currentPageId: 'p-1', pages }),
@@ -74,8 +68,7 @@ describe('get_metadata handler', () => {
     expect(result.mode).toBe('default');
   });
 
-  // In a Display P3 file every colour is P3 channels: the agent needs to know before it reads one.
-  it('reports the document colour profile', async () => {
+  it('reports the document colour profile, since a Display P3 file reads every colour as P3 channels', async () => {
     const figmaCtx = fakeFigma({ fileName: 'Wide', currentPageId: 'p-1', pages });
     (figmaCtx.root as { documentColorProfile?: string }).documentColorProfile = 'DISPLAY_P3';
     const result = (await createGetMetadataHandler(figmaCtx)(undefined)) as GetMetadataResult;

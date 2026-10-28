@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createAddPageHandler } from '../../src/handlers/add-page.js';
+import { createAddPageHandler } from '../../../src/features/files/add-page.handler.js';
 
 const fakeFigma = (): { figma: typeof figma; page: Record<string, unknown> } => {
   const page: Record<string, unknown> = { id: 'P:1', name: 'Page 1', type: 'PAGE' };
