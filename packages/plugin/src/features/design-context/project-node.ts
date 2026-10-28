@@ -5,7 +5,7 @@ import {
   type SerializedNode,
 } from '@figma-forge/core';
 
-import { serializeFlatSync } from '../../serializer.js';
+import { serializeFlatSync } from '../../serialize/serialize-node.js';
 import { dropDefaults } from './drop-defaults.js';
 import { projectText } from './project-text.js';
 import { cleanStyleIds } from './style-ids.js';

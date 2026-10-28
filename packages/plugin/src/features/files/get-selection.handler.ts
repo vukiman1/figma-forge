@@ -1,7 +1,8 @@
 import { GET_SELECTION_TOOL_NAME as TOOL, type GetSelectionResult } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { RESULT_LIMIT_LABEL, resultCharBudget, serializeFlatNodes } from '../../serializer.js';
+import { RESULT_LIMIT_LABEL, resultCharBudget } from '../../serialize/result-budget.js';
+import { serializeFlatNodes } from '../../serialize/serialize-runs.js';
 
 export const createGetSelectionHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>

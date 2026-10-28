@@ -6,7 +6,8 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { resultCharBudget, serializeTrees, treeTooLargeError } from '../../serializer.js';
+import { resultCharBudget, treeTooLargeError } from '../../serialize/result-budget.js';
+import { serializeTrees } from '../../serialize/serialize-runs.js';
 import { isSceneNode } from '../nodes/scene-node.js';
 import { parseParams } from '../parse-params.js';
 

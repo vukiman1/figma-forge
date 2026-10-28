@@ -1,6 +1,6 @@
 import type { DesignContextNode, GetDesignContextResult, ResolvedToken } from '@figma-forge/core';
 
-import { serializeCodeSyntax } from '../../serializer.js';
+import { serializeCodeSyntax } from '../../serialize/code-syntax.js';
 import { collectRefs } from './collect-refs.js';
 
 type TokenMaps = Pick<GetDesignContextResult, 'variables' | 'styles'>;

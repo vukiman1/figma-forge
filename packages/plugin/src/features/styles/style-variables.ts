@@ -1,6 +1,6 @@
 import type { GetStylesResult, ResolvedToken, SerializedBindings } from '@figma-forge/core';
 
-import { serializeCodeSyntax } from '../../serializer.js';
+import { serializeCodeSyntax } from '../../serialize/code-syntax.js';
 
 const idsOf = (bindings: SerializedBindings | undefined): string[] =>
   bindings === undefined ? [] : Object.values(bindings);

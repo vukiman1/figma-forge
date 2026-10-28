@@ -5,7 +5,8 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { RESULT_LIMIT_LABEL, resultCharBudget, serializeTrees } from '../../serializer.js';
+import { RESULT_LIMIT_LABEL, resultCharBudget } from '../../serialize/result-budget.js';
+import { serializeTrees } from '../../serialize/serialize-runs.js';
 import { isSceneNode } from '../nodes/scene-node.js';
 import { parseParams } from '../parse-params.js';
 

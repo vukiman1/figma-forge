@@ -1,14 +1,11 @@
 import type { FontUsage } from '@figma-forge/core';
 
-import { serializeFontName } from '../../serializer.js';
+import { isFontName, serializeFontName } from '../../serialize/font-name.js';
 
 type TextLike = TextNode | TextPathNode;
 
 const isTextLike = (node: SceneNode): node is TextLike =>
   node.type === 'TEXT' || node.type === 'TEXT_PATH';
-
-const isFontName = (value: unknown): value is FontName =>
-  typeof value === 'object' && value !== null && 'family' in value && 'style' in value;
 
 const usageKey = (font: FontName): string => {
   const settings = font.variationSettings ?? {};

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { collectMatches, flattenForest, resolveScope, walk } from '../src/traverse.js';
+import { collectMatches, flattenForest, resolveScope, walk } from '../../src/serialize/traverse.js';
 
 const node = (id: string, type: string, children?: SceneNode[]): SceneNode =>
   ({ id, type, name: id, children }) as unknown as SceneNode;
@@ -23,7 +23,6 @@ describe('walk', () => {
   });
 });
 
-// A frame whose `children` getter counts reads, the way Figma's native getter builds a new array.
 const countedFrame = (
   id: string,
   children: SceneNode[],
@@ -74,7 +73,6 @@ describe('collectMatches', () => {
         Array.from({ length: 500 }, (_, i) => node(`${i}`, 'TEXT')),
       ),
     ];
-    // Each Date.now() read advances 1ms, so slices end after a fixed number of nodes.
     let now = 0;
     const clock = vi.spyOn(Date, 'now').mockImplementation(() => (now += 1));
     try {
@@ -98,7 +96,6 @@ describe('flattenForest', () => {
     const flat = await flattenForest(forest());
     expect(flat.nodes.map(n => n.id)).toEqual(['a', 'b', 'c', 'd', 'e']);
     expect(flat.parents).toEqual([-1, 0, 1, 0, -1]);
-    // d has an empty children array — still a container; c and e are leaves.
     expect(flat.hasChildren).toEqual([true, true, false, true, false]);
   });
 });
@@ -167,10 +164,7 @@ describe('resolveScope', () => {
 
   it('returns [node] for a SceneNode root id', async () => {
     const target = node('1:2', 'FRAME');
-    const scope = await resolveScope(
-      fakeFigma({ lookup: { '1:2': target as unknown as BaseNode } }),
-      '1:2',
-    );
+    const scope = await resolveScope(fakeFigma({ lookup: { '1:2': target } }), '1:2');
     expect(scope.map(n => n.id)).toEqual(['1:2']);
   });
 

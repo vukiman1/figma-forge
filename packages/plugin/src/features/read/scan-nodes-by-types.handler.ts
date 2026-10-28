@@ -1,8 +1,9 @@
 import { SCAN_NODES_BY_TYPES_TOOL_NAME as TOOL, scanNodesByTypesParams } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { resultCharBudget, serializeFlatNodes, toNodeListResult } from '../../serializer.js';
-import { collectMatches, resolveScope } from '../../traverse.js';
+import { resultCharBudget } from '../../serialize/result-budget.js';
+import { serializeFlatNodes, toNodeListResult } from '../../serialize/serialize-runs.js';
+import { collectMatches, resolveScope } from '../../serialize/traverse.js';
 import { parseParams } from '../parse-params.js';
 
 export const createScanNodesByTypesHandler =

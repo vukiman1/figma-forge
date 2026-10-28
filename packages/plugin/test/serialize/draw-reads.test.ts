@@ -2,14 +2,13 @@ import type { SerializedTransformModifier } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import {
-  MAX_REPEAT_TRANSFORMS,
-  renderBoundsOf,
-  type RepeatChild,
-  repeatTransforms,
   serializeComplexStroke,
-  serializeTransformModifiers,
   serializeVariableWidthStroke,
-} from '../src/draw.js';
+} from '../../src/serialize/draw-strokes.js';
+import { renderBoundsOf } from '../../src/serialize/render-bounds.js';
+import { type RepeatChild } from '../../src/serialize/repeat-box.js';
+import { serializeTransformModifiers } from '../../src/serialize/repeat-fields.js';
+import { MAX_REPEAT_TRANSFORMS, repeatTransforms } from '../../src/serialize/repeat-transforms.js';
 
 type Affine = RepeatChild['absoluteTransform'];
 
@@ -45,11 +44,7 @@ const radial = (
 });
 
 describe('repeatTransforms', () => {
-  // Every expectation below is what Figma's own SVG export of the same group writes as its
-  // `<use transform>` list (rounded to 2 dp), recorded from live files.
-
   it('turns a RADIAL copy about a centre straight below the content, offset being the diameter', () => {
-    // A 6×20 tick, 12 copies, offset 70: the dial in the live probe.
     const out = repeatTransforms(
       at(57.90011215209961, 39.90011215209961),
       [{ width: 6, height: 20, absoluteTransform: at(100, 40.00000128895044) }],
@@ -63,7 +58,6 @@ describe('repeatTransforms', () => {
   });
 
   it('repeats everything the first modifier drew, in the order Figma lists the copies', () => {
-    // Two ticks 4 px apart, then four of that pair round a circle 30 px across.
     const out = repeatTransforms(
       at(79.5049057006836, 99.5049057006836),
       [{ width: 6, height: 20, absoluteTransform: at(100.00000381469727, 100.00000327825546) }],
@@ -81,7 +75,6 @@ describe('repeatTransforms', () => {
   });
 
   it('sizes a RELATIVE step from the union of every child', () => {
-    // Children spanning 20→216 (196 wide): 1.2 × 196 = 235.2 per copy, then three rows 30 apart.
     const out = repeatTransforms(
       at(20, 20),
       [
@@ -101,18 +94,15 @@ describe('repeatTransforms', () => {
   });
 
   it('takes a RELATIVE RADIAL radius from the content height', () => {
-    // A 40×10 bar, offset 1: a circle 10 px across, centre 5 px below the bar's centre.
     const out = repeatTransforms(
       at(0, 0),
       [{ width: 40, height: 10, absoluteTransform: at(0, 0) }],
       [radial(1, 2, 'RELATIVE')],
     );
-    // A half turn about (20, 10) lands the copy at 2 × centre.
     expect(out).toEqual(['translate(40px, 20px) rotate(180deg)']);
   });
 
   it('does not grow the content box for a step backwards', () => {
-    // Stepping −4 then RELATIVE 1: the second step is the original 10 px, not 14 (measured).
     const out = repeatTransforms(
       at(0, 0),
       [{ width: 10, height: 10, absoluteTransform: at(0, 0) }],
@@ -122,8 +112,6 @@ describe('repeatTransforms', () => {
   });
 
   it('hands the next modifier the square the RADIAL content sweeps, not its copies', () => {
-    // A 20×20 square turned about a centre 10 px below its own: its far corners reach
-    // hypot(10, 20) ≈ 22.36 out, so the next RELATIVE step is 2 × 22.36 = 44.72.
     const out = repeatTransforms(
       at(0, 0),
       [{ width: 20, height: 20, absoluteTransform: at(0, 0) }],
@@ -140,7 +128,6 @@ describe('repeatTransforms', () => {
         [Math.sin(r), Math.cos(r), y],
       ];
     };
-    // The same group and child, both turned 30° about the group's origin.
     const flat = repeatTransforms(
       at(0, 0),
       [{ width: 6, height: 20, absoluteTransform: at(12, 0) }],
@@ -161,7 +148,6 @@ describe('repeatTransforms', () => {
     expect(repeatTransforms(at(0, 0), child, [])).toBeUndefined();
     expect(repeatTransforms(at(0, 0), [], [linear('HORIZONTAL', 4, 3)])).toBeUndefined();
     expect(repeatTransforms(at(0, 0), child, [{ type: 'SKEW' }])).toBeUndefined();
-    // Too many copies to be worth spelling out.
     const count = Math.ceil(Math.sqrt(MAX_REPEAT_TRANSFORMS + 2));
     expect(
       repeatTransforms(at(0, 0), child, [
@@ -246,7 +232,6 @@ describe('Draw field serializers', () => {
     const box = { x: 40, y: 300, width: 150, height: 23.09 };
     expect(renderBoundsOf({ x: 40.2, y: 300.1, width: 150, height: 23.2 }, box)).toBeUndefined();
     expect(renderBoundsOf(null, box)).toBeUndefined();
-    // A dynamic stroke painting well past its path's box.
     expect(renderBoundsOf({ x: 37.16, y: 267.14, width: 155.88, height: 85.86 }, box)).toEqual({
       x: -2.84,
       y: -32.86,
@@ -256,7 +241,6 @@ describe('Draw field serializers', () => {
   });
 
   it('measures from the node’s own x / y, which a rotated node’s bounding box does not start at', () => {
-    // A 469 × 59 stroke at (1471.68, 1308) turned −8.86°: its box starts 9.15 px left of its origin.
     const box = { x: 1462.53, y: 1308, width: 472.79, height: 130.95 };
     const render = { x: 1471.08, y: 1285.91, width: 455.92, height: 164.46 };
     expect(renderBoundsOf(render, box)).toMatchObject({ x: 8.55, y: -22.09 });
@@ -271,8 +255,6 @@ describe('Draw field serializers', () => {
 
 describe('repeat copies of a turned group', () => {
   it('are written in the parent’s axes, about the group’s origin', () => {
-    // Turned 90° counter-clockwise (Figma's [[0, 1], [-1, 0]]): a step along the group's own x
-    // axis goes up the page.
     const turned = [
       [0, 1, 0],
       [-1, 0, 0],

@@ -6,7 +6,7 @@ import { createPluginContextEvent, type PluginContextEvent } from '../../protoco
 import { createHostYield } from '../../protocol/host-yield.js';
 import { createSearchNodesHandler } from '../../src/features/read/search-nodes.handler.js';
 import { resetThrottleForTests, resumeHostYield } from '../../src/runtime/cooperative.js';
-import { serializeTrees } from '../../src/serializer.js';
+import { serializeTrees } from '../../src/serialize/serialize-runs.js';
 import type { ActivityEntry, RelayClientState } from '../../ui/relay/state.js';
 
 /**

@@ -5,7 +5,7 @@ import { ALL_TOOL_SPECS } from '../packages/mcp/src/tools/registry.js';
 import { WIRE_TOOL_SCHEMAS } from '../packages/mcp/src/tools/wire-schema.js';
 import { project } from '../packages/plugin/src/features/design-context/project-node.js';
 import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
-import { serializeFlatSync } from '../packages/plugin/src/serializer.js';
+import { serializeFlatSync } from '../packages/plugin/src/serialize/serialize-node.js';
 
 // Figma is the external boundary. Schemas, dispatch, writes, reads and batch rollback stay real.
 const setup = () => {

@@ -1,12 +1,10 @@
 import type { GetStylesResult, SerializedLineHeight, SerializedTextStyle } from '@figma-forge/core';
 
-import {
-  collectBindings,
-  serializeEffect,
-  serializeFontName,
-  serializeLayoutGrid,
-  serializePaint,
-} from '../../serializer.js';
+import { collectBindings } from '../../serialize/bindings.js';
+import { serializeEffect } from '../../serialize/effect.js';
+import { serializeFontName } from '../../serialize/font-name.js';
+import { serializeLayoutGrid } from '../../serialize/layout-grid.js';
+import { serializePaint } from '../../serialize/paint.js';
 
 const identityOf = (style: BaseStyle) => ({
   id: style.id,

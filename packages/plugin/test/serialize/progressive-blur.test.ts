@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { cssProgressiveBlurLayers, progressiveMaskLine } from '../src/progressive-blur.js';
-
-// The expected values are the recipe that was rendered in Chrome and measured against Figma's own
-// renders (mean |Δ| 2.2–2.5 for background blurs, 0.7–1.0 for layer blurs), recomputed independently.
+import {
+  cssProgressiveBlurLayers,
+  progressiveMaskLine,
+} from '../../src/serialize/progressive-blur.js';
 
 describe('progressiveMaskLine', () => {
   it.each([
     ['left → right on a square', 200, 200, { x: 0, y: 0.5 }, { x: 1, y: 0.5 }, 90, 0, 100],
     ['top → bottom', 240, 240, { x: 0.5, y: 0 }, { x: 0.5, y: 1 }, 180, 0, 100],
     ['bottom → top', 200, 200, { x: 0.5, y: 1 }, { x: 0.5, y: 0 }, 0, 0, 100],
-    // The node's proportions turn the angle, and offsets inside the box land inside the line.
     [
       'diagonal, inside a 200×120 box',
       200,

@@ -5,7 +5,7 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { serializeCodeSyntax } from '../../serializer.js';
+import { serializeCodeSyntax } from '../../serialize/code-syntax.js';
 import { parseParams } from '../parse-params.js';
 import { requireVariable } from './lookup.js';
 

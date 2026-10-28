@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { resetThrottleForTests } from '../src/runtime/cooperative.js';
-import { serializeFlatNodes, serializeTrees } from '../src/serializer.js';
+import { resetThrottleForTests } from '../../src/runtime/cooperative.js';
+import { serializeFlatNodes, serializeTrees } from '../../src/serialize/serialize-runs.js';
 
 describe('native-read time slicing', () => {
   beforeEach(() => {

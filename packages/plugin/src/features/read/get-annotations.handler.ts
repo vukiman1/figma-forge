@@ -6,8 +6,8 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { serializeAnnotation } from '../../serializer.js';
-import { walk } from '../../traverse.js';
+import { serializeAnnotation } from '../../serialize/annotation.js';
+import { walk } from '../../serialize/traverse.js';
 import { parseParams } from '../parse-params.js';
 
 const annotationsOf = (node: BaseNode): NodeAnnotations[] => {

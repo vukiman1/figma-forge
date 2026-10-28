@@ -1,6 +1,6 @@
 import type { GetVectorResult } from '@figma-forge/core';
 
-import { serializePaint } from '../../serializer.js';
+import { serializePaint } from '../../serialize/paint.js';
 
 type WireNetwork = GetVectorResult['vectorNetwork'];
 type WireRegion = NonNullable<WireNetwork['regions']>[number];

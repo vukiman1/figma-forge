@@ -1,6 +1,6 @@
 import type { DesignContextNode, DetailLevel } from '@figma-forge/core';
 
-import { inheritRepeat } from '../../serializer.js';
+import { inheritRepeat } from '../../serialize/serialize-node.js';
 import { childrenOf } from './child-nodes.js';
 import { depthBelow } from './depth.js';
 import { hasDrawStroke } from './draw-stroke.js';

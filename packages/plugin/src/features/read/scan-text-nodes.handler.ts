@@ -1,8 +1,9 @@
 import { SCAN_TEXT_NODES_TOOL_NAME as TOOL, scanTextNodesParams } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
-import { resultCharBudget, serializeFlatNodes, toNodeListResult } from '../../serializer.js';
-import { collectMatches, resolveScope } from '../../traverse.js';
+import { resultCharBudget } from '../../serialize/result-budget.js';
+import { serializeFlatNodes, toNodeListResult } from '../../serialize/serialize-runs.js';
+import { collectMatches, resolveScope } from '../../serialize/traverse.js';
 import { parseParams } from '../parse-params.js';
 
 const isCopy = (node: SceneNode): boolean => node.type === 'TEXT' || node.type === 'TEXT_PATH';
