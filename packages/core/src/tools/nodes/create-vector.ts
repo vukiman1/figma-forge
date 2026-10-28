@@ -6,15 +6,21 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_VECTOR_TOOL_NAME = 'create_vector';
 
-export const createVectorParams = z.object({
-  parentId: z.string().optional().describe('Container node id; omit for current page'),
-  name: z.string().optional().describe('Layer name'),
-  x: z.number().optional().describe('Where the drawing’s x = 0 falls in the parent (default 0)'),
-  y: z.number().optional().describe('Where the drawing’s y = 0 falls in the parent (default 0)'),
-  vectorPaths: vectorPathsSchema.optional(),
-  vectorNetwork: vectorNetworkSchema.optional(),
-  ...initialStyleShape,
-});
+export const createVectorParams = z
+  .object({
+    parentId: z.string().optional().describe('Container node id; omit for current page'),
+    name: z.string().optional().describe('Layer name'),
+    x: z.number().optional().describe('Where the drawing’s x = 0 falls in the parent (default 0)'),
+    y: z.number().optional().describe('Where the drawing’s y = 0 falls in the parent (default 0)'),
+    vectorPaths: vectorPathsSchema.optional(),
+    vectorNetwork: vectorNetworkSchema.optional(),
+    ...initialStyleShape,
+  })
+  .refine(
+    ({ vectorPaths, vectorNetwork }) =>
+      (vectorPaths === undefined) !== (vectorNetwork === undefined),
+    { error: 'give exactly one of vectorPaths or vectorNetwork' },
+  );
 
 export const createVectorTool: ToolSpec = {
   name: CREATE_VECTOR_TOOL_NAME,

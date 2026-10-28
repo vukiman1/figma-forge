@@ -98,6 +98,10 @@ import { createSetNodeVariableModeHandler } from '../features/variables/set-node
 import { createSetVariableCodeSyntaxHandler } from '../features/variables/set-variable-code-syntax.handler.js';
 import { createSetVariableValueHandler } from '../features/variables/set-variable-value.handler.js';
 import { createUpdateVariableCollectionHandler } from '../features/variables/update-variable-collection.handler.js';
+import { createCreateVectorHandler } from '../features/vector/create-vector.handler.js';
+import { createGetVectorHandler } from '../features/vector/get-vector.handler.js';
+import { createOutlineStrokeHandler } from '../features/vector/outline-stroke.handler.js';
+import { createSetVectorHandler } from '../features/vector/set-vector.handler.js';
 import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
 import { createAddPageHandler } from './add-page.js';
@@ -124,12 +128,6 @@ import { createSaveImageFillsHandler } from './save-image-fills.js';
 import { createScanNodesByTypesHandler } from './scan-nodes-by-types.js';
 import { createScanTextNodesHandler } from './scan-text-nodes.js';
 import { createSearchNodesHandler } from './search-nodes.js';
-import {
-  createCreateVectorHandler,
-  createGetVectorHandler,
-  createOutlineStrokeHandler,
-  createSetVectorHandler,
-} from './vector.js';
 
 /**
  * Build the full sandbox handler map. Read handlers run as-is; write handlers are wrapped with

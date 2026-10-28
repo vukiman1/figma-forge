@@ -47,14 +47,12 @@ import { createRenameVariableHandler } from '../../src/features/variables/rename
 import { createSetVariableCodeSyntaxHandler } from '../../src/features/variables/set-variable-code-syntax.handler.js';
 import { createSetVariableValueHandler } from '../../src/features/variables/set-variable-value.handler.js';
 import { createUpdateVariableCollectionHandler } from '../../src/features/variables/update-variable-collection.handler.js';
+import { createCreateVectorHandler } from '../../src/features/vector/create-vector.handler.js';
+import { createOutlineStrokeHandler } from '../../src/features/vector/outline-stroke.handler.js';
+import { createSetVectorHandler } from '../../src/features/vector/set-vector.handler.js';
 import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
 import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
-import {
-  createCreateVectorHandler,
-  createOutlineStrokeHandler,
-  createSetVectorHandler,
-} from '../../src/handlers/vector.js';
 import { createIdempotencyCache, idempotent } from '../../src/idempotency.js';
 import { makeFlowsFigma } from '../features/prototype/flows-fake.js';
 

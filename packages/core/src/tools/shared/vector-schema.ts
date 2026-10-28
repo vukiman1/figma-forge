@@ -4,6 +4,39 @@ import { paintItemSchema } from '../shared/paint-schema.js';
 
 const point = z.object({ x: z.number(), y: z.number() });
 
+interface IndexedNetwork {
+  readonly vertices: readonly unknown[];
+  readonly segments: readonly { readonly start: number; readonly end: number }[];
+  readonly regions?: readonly { readonly loops: readonly (readonly number[])[] }[] | undefined;
+}
+
+const SEGMENT_ENDS = ['start', 'end'] as const;
+
+const requireVertexIndices = (network: IndexedNetwork, ctx: z.RefinementCtx): void => {
+  const count = network.vertices.length;
+  network.segments.forEach((segment, index) => {
+    for (const end of SEGMENT_ENDS.filter(name => segment[name] >= count)) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['segments', index, end],
+        message: `must name one of the ${count} vertices (0–${count - 1})`,
+      });
+    }
+  });
+};
+
+const requireSegmentIndices = (network: IndexedNetwork, ctx: z.RefinementCtx): void => {
+  const count = network.segments.length;
+  (network.regions ?? []).forEach((region, index) => {
+    if (region.loops.every(loop => loop.every(segment => segment < count))) return;
+    ctx.addIssue({
+      code: 'custom',
+      path: ['regions', index, 'loops'],
+      message: `must list segment indices (0–${count - 1})`,
+    });
+  });
+};
+
 export const vectorPathsSchema = z
   .array(
     z.object({
@@ -15,6 +48,7 @@ export const vectorPathsSchema = z
       data: z
         .string()
         .min(1)
+        .refine(data => data.trim() !== '', { error: 'must be SVG path data' })
         .describe(
           'SVG path data in any syntax — relative commands, H / V, S / T, arcs and minified icon paths ' +
             'included; it is rewritten into the absolute M / L / C / Q / Z form Figma stores',
@@ -78,6 +112,8 @@ export const vectorNetworkSchema = z
       .describe('Closed areas that take a fill; omit for a stroke-only drawing')
       .optional(),
   })
+  .superRefine(requireVertexIndices)
+  .superRefine(requireSegmentIndices)
   .describe(
     'Vertices joined by segments — unlike SVG paths, a vertex may join three or more segments (a ' +
       'branching drawing). Each segment may curve through Bézier tangents.',

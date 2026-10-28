@@ -5,11 +5,17 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const SET_VECTOR_TOOL_NAME = 'set_vector';
 
-export const setVectorParams = z.object({
-  nodeId: z.string().describe('The VECTOR to redraw'),
-  vectorPaths: vectorPathsSchema.optional(),
-  vectorNetwork: vectorNetworkSchema.optional(),
-});
+export const setVectorParams = z
+  .object({
+    nodeId: z.string().describe('The VECTOR to redraw'),
+    vectorPaths: vectorPathsSchema.optional(),
+    vectorNetwork: vectorNetworkSchema.optional(),
+  })
+  .refine(
+    ({ vectorPaths, vectorNetwork }) =>
+      (vectorPaths === undefined) !== (vectorNetwork === undefined),
+    { error: 'give exactly one of vectorPaths or vectorNetwork' },
+  );
 
 export const setVectorTool: ToolSpec = {
   name: SET_VECTOR_TOOL_NAME,
