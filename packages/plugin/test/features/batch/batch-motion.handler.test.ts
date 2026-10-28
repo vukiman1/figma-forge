@@ -23,7 +23,7 @@ describe('batch Motion inverses', () => {
     expect(a.animationStyles).toHaveLength(0);
   });
 
-  it('restores a prior PROPERTY keyframe track on rollback', async () => {
+  it('restores a prior PROPERTY keyframe track on rollback, which keeps that track’s ids', async () => {
     const OLD = {
       baseValue: { type: 'FLOAT', value: 0 },
       keyframes: [{ timelinePosition: 0, value: { type: 'FLOAT', value: 0 } }],

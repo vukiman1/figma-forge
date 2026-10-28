@@ -70,7 +70,7 @@ describe('batch inverse for update_flows', () => {
     expect(page.flowStartingPoints).toEqual(before);
   });
 
-  it('restores the order when an earlier op hid one of the flows', async () => {
+  it('restores the order when an earlier op hid one of the flows, only after the whole unwind since Figma refuses a list naming a hidden frame', async () => {
     const { page, before, handler } = setup();
     await expect(
       handler({

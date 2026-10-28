@@ -50,7 +50,7 @@ describe('restoreGeometry', () => {
     expect(placed).toEqual([]);
   });
 
-  it('writes bounds, positioning, the sizing primitives, then the size and transform', () => {
+  it('writes bounds, positioning, the sizing primitives, then the size and transform — a size written while FILL is overridden by the layout', () => {
     const log: string[] = [];
     const state: Record<string, unknown> = {
       maxWidth: null,

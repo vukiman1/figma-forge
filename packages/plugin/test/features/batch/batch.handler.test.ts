@@ -153,7 +153,7 @@ describe('batch handler', () => {
     expect(store.get('a')).toMatchObject({ parent: group });
   });
 
-  it('refuses taking a variant out of its set at capture', async () => {
+  it('refuses taking a variant out of its set at capture, since the set’s variant properties cannot be put back', async () => {
     const set: Record<string, unknown> = { id: 'S', type: 'COMPONENT_SET' };
     const variant = { id: 'v', type: 'COMPONENT', name: 'State=A', parent: set };
     const other = { id: 'w', type: 'COMPONENT', name: 'State=B', parent: set };

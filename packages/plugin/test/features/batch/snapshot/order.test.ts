@@ -20,7 +20,7 @@ describe('restoreOrder', () => {
     return parent;
   };
 
-  it('rebuilds a shuffled child order exactly', async () => {
+  it('rebuilds a shuffled child order exactly, placing ascending since insertChild counts the index before removing the node', async () => {
     const parent = container(['a', 'b', 'c', 'd']);
     const store = new Map<string, Node>([
       ['P', parent],

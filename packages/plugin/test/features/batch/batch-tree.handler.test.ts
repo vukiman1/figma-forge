@@ -10,7 +10,7 @@ import { FAIL } from './batch-fake.js';
 import { type TreeNode, makeTree, ids } from './batch-tree-fake.js';
 
 describe('batch inverses for tree structure', () => {
-  it('puts a node taken into auto-layout back where it was, position included', async () => {
+  it('puts a node taken into auto-layout back where it was, position included, since leaving auto-layout drops it', async () => {
     const { node, figmaCtx } = makeTree();
     const page = node('P0', 'PAGE', null);
     const plain = node('P1', 'FRAME', page);
@@ -66,7 +66,7 @@ describe('batch inverses for tree structure', () => {
     expect([...store.keys()].filter(k => k.startsWith('G:'))).toEqual([]);
   });
 
-  it('un-combines components: order, names, and the properties the set handed out', async () => {
+  it('un-combines components: order, names, and the copies of shared properties the set handed every variant', async () => {
     const { node, store, figmaCtx } = makeTree();
     const page = node('P0', 'PAGE', null);
     const component = (id: string, defs: Record<string, unknown>) =>

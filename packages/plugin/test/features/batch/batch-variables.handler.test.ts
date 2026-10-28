@@ -98,7 +98,7 @@ describe('batch inverses for the newly batchable writes', () => {
     expect((variable.valuesByMode as Record<string, unknown>).m1).toEqual(composed);
   });
 
-  it('restores a collection name and every mode name it renamed', async () => {
+  it('restores a collection name and every mode name it renamed, whose ids a rename keeps', async () => {
     const { figmaCtx, store, collections } = makeWide();
     failingFrame(store);
     const collection: Record<string, unknown> = {

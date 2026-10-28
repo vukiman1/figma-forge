@@ -61,7 +61,7 @@ const makeInstance = () => {
 };
 
 describe('instance override guard', () => {
-  it('resets the instance and re-applies only the overrides it had, when an undo left a mark', async () => {
+  it('resets the instance and re-applies only the overrides it had, since a field written back to its old value stays listed as an override', async () => {
     const { instance, sublayer, figmaCtx } = makeInstance();
     const a = sublayer('I;1', { fills: ['red'], name: 'A' });
     const b = sublayer('I;2', { fills: ['red'], name: 'B' });

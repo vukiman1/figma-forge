@@ -42,7 +42,7 @@ describe('batch handler', () => {
     expect(loadFontAsync).toHaveBeenCalledWith(INTER_BOLD);
   });
 
-  it('brings back the runs a set_text restyled', async () => {
+  it('brings back the runs a set_text restyled, which writing characters flattens to the first run’s style', async () => {
     const text = fakeText('1:1', 'Hello World');
     (text.setRangeFontName as (s: number, e: number, v: unknown) => void)(6, 11, INTER_BOLD);
     (text.setRangeFills as (s: number, e: number, v: unknown) => void)(0, 5, [SOLID(0.9)]);

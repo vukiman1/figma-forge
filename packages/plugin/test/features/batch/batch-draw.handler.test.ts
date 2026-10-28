@@ -11,7 +11,7 @@ import { makeFigma, SOLID, FAIL } from './batch-fake.js';
 import { makeTree, ids } from './batch-tree-fake.js';
 
 describe('batch inverses for Figma Draw', () => {
-  it('undoes repeat_nodes like group_nodes: content back in place, the repeat group gone', async () => {
+  it('undoes repeat_nodes like group_nodes: content back in place, the repeat group gone — ungrouping keeps every child’s id and place', async () => {
     const { node, store, figmaCtx } = makeTree();
     const page = node('P0', 'PAGE', null);
     const p = node('P', 'FRAME', page);
