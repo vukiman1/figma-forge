@@ -1,19 +1,3 @@
-/**
- * Tool RPC across the plugin's own iframe boundary: the panel hands a tool call down to the
- * sandbox, which executes it against the Figma API and answers with a result or an error. Plus the
- * one-way context event the sandbox pushes back up so the panel can show what the plugin sees.
- *
- * This binds the panel and the sandbox — the same two parties as `panel-control.ts`, which is why
- * both live here rather than in `@figma-forge/core`. The relay carries these calls, but the MCP
- * server never constructs or reads one: it addresses tools by name over the wire protocol in
- * `shared`, and what crosses this boundary afterwards is the plugin's own business.
- *
- * Zod, unlike the panel-control channel next door, is warranted here: `params` and `result` are
- * `unknown` by construction — they carry whatever the agent asked for and whatever the Figma API
- * returned — so the tag and envelope are the only things a receiver can check before trusting the
- * message at all.
- */
-
 import { z } from 'zod';
 
 export const PLUGIN_BRIDGE_TAG = '@figma-forge/bridge';
@@ -54,24 +38,14 @@ export type PluginToolResult = z.infer<typeof PluginToolResultSchema>;
 export type PluginToolError = z.infer<typeof PluginToolErrorSchema>;
 export type PluginBridgeMessage = z.infer<typeof PluginBridgeMessageSchema>;
 
-/**
- * A `tool-error` reply carried across the iframe boundary as an Error, with its `code` still a
- * field.
- *
- * A rejected promise can only carry one value, so the UI used to fold the code into the message
- * (`${code}: ${message}`). The relay client then could not tell the two apart again: it read
- * `err.message` — which already named the code — and sent it alongside a hardcoded
- * `INTERNAL_ERROR`, so the real code never reached the server and the server's own `${code}:
- * ${message}` produced a second prefix. Keeping the code addressable is what makes both of those go
- * away.
- */
 export class PluginToolFailure extends Error {
+  override readonly name = 'PluginToolFailure';
+
   constructor(
     readonly code: string,
     message: string,
   ) {
     super(message);
-    this.name = 'PluginToolFailure';
   }
 }
 
@@ -106,20 +80,14 @@ export const createToolError = (input: {
   message: input.message,
 });
 
+const hasBridgeTag = (raw: unknown): boolean =>
+  typeof raw === 'object' && raw !== null && 'tag' in raw && raw.tag === PLUGIN_BRIDGE_TAG;
+
 export const isPluginBridgeMessage = (raw: unknown): raw is PluginBridgeMessage => {
-  if (typeof raw !== 'object' || raw === null) return false;
-  if (!('tag' in raw) || (raw as { tag: unknown }).tag !== PLUGIN_BRIDGE_TAG) return false;
+  if (!hasBridgeTag(raw)) return false;
   return PluginBridgeMessageSchema.safeParse(raw).success;
 };
 
-// ── sandbox → UI context push ────────────────────────────────────────────────
-// A one-way event the sandbox emits (on init / page change / selection change) so the UI can show
-// what the plugin currently sees. Kept out of the tool-call request/response variant on purpose.
-
-/**
- * Cap on per-node selection detail carried in a context event (selectionCount keeps the true
- * total).
- */
 export const SELECTION_DETAIL_LIMIT = 25;
 
 export const SelectionItemSchema = z.object({
@@ -137,15 +105,8 @@ export const PluginContextEventSchema = z.object({
   pageId: z.string(),
   pageName: z.string(),
   selectionCount: z.number(),
-  /** Per-node detail for the first SELECTION_DETAIL_LIMIT selected nodes. */
   selection: z.array(SelectionItemSchema),
   editorType: z.string(),
-  /**
-   * `figma.mode` — how the plugin was launched, not which editor it is in. The two are independent
-   * and the panel needs both: `editorType` says what the document allows, while `mode` says whether
-   * our UI is a floating window (`default`) or an iframe filling Dev Mode's Inspect panel
-   * (`inspect`), where the window chrome we draw ourselves has nothing to act on.
-   */
   mode: z.string(),
   apiVersion: z.string(),
 });
@@ -156,7 +117,6 @@ export const createPluginContextEvent = (
 ): PluginContextEvent => ({ tag: PLUGIN_BRIDGE_TAG, kind: 'context', ...input });
 
 export const isPluginContextEvent = (raw: unknown): raw is PluginContextEvent => {
-  if (typeof raw !== 'object' || raw === null) return false;
-  if (!('tag' in raw) || (raw as { tag: unknown }).tag !== PLUGIN_BRIDGE_TAG) return false;
+  if (!hasBridgeTag(raw)) return false;
   return PluginContextEventSchema.safeParse(raw).success;
 };

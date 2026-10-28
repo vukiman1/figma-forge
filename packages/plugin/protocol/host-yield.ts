@@ -1,9 +1,8 @@
-/** The sandbox hands a host turn to the panel, which replies from a message task, not a timer. */
 export const HOST_YIELD_TAG = '@figma-forge/yield';
 
 interface HostYieldBase {
-  tag: typeof HOST_YIELD_TAG;
-  id: number;
+  readonly tag: typeof HOST_YIELD_TAG;
+  readonly id: number;
 }
 
 export type HostYieldMessage = HostYieldBase &
@@ -18,14 +17,21 @@ export const createHostYield = (
     ? { tag: HOST_YIELD_TAG, kind, id }
     : { tag: HOST_YIELD_TAG, kind, id, background };
 
-/** Both ends ship together; only the tag, direction and correlation id cross this channel. */
+const isHostYieldKind = (kind: unknown): kind is HostYieldMessage['kind'] =>
+  kind === 'yield-request' || kind === 'yield-resume';
+
+const isYieldId = (id: unknown): id is number =>
+  typeof id === 'number' && Number.isSafeInteger(id) && id > 0;
+
+const fieldOf = (raw: object, key: string): unknown => Reflect.get(raw, key);
+
 export const parseHostYield = (raw: unknown): HostYieldMessage | null => {
-  if (raw === null || typeof raw !== 'object') return null;
-  const message = raw as Record<string, unknown>;
-  if (message.tag !== HOST_YIELD_TAG) return null;
-  if (message.kind !== 'yield-request' && message.kind !== 'yield-resume') return null;
-  if (message.kind === 'yield-resume' && typeof message.background !== 'boolean') return null;
-  if (typeof message.id !== 'number' || !Number.isSafeInteger(message.id) || message.id <= 0)
+  if (raw === null || typeof raw !== 'object' || fieldOf(raw, 'tag') !== HOST_YIELD_TAG)
     return null;
-  return createHostYield(message.id, message.kind, message.background === true);
+  const kind = fieldOf(raw, 'kind');
+  const id = fieldOf(raw, 'id');
+  const background = fieldOf(raw, 'background');
+  if (!isHostYieldKind(kind) || !isYieldId(id)) return null;
+  if (kind === 'yield-resume' && typeof background !== 'boolean') return null;
+  return createHostYield(id, kind, background === true);
 };
