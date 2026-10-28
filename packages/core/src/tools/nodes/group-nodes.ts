@@ -5,7 +5,7 @@ import type { ToolSpec } from '../tool-spec.js';
 export const GROUP_NODES_TOOL_NAME = 'group_nodes';
 
 export const groupNodesParams = z.object({
-  nodeIds: z.array(z.string()).describe('Node ids to group'),
+  nodeIds: z.array(z.string()).min(1).describe('Node ids to group'),
   name: z.string().optional().describe('Optional name for the new group'),
 });
 

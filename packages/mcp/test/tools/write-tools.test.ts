@@ -194,7 +194,7 @@ describe('M2 write tool definitions', () => {
     expect(setMaskToolDefinition.name).toBe(SET_MASK_TOOL_NAME);
     expect(setMaskToolDefinition.inputSchema).toMatchObject({
       required: ['nodeId', 'isMask'],
-      properties: { maskType: { enum: ['ALPHA', 'LUMINANCE', 'GEOMETRY'] } },
+      properties: { maskType: { enum: ['ALPHA', 'VECTOR', 'LUMINANCE'] } },
     });
     expect(rotateNodesToolDefinition.name).toBe(ROTATE_NODES_TOOL_NAME);
     expect(rotateNodesToolDefinition.inputSchema).toMatchObject({

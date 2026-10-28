@@ -6,7 +6,7 @@ export const RENAME_NODE_TOOL_NAME = 'rename_node';
 
 export const renameNodeParams = z.object({
   nodeId: z.string().describe('Figma node id'),
-  name: z.string().describe('New layer name'),
+  name: z.string().min(1).describe('New layer name'),
 });
 
 export const renameNodeTool: ToolSpec = {

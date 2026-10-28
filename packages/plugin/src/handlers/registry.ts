@@ -23,6 +23,22 @@ import { createGetNodeMotionHandler } from '../features/motion/get-node-motion.h
 import { createRemoveAnimationStyleHandler } from '../features/motion/remove-animation-style.handler.js';
 import { createRemoveManualKeyframeTrackHandler } from '../features/motion/remove-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../features/motion/set-timeline-duration.handler.js';
+import { createBatchRenameNodesHandler } from '../features/nodes/batch-rename-nodes.handler.js';
+import { createCloneNodeHandler } from '../features/nodes/clone-node.handler.js';
+import { createDeleteNodesHandler } from '../features/nodes/delete-nodes.handler.js';
+import { createFlipNodesHandler } from '../features/nodes/flip-nodes.handler.js';
+import { createGroupNodesHandler } from '../features/nodes/group-nodes.handler.js';
+import { createLockNodesHandler } from '../features/nodes/lock-nodes.handler.js';
+import { createMoveNodesHandler } from '../features/nodes/move-nodes.handler.js';
+import { createRenameNodeHandler } from '../features/nodes/rename-node.handler.js';
+import { createReorderNodesHandler } from '../features/nodes/reorder-nodes.handler.js';
+import { createReparentNodesHandler } from '../features/nodes/reparent-nodes.handler.js';
+import { createRotateNodesHandler } from '../features/nodes/rotate-nodes.handler.js';
+import { createSetMaskHandler } from '../features/nodes/set-mask.handler.js';
+import { createSetPositionHandler } from '../features/nodes/set-position.handler.js';
+import { createSetVisibleHandler } from '../features/nodes/set-visible.handler.js';
+import { createUngroupNodesHandler } from '../features/nodes/ungroup-nodes.handler.js';
+import { createUnlockNodesHandler } from '../features/nodes/unlock-nodes.handler.js';
 import { createSetBlendModeHandler } from '../features/paint/set-blend-mode.handler.js';
 import { createSetComplexStrokeHandler } from '../features/paint/set-complex-stroke.handler.js';
 import { createSetCornerRadiusHandler } from '../features/paint/set-corner-radius.handler.js';
@@ -71,22 +87,18 @@ import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
 import { createAddPageHandler } from './add-page.js';
 import { createAlignNodesHandler } from './align-nodes.js';
-import { createBatchRenameNodesHandler } from './batch-rename-nodes.js';
 import { createBatchHandler } from './batch.js';
 import { createBooleanNodesHandler } from './boolean-nodes.js';
-import { createCloneNodeHandler } from './clone-node.js';
 import { createCreateEllipseHandler } from './create-ellipse.js';
 import { createCreateFrameHandler } from './create-frame.js';
 import { createCreateRectangleHandler } from './create-rectangle.js';
 import { createCreateSectionHandler } from './create-section.js';
 import { createCreateShapeHandler } from './create-shape.js';
 import { createCreateTextHandler } from './create-text.js';
-import { createDeleteNodesHandler } from './delete-nodes.js';
 import { createDeletePageHandler } from './delete-page.js';
 import { createExportPdfHandler } from './export-pdf.js';
 import { createExportVideoHandler } from './export-video.js';
 import { createFlattenNodesHandler } from './flatten-nodes.js';
-import { createFlipNodesHandler } from './flip-nodes.js';
 import { createGetAnnotationsHandler } from './get-annotations.js';
 import { createGetDesignContextHandler } from './get-design-context.js';
 import { createGetDocumentHandler } from './get-document.js';
@@ -98,30 +110,19 @@ import { createGetPagesHandler } from './get-pages.js';
 import { createGetScreenshotHandler } from './get-screenshot.js';
 import { createGetSelectionHandler } from './get-selection.js';
 import { createGetViewportHandler } from './get-viewport.js';
-import { createGroupNodesHandler } from './group-nodes.js';
 import { createImportImageHandler } from './import-image.js';
 import { createImportSvgHandler } from './import-svg.js';
 import { createListFilesHandler } from './list-files.js';
-import { createSetLockedHandler } from './lock-nodes.js';
-import { createMoveNodesHandler } from './move-nodes.js';
 import { createNavigateToPageHandler } from './navigate-to-page.js';
 import { createPingHandler } from './ping.js';
-import { createRenameNodeHandler } from './rename-node.js';
 import { createRenamePageHandler } from './rename-page.js';
-import { createReorderNodesHandler } from './reorder-nodes.js';
-import { createReparentNodesHandler } from './reparent-nodes.js';
 import { createRepeatNodesHandler, createSetRepeatHandler } from './repeat.js';
 import { createResizeNodesHandler } from './resize-nodes.js';
-import { createRotateNodesHandler } from './rotate-nodes.js';
 import { createSaveImageFillsHandler } from './save-image-fills.js';
 import { createScanNodesByTypesHandler } from './scan-nodes-by-types.js';
 import { createScanTextNodesHandler } from './scan-text-nodes.js';
 import { createSearchNodesHandler } from './search-nodes.js';
 import { createSetArcHandler } from './set-arc.js';
-import { createSetMaskHandler } from './set-mask.js';
-import { createSetPositionHandler } from './set-position.js';
-import { createSetVisibleHandler } from './set-visible.js';
-import { createUngroupNodesHandler } from './ungroup-nodes.js';
 import {
   createCreateVectorHandler,
   createGetVectorHandler,
@@ -180,8 +181,8 @@ export const createSandboxHandlers = (figmaApi: typeof figma): SandboxHandlers =
     set_constraints: createSetConstraintsHandler(figmaCtx),
     rotate_nodes: createRotateNodesHandler(figmaCtx),
     flip_nodes: createFlipNodesHandler(figmaCtx),
-    lock_nodes: createSetLockedHandler(figmaCtx, true),
-    unlock_nodes: createSetLockedHandler(figmaCtx, false),
+    lock_nodes: createLockNodesHandler(figmaCtx),
+    unlock_nodes: createUnlockNodesHandler(figmaCtx),
     clone_node: createCloneNodeHandler(figmaCtx),
     // Styles
     set_effects: createSetEffectsHandler(figmaCtx),

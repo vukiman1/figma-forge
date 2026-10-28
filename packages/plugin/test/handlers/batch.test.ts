@@ -14,6 +14,16 @@ import { createSetAutoLayoutHandler } from '../../src/features/layout/set-auto-l
 import { createApplyAnimationStyleHandler } from '../../src/features/motion/apply-animation-style.handler.js';
 import { createApplyManualKeyframeTrackHandler } from '../../src/features/motion/apply-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../../src/features/motion/set-timeline-duration.handler.js';
+import { createBatchRenameNodesHandler } from '../../src/features/nodes/batch-rename-nodes.handler.js';
+import { createDeleteNodesHandler } from '../../src/features/nodes/delete-nodes.handler.js';
+import { createFlipNodesHandler } from '../../src/features/nodes/flip-nodes.handler.js';
+import { createGroupNodesHandler } from '../../src/features/nodes/group-nodes.handler.js';
+import { createMoveNodesHandler } from '../../src/features/nodes/move-nodes.handler.js';
+import { createRenameNodeHandler } from '../../src/features/nodes/rename-node.handler.js';
+import { createReorderNodesHandler } from '../../src/features/nodes/reorder-nodes.handler.js';
+import { createReparentNodesHandler } from '../../src/features/nodes/reparent-nodes.handler.js';
+import { createSetPositionHandler } from '../../src/features/nodes/set-position.handler.js';
+import { createSetVisibleHandler } from '../../src/features/nodes/set-visible.handler.js';
 import { createSetComplexStrokeHandler } from '../../src/features/paint/set-complex-stroke.handler.js';
 import { createSetCornerRadiusHandler } from '../../src/features/paint/set-corner-radius.handler.js';
 import { createSetFillsHandler } from '../../src/features/paint/set-fills.handler.js';
@@ -34,21 +44,11 @@ import { createRenameVariableHandler } from '../../src/features/variables/rename
 import { createSetVariableCodeSyntaxHandler } from '../../src/features/variables/set-variable-code-syntax.handler.js';
 import { createSetVariableValueHandler } from '../../src/features/variables/set-variable-value.handler.js';
 import { createUpdateVariableCollectionHandler } from '../../src/features/variables/update-variable-collection.handler.js';
-import { createBatchRenameNodesHandler } from '../../src/handlers/batch-rename-nodes.js';
 import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
 import { createCreateFrameHandler } from '../../src/handlers/create-frame.js';
-import { createDeleteNodesHandler } from '../../src/handlers/delete-nodes.js';
-import { createFlipNodesHandler } from '../../src/handlers/flip-nodes.js';
-import { createGroupNodesHandler } from '../../src/handlers/group-nodes.js';
-import { createMoveNodesHandler } from '../../src/handlers/move-nodes.js';
 import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
-import { createRenameNodeHandler } from '../../src/handlers/rename-node.js';
-import { createReorderNodesHandler } from '../../src/handlers/reorder-nodes.js';
-import { createReparentNodesHandler } from '../../src/handlers/reparent-nodes.js';
 import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/handlers/repeat.js';
-import { createSetPositionHandler } from '../../src/handlers/set-position.js';
-import { createSetVisibleHandler } from '../../src/handlers/set-visible.js';
 import {
   createCreateVectorHandler,
   createOutlineStrokeHandler,
