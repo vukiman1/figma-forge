@@ -24,7 +24,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vukiman1/figma-forge.git",
-    "directory": "packages/mcp"
+    "directory": "packages/server"
   },
   "bin": {
     "figma-forge-mcp": "./dist/index.mjs"
@@ -39,7 +39,7 @@
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
-    "prepack": "node ../../scripts/pack-mcp-assets.ts",
+    "prepack": "node ../../scripts/pack-server-assets.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {

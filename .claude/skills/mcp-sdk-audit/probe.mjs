@@ -1,6 +1,6 @@
 // Wire probe for @modelcontextprotocol/server upgrades. Boots the built server over stdio and
 // snapshots everything an MCP client can observe; run it once before the bump and once after, then
-// diff. `packages/mcp/test/e2e/mcp-wire.test.ts` is the standing gate that says pass/fail against
+// diff. `packages/server/test/e2e/mcp-wire.test.ts` is the standing gate that says pass/fail against
 // what the specs declare; this says *what moved* between two SDK versions, which a boolean can't.
 //
 // It speaks raw newline-delimited JSON-RPC instead of the SDK's own Client on purpose: a probe built
@@ -26,11 +26,11 @@ const installedSdkVersion = repo => {
 /**
  * One server process plus a JSON-RPC channel to it. A random high port keeps the probe off
  * DEFAULT_PORT (3055) so it can't contend with a real server or steal a connected plugin;
- * FIGMA_FORGE_PORT is the seam packages/mcp/src/index.ts already exposes for exactly this.
+ * FIGMA_FORGE_PORT is the seam packages/server/src/index.ts already exposes for exactly this.
  */
 const session = repo => {
   const port = String(20_000 + Math.floor(Math.random() * 20_000));
-  const child = spawn(process.execPath, [`${repo}/packages/mcp/dist/index.mjs`], {
+  const child = spawn(process.execPath, [`${repo}/packages/server/dist/index.mjs`], {
     env: { ...process.env, FIGMA_FORGE_PORT: port },
     stdio: ['pipe', 'pipe', 'pipe'],
   });

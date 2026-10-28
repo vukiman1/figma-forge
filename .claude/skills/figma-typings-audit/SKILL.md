@@ -117,7 +117,7 @@ The three source trees have completely different exposure. Don't treat them alik
 - **Bucket 3** — for each added field, check whether the Zod mirror in `packages/core/src/` carries
   it, and whether `serializer.ts` or `handlers/get-design-context.ts` projects it. A miss here is a
   real fidelity gap with every gate green.
-- **Bucket 2** — check coverage against `packages/mcp/src/tools/registry.ts` (`ALL_TOOL_SPECS` is the
+- **Bucket 2** — check coverage against `packages/server/src/tools/registry.ts` (`ALL_TOOL_SPECS` is the
   authority on the tool count; prose in READMEs is hand-written and stale).
 
 ## Stage 4 — Sandbox typecheck (only if Stage 2 found bucket 1)
@@ -215,7 +215,7 @@ Choosing where a new capability lands is the part worth thinking about:
   tool. The tool count is already large; a new tool needs to earn itself.
 - A new read dimension usually touches four places: the Zod schema in `packages/core/src/`, the
   sandbox handler in `packages/plugin/src/handlers/`, the tool description in
-  `packages/mcp/src/tools/` (it is the LLM's only spec — fix it if it misreports the shape), and a
+  `packages/server/src/tools/` (it is the LLM's only spec — fix it if it misreports the shape), and a
   test.
 - `exactOptionalPropertyTypes` is on: assign optional fields conditionally
   (`if (x !== undefined) result.x = x`), never `result.x = undefined`.

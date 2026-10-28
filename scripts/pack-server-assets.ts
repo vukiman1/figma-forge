@@ -3,8 +3,8 @@ import { dirname, join } from 'node:path';
 
 const REPO_ROOT = join(import.meta.dirname, '..');
 const PLUGIN_ROOT = join(REPO_ROOT, 'packages/plugin');
-const MCP_ROOT = join(REPO_ROOT, 'packages/mcp');
-const BUNDLED_PLUGIN_DIR = join(MCP_ROOT, 'plugin');
+const SERVER_ROOT = join(REPO_ROOT, 'packages/server');
+const BUNDLED_PLUGIN_DIR = join(SERVER_ROOT, 'plugin');
 const PLUGIN_FILES = ['manifest.json', 'dist/code.js', 'dist/index.html'] as const;
 const LICENSE_FILE = 'LICENSE';
 
@@ -33,4 +33,4 @@ const bundlePlugin = (): void => {
 
 assertPluginBuilt();
 bundlePlugin();
-cpSync(join(REPO_ROOT, LICENSE_FILE), join(MCP_ROOT, LICENSE_FILE));
+cpSync(join(REPO_ROOT, LICENSE_FILE), join(SERVER_ROOT, LICENSE_FILE));

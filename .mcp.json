@@ -2,7 +2,7 @@
   "mcpServers": {
     "figma-forge": {
       "command": "node",
-      "args": ["packages/mcp/dist/index.mjs"]
+      "args": ["packages/server/dist/index.mjs"]
     }
   }
 }

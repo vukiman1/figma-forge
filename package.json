@@ -15,9 +15,9 @@
   },
   "type": "module",
   "scripts": {
-    "build": "pnpm -r run build && node scripts/pack-mcp-assets.ts",
+    "build": "pnpm -r run build && node scripts/pack-server-assets.ts",
     "clean": "pnpm -r exec rm -rf dist *.tsbuildinfo",
-    "comments:check": "node scripts/check-comments.ts --check 'scripts/*.ts' 'packages/core/**/*.ts' 'packages/server/**/*.ts' 'packages/plugin/**/*.ts'",
+    "comments:check": "node scripts/check-comments.ts --check 'scripts/*.ts' 'packages/core/**/*.ts' 'packages/plugin/**/*.ts'",
     "comments:report": "node scripts/check-comments.ts --report 'packages/**/*.ts'",
     "deps:check": "depcruise packages --config .dependency-cruiser.json",
     "dev": "pnpm -r --parallel run dev",

@@ -42,7 +42,7 @@ Build from source with pnpm 12:
 pnpm install && pnpm build
 ```
 
-Point your MCP client at `node /path/to/figma-forge/packages/mcp/dist/index.mjs`, and import `packages/plugin/manifest.json` in Figma so plugin rebuilds take effect without a version bump.
+Point your MCP client at `node /path/to/figma-forge/packages/server/dist/index.mjs`, and import `packages/plugin/manifest.json` in Figma so plugin rebuilds take effect without a version bump.
 
 Run the same checks CI runs:
 

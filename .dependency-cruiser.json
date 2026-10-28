@@ -6,7 +6,7 @@
       "from": { "path": "^packages/(core|shared)/" },
       "to": {
         "dependencyTypesNot": ["type-only"],
-        "path": "^packages/(mcp|server|plugin)/|node_modules/(ws|vue|@vueuse|@lucide|@modelcontextprotocol|fdir|ignore|oxc-parser)/"
+        "path": "^packages/(server|plugin)/|node_modules/(ws|vue|@vueuse|@lucide|@modelcontextprotocol|fdir|ignore|oxc-parser)/"
       }
     },
     {
@@ -19,12 +19,12 @@
       "name": "plugin-does-not-import-server",
       "severity": "error",
       "from": { "path": "^packages/plugin/" },
-      "to": { "path": "^packages/(mcp|server)/" }
+      "to": { "path": "^packages/server/" }
     },
     {
       "name": "server-does-not-import-plugin",
       "severity": "error",
-      "from": { "path": "^packages/(mcp|server)/" },
+      "from": { "path": "^packages/server/" },
       "to": { "path": "^packages/plugin/" }
     },
     {

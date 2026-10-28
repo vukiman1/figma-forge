@@ -50,5 +50,5 @@
       }
     }
   ],
-  "ignorePatterns": ["**/dist/**", "**/node_modules/**", "packages/mcp/**", "test/**"]
+  "ignorePatterns": ["**/dist/**", "**/node_modules/**", "packages/server/**", "test/**"]
 }

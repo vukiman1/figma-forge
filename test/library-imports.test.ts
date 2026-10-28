@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS, WRITE_TOOL_NAMES } from '../packages/mcp/src/tools/registry.js';
-import { WIRE_TOOL_SCHEMAS } from '../packages/mcp/src/tools/wire-schema.js';
 import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
+import { ALL_TOOL_SPECS, WRITE_TOOL_NAMES } from '../packages/server/src/tools/registry.js';
+import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire-schema.js';
 
 // Only Figma's external library API is replaced. The real schemas, registry, idempotency and
 // binding/apply handlers consume the imported target-file references, never a guessed source id.

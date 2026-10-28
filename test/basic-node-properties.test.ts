@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
 import { DesignContextNodeSchema, SerializedNodeSchema } from '../packages/core/src/index.js';
-import { ALL_TOOL_SPECS } from '../packages/mcp/src/tools/registry.js';
-import { WIRE_TOOL_SCHEMAS } from '../packages/mcp/src/tools/wire-schema.js';
 import { project } from '../packages/plugin/src/features/design-context/project-node.js';
 import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
 import { serializeFlatSync } from '../packages/plugin/src/serialize/serialize-node.js';
+import { ALL_TOOL_SPECS } from '../packages/server/src/tools/registry.js';
+import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire-schema.js';
 
 // Figma is the external boundary. Schemas, dispatch, writes, reads and batch rollback stay real.
 const setup = () => {

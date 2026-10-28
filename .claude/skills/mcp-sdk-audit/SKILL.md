@@ -13,7 +13,7 @@ release can leave every type identical and still change what clients see. `pnpm 
 green through it.
 
 **Unlike every other dependency here, this one has a dedicated gate — use it.**
-`packages/mcp/test/e2e/mcp-wire.test.ts` spawns the built `dist` over real stdio, speaks raw
+`packages/server/test/e2e/mcp-wire.test.ts` spawns the built `dist` over real stdio, speaks raw
 JSON-RPC at it, and asserts the advertised contract against what the specs declare. It runs in
 `pnpm test`. That gate answers *did anything break*; it does not answer *what moved*, which is what
 an audit is for — Stage 5 covers the difference.
@@ -24,7 +24,7 @@ the *SDK* — it catches an SDK that stops asking Zod the same question — but 
 changes what it answers, both sides move together and the equality still holds. An SDK bump that
 also moves the resolved `zod` version (its range is `^4.2.0`, so it shares the repo's copy) can
 therefore reshape every client's schema with this gate green.
-`packages/mcp/test/json-schema-generation.test.ts` covers that half by pinning each construct's
+`packages/server/test/json-schema-generation.test.ts` covers that half by pinning each construct's
 rendering by hand — if a bump moves the Zod version, read its diff too, and let `probe.mjs` name
 which tools changed.
 
@@ -33,7 +33,7 @@ Target version: whatever the user named, otherwise the latest `@modelcontextprot
 ## Stage 0 — Resolve versions
 
 ```bash
-grep '@modelcontextprotocol' packages/mcp/package.json          # declared range
+grep '@modelcontextprotocol' packages/server/package.json          # declared range
 grep -m1 '@modelcontextprotocol/server@' pnpm-lock.yaml         # what is installed
 npm view @modelcontextprotocol/server version dist-tags --json  # latest
 gh api repos/modelcontextprotocol/typescript-sdk/releases --jq '.[0:15][] | "\(.tag_name)\t\(.published_at)"'
@@ -74,7 +74,7 @@ is how the hunk that mattered gets missed.
 
 ## Stage 2 — Sort by file path
 
-Figma Forge imports exactly two entry points (`packages/mcp/src/index.ts`, `src/prompts/*`,
+Figma Forge imports exactly two entry points (`packages/server/src/index.ts`, `src/prompts/*`,
 `test/tool-schema.ts`, `test/e2e/mcp-wire.test.ts`): `@modelcontextprotocol/server` and
 `@modelcontextprotocol/server/stdio`. That narrow slice is what makes this audit cheap — most of any
 given release is about parts of the family this server never loads.
@@ -184,14 +184,14 @@ Two different questions, two tools. Run both.
 **The gate — did anything break?**
 
 ```bash
-pnpm build && pnpm vitest run packages/mcp/test/e2e/mcp-wire.test.ts
+pnpm build && pnpm vitest run packages/server/test/e2e/mcp-wire.test.ts
 ```
 
 It asserts the advertised tool set, each tool's JSON Schema against a derivation that is independent
 of the SDK (but not of Zod — see above), the dialect, annotations, prompts, a live `tools/call`, the
 bad-argument path, and that a 2024-11-05 client is still served. Red here means the release moved
 something that matters. If the bump also moved `zod`, run
-`pnpm vitest run packages/mcp/test/json-schema-generation.test.ts` as a second gate.
+`pnpm vitest run packages/server/test/json-schema-generation.test.ts` as a second gate.
 
 **The probe — what moved?** A gate is a boolean; an audit has to name the change. `probe.mjs` boots
 the same built server, snapshots everything a client can observe, and diffs two snapshots.
@@ -221,7 +221,7 @@ Notes that matter:
 ## Stage 6 — Upgrade and run the gates
 
 ```bash
-pnpm -C packages/mcp add @modelcontextprotocol/server@^<target>
+pnpm -C packages/server add @modelcontextprotocol/server@^<target>
 pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm build && pnpm test
 ```
 
@@ -252,7 +252,7 @@ The gate and the probe prove the server speaks correctly to a test harness. They
 clients are happy:
 
 - The MCP server runs the built `dist` → `pnpm build`, then the user reconnects the MCP connection
-  (`.mcp.json` launches `packages/mcp/dist/index.mjs`).
+  (`.mcp.json` launches `packages/server/dist/index.mjs`).
 - Ask the user to run one read tool (`ping`, then something with a real payload like
   `get_design_context`) through the reconnected server with the plugin open.
 - If the release touched protocol-version constants or schema generation, that check should ideally

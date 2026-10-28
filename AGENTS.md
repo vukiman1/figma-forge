@@ -12,7 +12,7 @@ Hexagonal. Dependencies point inward only.
 
 `server` and `plugin` never import each other. Plugin handlers receive `figma` as a parameter (`createXHandler(figmaCtx)`), so the Plugin API stays the port.
 
-The migration is in progress. `packages/core` and `packages/mcp` are being moved into `core` and `server`. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover migrated paths only; legacy paths are listed there and drop off as they move.
+The migration is in progress: `packages/server` (published as `@figma-forge/mcp`) is being brought under the strict rules. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover migrated paths only; legacy paths are listed there and drop off as they move.
 
 ## Rules
 
@@ -31,7 +31,7 @@ The migration is in progress. `packages/core` and `packages/mcp` are being moved
 pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm deps:check && pnpm comments:check && pnpm build && pnpm test
 ```
 
-`packages/mcp/test/e2e` runs against the built `dist`, so run `pnpm build` before `pnpm test`.
+`packages/server/test/e2e` runs against the built `dist`, so run `pnpm build` before `pnpm test`.
 
 ## Commits
 

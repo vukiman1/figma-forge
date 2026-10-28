@@ -19,7 +19,7 @@ describe('pluginSetupHint', () => {
   it('points a source checkout at the build when no plugin is bundled', () => {
     const hint = pluginSetupHint({
       status: PluginInstallStatus.NotBundled,
-      bundleDir: '/repo/packages/mcp/plugin/',
+      bundleDir: '/repo/packages/server/plugin/',
     });
     expect(hint).toContain('pnpm build');
   });

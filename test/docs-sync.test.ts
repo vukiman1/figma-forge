@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../packages/mcp/src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../packages/server/src/tools/registry.js';
 
 // Docs-sync guard: the tool count is prose in the two user-facing READMEs (the GitHub front page and
 // the npm package page) while the authority is ALL_TOOL_SPECS.length — and the npm one has already
@@ -18,7 +18,7 @@ import { ALL_TOOL_SPECS } from '../packages/mcp/src/tools/registry.js';
 // the JSON-schema test each said a number once, drifted, and now describe the set instead
 // ("every tool"). Guard what earns a number; reword what doesn't.
 
-const COUNTED_DOC_PATHS = ['packages/mcp/README.md'];
+const COUNTED_DOC_PATHS = ['packages/server/README.md'];
 const TOOL_COUNT_CLAIM = /\*{0,2}(\d+)\*{0,2} (?:MCP )?tools\b/g;
 
 describe('README tool counts', () => {
