@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -99,11 +99,11 @@ describe('installPlugin', () => {
 
 describe('resolvePluginInstallDir', () => {
   it('defaults to a visible Figma Forge folder in the home directory', () => {
-    expect(resolvePluginInstallDir(undefined, '/Users/me')).toBe('/Users/me/Figma Forge');
-    expect(resolvePluginInstallDir('', '/Users/me')).toBe('/Users/me/Figma Forge');
+    expect(resolvePluginInstallDir(undefined, '/Users/me')).toBe(join('/Users/me', 'Figma Forge'));
+    expect(resolvePluginInstallDir('', '/Users/me')).toBe(join('/Users/me', 'Figma Forge'));
   });
 
   it('uses the override folder when one is set', () => {
-    expect(resolvePluginInstallDir('/opt/forge', '/Users/me')).toBe('/opt/forge');
+    expect(resolvePluginInstallDir('/opt/forge', '/Users/me')).toBe(resolve('/opt/forge'));
   });
 });
