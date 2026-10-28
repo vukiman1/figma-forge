@@ -11,6 +11,10 @@ import { createGetComponentApiHandler } from '../features/components/get-compone
 import { createGetLocalComponentsHandler } from '../features/components/get-local-components.handler.js';
 import { createSetInstancePropertiesHandler } from '../features/components/set-instance-properties.handler.js';
 import { createSwapComponentHandler } from '../features/components/swap-component.handler.js';
+import { createExportPdfHandler } from '../features/export/export-pdf.handler.js';
+import { createExportVideoHandler } from '../features/export/export-video.handler.js';
+import { createGetScreenshotHandler } from '../features/export/get-screenshot.handler.js';
+import { createSaveImageFillsHandler } from '../features/export/save-image-fills.handler.js';
 import { createAddPageHandler } from '../features/files/add-page.handler.js';
 import { createDeletePageHandler } from '../features/files/delete-page.handler.js';
 import { createGetDocumentHandler } from '../features/files/get-document.handler.js';
@@ -116,15 +120,11 @@ import { createSetVectorHandler } from '../features/vector/set-vector.handler.js
 import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
 import { createBatchHandler } from './batch.js';
-import { createExportPdfHandler } from './export-pdf.js';
-import { createExportVideoHandler } from './export-video.js';
 import { createGetAnnotationsHandler } from './get-annotations.js';
 import { createGetDesignContextHandler } from './get-design-context.js';
 import { createGetFontsHandler } from './get-fonts.js';
 import { createGetNodeHandler } from './get-node.js';
 import { createGetNodesInfoHandler } from './get-nodes-info.js';
-import { createGetScreenshotHandler } from './get-screenshot.js';
-import { createSaveImageFillsHandler } from './save-image-fills.js';
 import { createScanNodesByTypesHandler } from './scan-nodes-by-types.js';
 import { createScanTextNodesHandler } from './scan-text-nodes.js';
 import { createSearchNodesHandler } from './search-nodes.js';

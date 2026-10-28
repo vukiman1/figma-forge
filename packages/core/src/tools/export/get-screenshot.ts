@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
 import { SCREENSHOT_FORMATS } from '../../results/exports.js';
+import { binaryArgShape, forVisionArgShape } from '../shared/injected-args-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const GET_SCREENSHOT_TOOL_NAME = 'get_screenshot';
 
 export const getScreenshotParams = z.object({
-  nodeIds: z.array(z.string()).describe('Figma node ids to export'),
+  nodeIds: z.array(z.string()).min(1).describe('Figma node ids to export'),
   format: z
     .enum(SCREENSHOT_FORMATS)
     .describe('Export format: PNG (default) / JPG / SVG')
@@ -16,6 +17,11 @@ export const getScreenshotParams = z.object({
     .positive()
     .describe('Raster scale factor (PNG/JPG); omit to auto-fit each node to a legible size')
     .optional(),
+});
+
+export const getScreenshotSandboxParams = getScreenshotParams.extend({
+  ...binaryArgShape,
+  ...forVisionArgShape,
 });
 
 export const getScreenshotTool: ToolSpec = {

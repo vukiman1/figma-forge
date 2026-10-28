@@ -6,7 +6,7 @@ import type { ToolSpec } from '../tool-spec.js';
 export const SAVE_SCREENSHOTS_TOOL_NAME = 'save_screenshots';
 
 export const saveScreenshotsParams = z.object({
-  nodeIds: z.array(z.string()).describe('Figma node ids to export'),
+  nodeIds: z.array(z.string()).min(1).describe('Figma node ids to export'),
   outDir: z.string().describe('Directory to write files into (created if missing)'),
   format: z
     .enum(SCREENSHOT_FORMATS)

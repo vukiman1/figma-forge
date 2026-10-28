@@ -1,7 +1,7 @@
 import type { PdfExport } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createExportPdfHandler } from '../../src/handlers/export-pdf.js';
+import { createExportPdfHandler } from '../../../src/features/export/export-pdf.handler.js';
 
 const base64Encode = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64');
 const pdfBytes = new Uint8Array([1, 2, 3]);
@@ -37,7 +37,7 @@ describe('export_pdf handler', () => {
     expect(result).toEqual({ nodeId: '3:21', base64: Buffer.from(pdfBytes).toString('base64') });
   });
 
-  it('returns raw bytes instead of base64 when the server asks for binary', async () => {
+  it('returns raw bytes instead of base64 when the server asks for binary, skipping the base64 inflation', async () => {
     const base64Spy = vi.fn<(bytes: Uint8Array) => string>(base64Encode);
     const figmaCtx = {
       currentPage: { id: '0:1', exportAsync: async () => pdfBytes },
@@ -47,7 +47,6 @@ describe('export_pdf handler', () => {
     const result = (await createExportPdfHandler(figmaCtx)({ binary: true })) as PdfExport;
 
     expect(result).toEqual({ nodeId: '0:1', base64: null, bytes: pdfBytes });
-    // The point of the flag: the 33% base64 inflation is never paid on this path.
     expect(base64Spy).not.toHaveBeenCalled();
   });
 

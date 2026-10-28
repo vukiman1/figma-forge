@@ -1,11 +1,27 @@
 import { z } from 'zod';
 
-import { videoExportConstraintSchema } from '../shared/video-export-schema.js';
+import { binaryArgShape } from '../shared/injected-args-schema.js';
+import { VIDEO_FPS, videoExportConstraintSchema } from '../shared/video-export-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const EXPORT_VIDEO_TOOL_NAME = 'export_video';
 
-export const exportVideoParams = z.object({
+interface FpsChoice {
+  readonly format: keyof typeof VIDEO_FPS;
+  readonly fps?: number | undefined;
+}
+
+const requireFormatFps = ({ format, fps }: FpsChoice, ctx: z.RefinementCtx): void => {
+  const allowed: readonly number[] = VIDEO_FPS[format];
+  if (fps === undefined || allowed.includes(fps)) return;
+  ctx.addIssue({
+    code: 'custom',
+    path: ['fps'],
+    message: `${format} takes ${allowed.join(' / ')} fps`,
+  });
+};
+
+const exportVideoShape = {
   nodeId: z
     .string()
     .describe(
@@ -29,8 +45,20 @@ export const exportVideoParams = z.object({
     .describe('GIF only: number of loops; 0 = loop forever')
     .optional(),
   constraint: videoExportConstraintSchema.optional(),
-  outPath: z.string().describe('File path to write the video to (parent dirs created if missing)'),
-});
+};
+
+export const exportVideoParams = z
+  .object({
+    ...exportVideoShape,
+    outPath: z
+      .string()
+      .describe('File path to write the video to (parent dirs created if missing)'),
+  })
+  .superRefine(requireFormatFps);
+
+export const exportVideoSandboxParams = z
+  .object({ ...exportVideoShape, ...binaryArgShape })
+  .superRefine(requireFormatFps);
 
 export const exportVideoTool: ToolSpec = {
   name: EXPORT_VIDEO_TOOL_NAME,

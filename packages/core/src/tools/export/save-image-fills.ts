@@ -1,15 +1,20 @@
 import { z } from 'zod';
 
+import { binaryArgShape } from '../shared/injected-args-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const SAVE_IMAGE_FILLS_TOOL_NAME = 'save_image_fills';
 
 export const saveImageFillsParams = z.object({
-  nodeIds: z.array(z.string()).describe('Figma node ids whose IMAGE fills to extract'),
+  nodeIds: z.array(z.string()).min(1).describe('Figma node ids whose IMAGE fills to extract'),
   outDir: z
     .string()
     .describe('Directory to write the original image files into (created if missing)'),
 });
+
+export const saveImageFillsSandboxParams = saveImageFillsParams
+  .omit({ outDir: true })
+  .extend(binaryArgShape);
 
 export const saveImageFillsTool: ToolSpec = {
   name: SAVE_IMAGE_FILLS_TOOL_NAME,

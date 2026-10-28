@@ -1,12 +1,11 @@
 import type { VideoExport } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createExportVideoHandler } from '../../src/handlers/export-video.js';
+import { createExportVideoHandler } from '../../../src/features/export/export-video.handler.js';
 
 const videoBytes = new Uint8Array([0x00, 0x00, 0x00, 0x18]);
 const base64Encode = (bytes: Uint8Array): string => Buffer.from(bytes).toString('base64');
 
-/** A node whose getTopLevelFrame() resolves to an exportable frame. */
 const animatedNode = (
   frameId: string,
   exportAsync: (settings: unknown) => Promise<Uint8Array>,
@@ -73,6 +72,21 @@ describe('export_video handler', () => {
     });
   });
 
+  it('carries loopCount for a GIF and drops quality, which a GIF has no preset for', async () => {
+    const exportAsync = vi.fn<() => Promise<Uint8Array>>(async () => videoBytes);
+    const f = makeFigma({ '3:21': animatedNode('3:21', exportAsync) });
+
+    await createExportVideoHandler(f)({
+      nodeId: '3:21',
+      format: 'GIF',
+      fps: 15,
+      quality: 'LOW',
+      loopCount: 3,
+    });
+
+    expect(exportAsync).toHaveBeenCalledWith({ format: 'GIF', fps: 15, loopCount: 3 });
+  });
+
   it('misses with a reason (and no bytes) outside the Figma Design editor', async () => {
     const f = makeFigma({}, 'figjam');
     const result = (await createExportVideoHandler(f)({
@@ -119,7 +133,14 @@ describe('export_video handler', () => {
   it('rejects a bad format up front', async () => {
     const f = makeFigma({});
     await expect(createExportVideoHandler(f)({ nodeId: '5:5', format: 'AVI' })).rejects.toThrow(
-      /format must be MP4, GIF, or WEBM/,
+      /format: .*"MP4"\|"GIF"\|"WEBM"/,
     );
+  });
+
+  it('rejects a frame rate the format does not offer before asking Figma to render', async () => {
+    const f = makeFigma({});
+    await expect(
+      createExportVideoHandler(f)({ nodeId: '5:5', format: 'GIF', fps: 60 }),
+    ).rejects.toThrow('fps: GIF takes 8 / 12 / 15 / 24 / 30 fps');
   });
 });

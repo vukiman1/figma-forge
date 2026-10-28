@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { binaryArgShape } from '../shared/injected-args-schema.js';
 import type { ToolSpec } from '../tool-spec.js';
 
 export const EXPORT_PDF_TOOL_NAME = 'export_pdf';
@@ -13,6 +14,10 @@ export const exportPdfParams = z.object({
     .optional(),
   outPath: z.string().describe('File path to write the .pdf to (parent dirs created if missing)'),
 });
+
+export const exportPdfSandboxParams = exportPdfParams
+  .omit({ outPath: true })
+  .extend(binaryArgShape);
 
 export const exportPdfTool: ToolSpec = {
   name: EXPORT_PDF_TOOL_NAME,

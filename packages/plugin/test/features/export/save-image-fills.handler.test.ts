@@ -1,7 +1,7 @@
 import type { ImageFillsResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createSaveImageFillsHandler } from '../../src/handlers/save-image-fills.js';
+import { createSaveImageFillsHandler } from '../../../src/features/export/save-image-fills.handler.js';
 
 const MIXED = Symbol('figma.mixed');
 
@@ -22,7 +22,6 @@ const makeFigma = (
     getImageByHash: (hash: string) => {
       const img = images[hash];
       if (img === null || img === undefined) return null;
-      // Route byte reads through the shared spy so tests can count fetches (dedup).
       return { ...img, getBytesAsync: () => getBytes(hash) };
     },
     __getBytes: getBytes,
@@ -69,9 +68,7 @@ describe('save_image_fills handler', () => {
     ]);
   });
 
-  it('encodes a shared imageHash once, not once per usage', async () => {
-    // The memo holds the finished payload, not the raw bytes: a logo reused across nodes must cost
-    // one base64Encode. Encoding per usage would be invisible in the result and quadratic in fills.
+  it('encodes a shared imageHash once, not once per usage, so a reused logo costs one base64Encode', async () => {
     const encode = vi.fn<(bytes: Uint8Array) => string>(bytes => `b64(${bytes.length})`);
     const getBytes = vi.fn<() => Promise<Uint8Array>>(async () => new Uint8Array([1, 2, 3]));
     const f = {
@@ -92,7 +89,6 @@ describe('save_image_fills handler', () => {
 
     expect(getBytes).toHaveBeenCalledTimes(1);
     expect(encode).toHaveBeenCalledTimes(1);
-    // all three usages still carry the payload
     expect(result.nodes.flatMap(n => n.images).map(i => i.base64)).toEqual([
       'b64(3)',
       'b64(3)',
@@ -139,7 +135,6 @@ describe('save_image_fills handler', () => {
     })) as ImageFillsResult;
     expect(result.nodes[0]?.images).toHaveLength(1);
     expect(result.nodes[1]?.images).toHaveLength(2);
-    // Three usages of one asset → a single getBytesAsync call.
     expect(getBytes).toHaveBeenCalledTimes(1);
   });
 

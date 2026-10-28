@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export const VIDEO_FPS = {
+  MP4: [12, 24, 30, 60],
+  WEBM: [12, 24, 30, 60],
+  GIF: [8, 12, 15, 24, 30],
+} as const;
+
 export const videoExportConstraintSchema = z
   .union([
     z.object({

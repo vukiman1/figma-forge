@@ -6,6 +6,7 @@ export * from './effect-schema.js';
 export * from './font-name-schema.js';
 export * from './grid-schema.js';
 export * from './initial-props-schema.js';
+export * from './injected-args-schema.js';
 export * from './motion-easing-schema.js';
 export * from './motion-keyframe-schema.js';
 export * from './paint-schema.js';
