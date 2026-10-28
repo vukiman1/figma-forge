@@ -6,22 +6,45 @@ export const ALIGN_NODES_TOOL_NAME = 'align_nodes';
 
 const edge = z.enum(['MIN', 'CENTER', 'MAX']);
 
-export const alignNodesParams = z.object({
-  nodeIds: z.array(z.string()).min(1).describe('Nodes to align / distribute'),
-  horizontal: edge.optional().describe('Horizontal alignment: MIN (left), CENTER or MAX (right)'),
-  vertical: edge.optional().describe('Vertical alignment: MIN (top), CENTER or MAX (bottom)'),
-  relativeTo: z
-    .enum(['PARENT', 'SELECTION'])
-    .optional()
-    .describe(
-      "PARENT (default): each node within its own parent's bounds. SELECTION: to the bounding " +
-        'box of all the given nodes',
-    ),
-  distribute: z
-    .enum(['HORIZONTAL', 'VERTICAL'])
-    .optional()
-    .describe('Equalise the gaps between nodes along this axis; needs 3+ nodes'),
-});
+const ALIGNMENT_ON_AXIS = {
+  HORIZONTAL: 'horizontal',
+  VERTICAL: 'vertical',
+} as const;
+
+export const alignNodesParams = z
+  .object({
+    nodeIds: z.array(z.string()).min(1).describe('Nodes to align / distribute'),
+    horizontal: edge.optional().describe('Horizontal alignment: MIN (left), CENTER or MAX (right)'),
+    vertical: edge.optional().describe('Vertical alignment: MIN (top), CENTER or MAX (bottom)'),
+    relativeTo: z
+      .enum(['PARENT', 'SELECTION'])
+      .optional()
+      .describe(
+        "PARENT (default): each node within its own parent's bounds. SELECTION: to the bounding " +
+          'box of all the given nodes',
+      ),
+    distribute: z
+      .enum(['HORIZONTAL', 'VERTICAL'])
+      .optional()
+      .describe('Equalise the gaps between nodes along this axis; needs 3+ nodes'),
+  })
+  .refine(
+    ({ horizontal, vertical, distribute }) =>
+      horizontal !== undefined || vertical !== undefined || distribute !== undefined,
+    { error: 'pass horizontal, vertical and/or distribute' },
+  )
+  .refine(
+    params =>
+      params.distribute === undefined || params[ALIGNMENT_ON_AXIS[params.distribute]] === undefined,
+    {
+      error: 'distribute cannot be combined with alignment on the same axis',
+      path: ['distribute'],
+    },
+  )
+  .refine(({ nodeIds, distribute }) => distribute === undefined || new Set(nodeIds).size >= 3, {
+    error: 'distribute needs at least 3 distinct nodes',
+    path: ['nodeIds'],
+  });
 
 export const alignNodesTool: ToolSpec = {
   name: ALIGN_NODES_TOOL_NAME,

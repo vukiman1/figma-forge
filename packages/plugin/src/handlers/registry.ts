@@ -23,6 +23,7 @@ import { createGetNodeMotionHandler } from '../features/motion/get-node-motion.h
 import { createRemoveAnimationStyleHandler } from '../features/motion/remove-animation-style.handler.js';
 import { createRemoveManualKeyframeTrackHandler } from '../features/motion/remove-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../features/motion/set-timeline-duration.handler.js';
+import { createAlignNodesHandler } from '../features/nodes/align-nodes.handler.js';
 import { createBatchRenameNodesHandler } from '../features/nodes/batch-rename-nodes.handler.js';
 import { createBooleanNodesHandler } from '../features/nodes/boolean-nodes.handler.js';
 import { createCloneNodeHandler } from '../features/nodes/clone-node.handler.js';
@@ -100,7 +101,6 @@ import { createUpdateVariableCollectionHandler } from '../features/variables/upd
 import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
 import { createAddPageHandler } from './add-page.js';
-import { createAlignNodesHandler } from './align-nodes.js';
 import { createBatchHandler } from './batch.js';
 import { createDeletePageHandler } from './delete-page.js';
 import { createExportPdfHandler } from './export-pdf.js';

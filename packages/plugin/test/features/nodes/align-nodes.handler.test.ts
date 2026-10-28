@@ -1,90 +1,8 @@
 import type { BatchNodeResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createAlignNodesHandler } from '../../src/handlers/align-nodes.js';
-
-type Matrix = [[number, number, number], [number, number, number]];
-
-interface FakeNode {
-  id: string;
-  type: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  parent: FakeNode | { id: string; type: 'PAGE'; parent: null } | null;
-  layoutMode?: string;
-  layoutPositioning?: string;
-  readonly relativeTransform: Matrix;
-  readonly absoluteTransform: Matrix;
-}
-
-const compose = (m: Matrix, n: Matrix): Matrix => [
-  [
-    m[0][0] * n[0][0] + m[0][1] * n[1][0],
-    m[0][0] * n[0][1] + m[0][1] * n[1][1],
-    m[0][0] * n[0][2] + m[0][1] * n[1][2] + m[0][2],
-  ],
-  [
-    m[1][0] * n[0][0] + m[1][1] * n[1][0],
-    m[1][0] * n[0][1] + m[1][1] * n[1][1],
-    m[1][0] * n[0][2] + m[1][1] * n[1][2] + m[1][2],
-  ],
-];
-
-const PAGE = { id: '0:0', type: 'PAGE' as const, parent: null };
-
-/**
- * A node whose transforms are derived from x / y / rotation and its parent chain, the way Figma
- * derives them — so a write to x moves absoluteTransform and everything under it.
- */
-const node = (
-  id: string,
-  parent: FakeNode['parent'],
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  extra: Partial<Pick<FakeNode, 'type' | 'rotation' | 'layoutMode' | 'layoutPositioning'>> = {},
-): FakeNode => ({
-  id,
-  type: 'RECTANGLE',
-  x,
-  y,
-  width,
-  height,
-  rotation: 0,
-  parent,
-  ...extra,
-  get relativeTransform(): Matrix {
-    const r = (this.rotation * Math.PI) / 180;
-    return [
-      [Math.cos(r), -Math.sin(r), this.x],
-      [Math.sin(r), Math.cos(r), this.y],
-    ];
-  },
-  get absoluteTransform(): Matrix {
-    const up = this.parent;
-    return up !== null && 'absoluteTransform' in up
-      ? compose(up.absoluteTransform, this.relativeTransform)
-      : this.relativeTransform;
-  },
-});
-
-/** A plain (non-auto-layout) frame on the page at canvas (100, 50), 400 × 200. */
-const frame = (extra: Parameters<typeof node>[6] = {}, id = '0:1'): FakeNode =>
-  node(id, PAGE, 100, 50, 400, 200, { type: 'FRAME', layoutMode: 'NONE', ...extra });
-
-const fakeFigma = (...nodes: { id: string }[]): typeof figma => {
-  const lookup = Object.fromEntries(nodes.map(n => [n.id, n]));
-  return { getNodeByIdAsync: async (id: string) => lookup[id] ?? null } as unknown as typeof figma;
-};
-
-const canvasOrigin = (n: FakeNode): [number, number] => [
-  n.absoluteTransform[0][2],
-  n.absoluteTransform[1][2],
-];
+import { createAlignNodesHandler } from '../../../src/features/nodes/align-nodes.handler.js';
+import { canvasOrigin, fakeFigma, frame, node, PAGE } from './align-fake.js';
 
 describe('align_nodes handler', () => {
   it('centres a node within its parent on both axes', async () => {
@@ -96,8 +14,8 @@ describe('align_nodes handler', () => {
       vertical: 'CENTER',
     })) as BatchNodeResult;
 
-    expect(n.x).toBeCloseTo(150); // (400-100)/2
-    expect(n.y).toBeCloseTo(80); // (200-40)/2
+    expect(n.x).toBeCloseTo(150);
+    expect(n.y).toBeCloseTo(80);
     expect(result).toEqual({ ok: true, affected: ['1:1'] });
   });
 
@@ -107,8 +25,8 @@ describe('align_nodes handler', () => {
     const b = node('1:2', parent, 50, 50, 100, 40);
     await createAlignNodesHandler(fakeFigma(a, b))({ nodeIds: ['1:1'], horizontal: 'MAX' });
     await createAlignNodesHandler(fakeFigma(a, b))({ nodeIds: ['1:2'], vertical: 'MAX' });
-    expect([a.x, a.y]).toEqual([300, 50]); // right edge flush: 400 - 100
-    expect([b.x, b.y]).toEqual([50, 160]); // bottom flush: 200 - 40
+    expect([a.x, a.y]).toEqual([300, 50]);
+    expect([b.x, b.y]).toEqual([50, 160]);
   });
 
   it('leaves an axis alone when it is not asked for', async () => {
@@ -127,17 +45,17 @@ describe('align_nodes handler', () => {
       vertical: 'CENTER',
       relativeTo: 'SELECTION',
     });
-    // union spans y 10..160 (centre 85): a centres at 85, b at 85
+
     expect(a.y).toBe(75);
     expect(b.y).toBe(55);
-    expect(a.x).toBe(10); // horizontal untouched
+    expect(a.x).toBe(10);
   });
 
   it('aligns a selection that spans different parents on the canvas', async () => {
     const left = frame({}, '0:1');
     const right = node('0:2', PAGE, 600, 300, 200, 200, { type: 'FRAME', layoutMode: 'NONE' });
-    const a = node('1:1', left, 0, 0, 40, 40); // canvas top 50
-    const b = node('1:2', right, 0, 20, 40, 40); // canvas top 320
+    const a = node('1:1', left, 0, 0, 40, 40);
+    const b = node('1:2', right, 0, 20, 40, 40);
     await createAlignNodesHandler(fakeFigma(a, b))({
       nodeIds: ['1:1', '1:2'],
       vertical: 'MIN',
@@ -145,7 +63,7 @@ describe('align_nodes handler', () => {
     });
     expect(canvasOrigin(a)[1]).toBeCloseTo(50);
     expect(canvasOrigin(b)[1]).toBeCloseTo(50);
-    expect(b.y).toBeCloseTo(-250); // 50 canvas = 300 + y
+    expect(b.y).toBeCloseTo(-250);
   });
 
   it('spaces three nodes with equal gaps, keeping the outer two in place', async () => {
@@ -157,7 +75,7 @@ describe('align_nodes handler', () => {
       nodeIds: ['1:1', '1:2', '1:3'],
       distribute: 'HORIZONTAL',
     });
-    // span 340, nodes 120, two gaps of 110
+
     expect([a.x, b.x, c.x]).toEqual([0, 150, 300]);
   });
 
@@ -184,7 +102,7 @@ describe('align_nodes handler', () => {
       vertical: 'CENTER',
     });
     expect([a.x, b.x, c.x]).toEqual([0, 150, 300]);
-    expect([a.y, b.y, c.y]).toEqual([80, 80, 80]); // (200-40)/2 in the parent, not the selection
+    expect([a.y, b.y, c.y]).toEqual([80, 80, 80]);
   });
 
   it("aligns to a rotated parent's own edges, leaving the other axis alone", async () => {
@@ -197,10 +115,9 @@ describe('align_nodes handler', () => {
 
   it('centres a rotated node by what it covers in the parent', async () => {
     const parent = frame();
-    // A 100×100 square turned 45° about its origin covers x ∈ [-70.7, 70.7] in the parent.
     const n = node('1:1', parent, 0, 0, 100, 100, { rotation: 45 });
     await createAlignNodesHandler(fakeFigma(n))({ nodeIds: ['1:1'], horizontal: 'CENTER' });
-    expect(n.x).toBeCloseTo(200); // its covered span is centred on the parent's x = 200
+    expect(n.x).toBeCloseTo(200);
   });
 
   it('moves a node once even when its id is passed twice', async () => {
@@ -258,6 +175,31 @@ describe('align_nodes handler', () => {
     expect(a.x).toBe(0);
   });
 
+  it('names the nodes it could not put back when restoring them fails too', async () => {
+    const parent = frame();
+    const a = node('1:1', parent, 0, 0, 10, 10);
+    const b = node('1:2', parent, 0, 20, 10, 10);
+    let ax = 0;
+    let writes = 0;
+    Object.defineProperty(a, 'x', {
+      get: () => ax,
+      set: (value: number) => {
+        writes += 1;
+        if (writes > 1) throw new Error('read-only now');
+        ax = value;
+      },
+    });
+    Object.defineProperty(b, 'x', {
+      get: () => 0,
+      set: () => {
+        throw new Error('locked by the editor');
+      },
+    });
+    await expect(
+      createAlignNodesHandler(fakeFigma(a, b))({ nodeIds: ['1:1', '1:2'], horizontal: 'MAX' }),
+    ).rejects.toThrow(/locked by the editor — and 1:1 could not be put back/);
+  });
+
   it('refuses an in-flow auto-layout child and moves nothing, even other nodes', async () => {
     const free = frame();
     const flow = frame({ layoutMode: 'VERTICAL' }, '0:2');
@@ -269,7 +211,7 @@ describe('align_nodes handler', () => {
         horizontal: 'CENTER',
       }),
     ).rejects.toThrow(/in-flow child.*layoutAlign/s);
-    expect(ok.x).toBe(0); // validated up front
+    expect(ok.x).toBe(0);
   });
 
   it('allows an ABSOLUTE child of an auto-layout frame', async () => {
@@ -292,7 +234,7 @@ describe('align_nodes handler', () => {
     await expect(handler({ nodeIds: [] })).rejects.toThrow(/nodeIds/);
     await expect(handler({ nodeIds: ['1:1'] })).rejects.toThrow(/horizontal, vertical and\/or/);
     await expect(handler({ nodeIds: ['1:1'], horizontal: 'LEFT' })).rejects.toThrow(
-      /MIN, CENTER or MAX/,
+      /horizontal: .*"MIN"\|"CENTER"\|"MAX"/,
     );
     await expect(handler({ nodeIds: ['1:1'], horizontal: 'MIN', relativeTo: 'X' })).rejects.toThrow(
       /relativeTo/,
