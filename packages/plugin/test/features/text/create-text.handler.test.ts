@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateTextHandler } from '../../src/handlers/create-text.js';
+import { createCreateTextHandler } from '../../../src/features/text/create-text.handler.js';
 
 const makeText = () => ({
   id: '2:1',

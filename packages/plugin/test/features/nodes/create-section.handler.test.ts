@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateSectionHandler } from '../../src/handlers/create-section.js';
+import { createCreateSectionHandler } from '../../../src/features/nodes/create-section.handler.js';
 
 const makeSection = () => {
   const node = {

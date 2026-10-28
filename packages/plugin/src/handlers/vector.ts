@@ -7,11 +7,11 @@ import type {
 
 import type { SandboxToolHandler } from '../dispatcher.js';
 import { type Affine, compose, invert } from '../draw.js';
+import { applyInitialProps } from '../features/nodes/initial-props.js';
+import { placeNode } from '../features/nodes/place-node.js';
 import { toFigmaPaintsBound } from '../features/paint/bound-paints.js';
 import { serializePaint } from '../serializer.js';
 import { toFigmaPathData } from '../svg-path.js';
-import { applyInitialProps } from './initial-props.js';
-import { placeNode } from './place.js';
 
 /**
  * A vector's geometry, read and written in the two forms Figma keeps: SVG path data per subpath,
@@ -243,7 +243,12 @@ export const createCreateVectorHandler =
       vector.x = typeof p.x === 'number' ? p.x : 0;
       vector.y = typeof p.y === 'number' ? p.y : 0;
       await draw(vector, geometry);
-      await placeNode(figmaCtx, vector, p.parentId, tool);
+      await placeNode(
+        figmaCtx,
+        vector,
+        typeof p.parentId === 'string' ? p.parentId : undefined,
+        tool,
+      );
       await applyInitialProps(figmaCtx, vector, params as Record<string, unknown>, tool);
     } catch (error) {
       // A vector Figma refused to draw (bad path data, a malformed network) is not left behind.

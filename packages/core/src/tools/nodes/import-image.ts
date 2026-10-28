@@ -10,7 +10,7 @@ export const importImageParams = z.object({
     .min(1)
     .optional()
     .describe(
-      'Local image file to import (PNG / JPEG / GIF), read by the MCP server; relative paths ' +
+      'Local image file (PNG / JPEG / GIF) to import, read by the MCP server; relative paths ' +
         'resolve against its working directory',
     ),
   data: z.string().optional().describe('Base64-encoded image bytes (PNG / JPG / GIF)'),

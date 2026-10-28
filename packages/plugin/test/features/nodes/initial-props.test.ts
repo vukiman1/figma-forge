@@ -1,9 +1,9 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateFrameHandler } from '../../src/handlers/create-frame.js';
-import { createCreateRectangleHandler } from '../../src/handlers/create-rectangle.js';
-import { createCreateTextHandler } from '../../src/handlers/create-text.js';
+import { createCreateFrameHandler } from '../../../src/features/nodes/create-frame.handler.js';
+import { createCreateRectangleHandler } from '../../../src/features/nodes/create-rectangle.handler.js';
+import { createCreateTextHandler } from '../../../src/features/text/create-text.handler.js';
 
 const MIXED = Symbol('mixed');
 
@@ -119,7 +119,6 @@ describe('create_* initial style', () => {
   it('keeps an explicit width / height when auto layout would otherwise hug it away', async () => {
     const make = () => {
       const s = setup(frameNode, 'FRAME');
-      // What Figma does: enabling auto layout flips the primary axis to HUG.
       let mode = 'NONE';
       Object.defineProperty(s.node, 'layoutMode', {
         get: () => mode,
@@ -141,7 +140,6 @@ describe('create_* initial style', () => {
       layoutSizingVertical: 'FIXED',
     });
 
-    // An axis the caller sized explicitly wins; without a size, Figma's hug stands.
     const hugging = make();
     await createCreateFrameHandler(hugging.ctx)({
       width: 300,
@@ -160,10 +158,23 @@ describe('create_* initial style', () => {
 
   it('removes the half-built layer and names the failing step when a style is refused', async () => {
     const { node, ctx } = setup(frameNode, 'FRAME');
+    Object.defineProperty(node, 'cornerRadius', {
+      set: () => {
+        throw new Error('radius refused');
+      },
+    });
     await expect(
-      createCreateFrameHandler(ctx)({ fills: [SOLID], cornerRadius: -3 }),
-    ).rejects.toThrow(/cornerRadius — .*radius: Too small.*removed/s);
+      createCreateFrameHandler(ctx)({ fills: [SOLID], cornerRadius: 4 }),
+    ).rejects.toThrow(/cornerRadius — radius refused \(the new layer was removed\)/);
     expect(node.remove).toHaveBeenCalled();
+  });
+
+  it('refuses an invalid style before creating the layer', async () => {
+    const { node, ctx } = setup(frameNode, 'FRAME');
+    await expect(createCreateFrameHandler(ctx)({ cornerRadius: -3 })).rejects.toThrow(
+      /cornerRadius: Too small/,
+    );
+    expect(node.remove).not.toHaveBeenCalled();
   });
 
   it('refuses strokeWeight without strokes and removes the new layer', async () => {

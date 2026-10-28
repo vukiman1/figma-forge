@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateRectangleHandler } from '../../src/handlers/create-rectangle.js';
+import { createCreateRectangleHandler } from '../../../src/features/nodes/create-rectangle.handler.js';
 
 const makeRect = () => {
   const rect = {

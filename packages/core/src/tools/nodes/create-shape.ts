@@ -5,33 +5,49 @@ import type { ToolSpec } from '../tool-spec.js';
 
 export const CREATE_SHAPE_TOOL_NAME = 'create_shape';
 
-export const createShapeParams = z.object({
-  shape: z.enum(['LINE', 'POLYGON', 'STAR']).describe('Which shape to create'),
-  parentId: z.string().optional().describe('Container node id; omit for current page'),
-  name: z.string().optional().describe('Layer name'),
-  x: z.number().optional().describe('X position in the parent'),
-  y: z.number().optional().describe('Y position in the parent'),
-  width: z.number().positive().optional().describe('Width in px (a LINE’s length)'),
-  height: z
-    .number()
-    .positive()
-    .optional()
-    .describe('Height in px (POLYGON / STAR only; a LINE has none)'),
-  pointCount: z
-    .number()
-    .int()
-    .min(3)
-    .max(60)
-    .optional()
-    .describe('Sides of a POLYGON or points of a STAR, 3–60'),
-  innerRadius: z
-    .number()
-    .gt(0)
-    .max(1)
-    .optional()
-    .describe('STAR only: inner ring as a share of the outer radius, above 0 and up to 1'),
-  ...initialStyleShape,
-});
+const POINT_COUNT_RANGE = 'must be an integer from 3 to 60';
+const INNER_RADIUS_RANGE = 'must be above 0 and at most 1';
+
+export const createShapeParams = z
+  .object({
+    shape: z.enum(['LINE', 'POLYGON', 'STAR']).describe('Which shape to create'),
+    parentId: z.string().optional().describe('Container node id; omit for current page'),
+    name: z.string().optional().describe('Layer name'),
+    x: z.number().optional().describe('X position in the parent'),
+    y: z.number().optional().describe('Y position in the parent'),
+    width: z.number().positive().optional().describe('Width in px (a LINE’s length)'),
+    height: z
+      .number()
+      .positive()
+      .optional()
+      .describe('Height in px (POLYGON / STAR only; a LINE has none)'),
+    pointCount: z
+      .number()
+      .int({ error: POINT_COUNT_RANGE })
+      .min(3, { error: POINT_COUNT_RANGE })
+      .max(60, { error: POINT_COUNT_RANGE })
+      .optional()
+      .describe('Sides of a POLYGON or points of a STAR, 3–60'),
+    innerRadius: z
+      .number()
+      .gt(0, { error: INNER_RADIUS_RANGE })
+      .max(1, { error: INNER_RADIUS_RANGE })
+      .optional()
+      .describe('STAR only: inner ring as a share of the outer radius, above 0 and up to 1'),
+    ...initialStyleShape,
+  })
+  .refine(params => params.shape !== 'LINE' || params.height === undefined, {
+    error: 'a LINE has no height — pass width as its length',
+    path: ['height'],
+  })
+  .refine(params => params.shape !== 'LINE' || params.pointCount === undefined, {
+    error: 'pointCount does not apply to a LINE',
+    path: ['pointCount'],
+  })
+  .refine(params => params.shape === 'STAR' || params.innerRadius === undefined, {
+    error: 'innerRadius applies to a STAR only',
+    path: ['innerRadius'],
+  });
 
 export const createShapeTool: ToolSpec = {
   name: CREATE_SHAPE_TOOL_NAME,

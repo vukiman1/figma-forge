@@ -5,7 +5,10 @@ import type { ToolSpec } from '../tool-spec.js';
 export const IMPORT_SVG_TOOL_NAME = 'import_svg';
 
 export const importSvgParams = z.object({
-  svg: z.string().describe('Raw SVG markup, e.g. "<svg …>…</svg>"'),
+  svg: z
+    .string()
+    .refine(markup => markup.trim() !== '', { error: 'must be non-empty SVG markup' })
+    .describe('Raw SVG markup, e.g. "<svg …>…</svg>"'),
   name: z.string().optional().describe('Optional name for the new node'),
   parentId: z.string().optional().describe('Parent node id (default: current page)'),
   x: z.number().optional(),

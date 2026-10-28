@@ -15,6 +15,7 @@ import { createApplyAnimationStyleHandler } from '../../src/features/motion/appl
 import { createApplyManualKeyframeTrackHandler } from '../../src/features/motion/apply-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../../src/features/motion/set-timeline-duration.handler.js';
 import { createBatchRenameNodesHandler } from '../../src/features/nodes/batch-rename-nodes.handler.js';
+import { createCreateFrameHandler } from '../../src/features/nodes/create-frame.handler.js';
 import { createDeleteNodesHandler } from '../../src/features/nodes/delete-nodes.handler.js';
 import { createFlipNodesHandler } from '../../src/features/nodes/flip-nodes.handler.js';
 import { createGroupNodesHandler } from '../../src/features/nodes/group-nodes.handler.js';
@@ -46,7 +47,6 @@ import { createSetVariableValueHandler } from '../../src/features/variables/set-
 import { createUpdateVariableCollectionHandler } from '../../src/features/variables/update-variable-collection.handler.js';
 import { SEGMENT_FIELDS, TEXT_RESTORED_FIELDS } from '../../src/handlers/batch-snapshot.js';
 import { createBatchHandler } from '../../src/handlers/batch.js';
-import { createCreateFrameHandler } from '../../src/handlers/create-frame.js';
 import { createNavigateToPageHandler } from '../../src/handlers/navigate-to-page.js';
 import { createRepeatNodesHandler, createSetRepeatHandler } from '../../src/handlers/repeat.js';
 import {

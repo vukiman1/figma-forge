@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createCreateShapeHandler } from '../../src/handlers/create-shape.js';
+import { createCreateShapeHandler } from '../../../src/features/nodes/create-shape.handler.js';
 
 interface FakeShape {
   id: string;
@@ -109,23 +109,19 @@ describe('create_shape handler', () => {
 
   it('refuses nonsensical combinations before creating anything', async () => {
     const { handler, created } = setup();
-    await expect(handler({})).rejects.toThrow(/LINE, POLYGON or STAR/);
-    await expect(handler({ shape: 'CIRCLE' })).rejects.toThrow(/LINE, POLYGON or STAR/);
+    await expect(handler({})).rejects.toThrow(/shape: /);
+    await expect(handler({ shape: 'CIRCLE' })).rejects.toThrow(/"LINE"\|"POLYGON"\|"STAR"/);
     await expect(handler({ shape: 'LINE', height: 10 })).rejects.toThrow(/no height/);
     await expect(handler({ shape: 'LINE', pointCount: 5 })).rejects.toThrow(
-      /do not apply to a LINE/,
+      /does not apply to a LINE/,
     );
     await expect(handler({ shape: 'POLYGON', innerRadius: 0.5 })).rejects.toThrow(/STAR only/);
     await expect(handler({ shape: 'STAR', pointCount: 2 })).rejects.toThrow(/3 to 60/);
     await expect(handler({ shape: 'STAR', pointCount: 4.5 })).rejects.toThrow(/3 to 60/);
-    // Figma draws 60 for anything larger, so a larger count is refused rather than misreported.
     await expect(handler({ shape: 'POLYGON', pointCount: 61 })).rejects.toThrow(/3 to 60/);
     await expect(handler({ shape: 'STAR', innerRadius: 2 })).rejects.toThrow(/at most 1/);
-    // 0 is a star with no area: Figma draws nothing.
     await expect(handler({ shape: 'STAR', innerRadius: 0 })).rejects.toThrow(/above 0/);
-    await expect(handler({ shape: 'STAR', width: 'wide' })).rejects.toThrow(
-      /width must be a number/,
-    );
+    await expect(handler({ shape: 'STAR', width: 'wide' })).rejects.toThrow(/width: /);
     expect(created).toHaveLength(0);
   });
 

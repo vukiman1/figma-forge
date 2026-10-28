@@ -5,7 +5,7 @@ import {
 } from '@figma-forge/core';
 
 import type { SandboxToolHandler } from '../../dispatcher.js';
-import { placeNode } from '../../handlers/place.js';
+import { placeNode } from '../nodes/place-node.js';
 import { parseParams } from '../parse-params.js';
 import { requireNode } from '../require-node.js';
 

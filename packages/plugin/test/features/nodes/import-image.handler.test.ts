@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createImportImageHandler } from '../../src/handlers/import-image.js';
+import { createImportImageHandler } from '../../../src/features/nodes/import-image.handler.js';
 
 interface FakeRect {
   id: string;

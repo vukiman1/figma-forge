@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateEllipseHandler } from '../../src/handlers/create-ellipse.js';
+import { createCreateEllipseHandler } from '../../../src/features/nodes/create-ellipse.handler.js';
 
 const makeEllipse = () => {
   const node = {

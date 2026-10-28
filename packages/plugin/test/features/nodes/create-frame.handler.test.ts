@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createCreateFrameHandler } from '../../src/handlers/create-frame.js';
+import { createCreateFrameHandler } from '../../../src/features/nodes/create-frame.handler.js';
 
 interface FakeFrame {
   id: string;

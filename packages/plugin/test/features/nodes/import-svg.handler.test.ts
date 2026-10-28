@@ -1,7 +1,7 @@
 import type { CreateResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createImportSvgHandler } from '../../src/handlers/import-svg.js';
+import { createImportSvgHandler } from '../../../src/features/nodes/import-svg.handler.js';
 
 interface FakeFrame {
   id: string;
@@ -50,7 +50,7 @@ describe('import_svg handler', () => {
     const result = (await createImportSvgHandler(f)({ svg: SVG, name: 'Logo' })) as CreateResult;
 
     expect(createNodeFromSvg).toHaveBeenCalledWith(SVG);
-    expect(frame.width).toBe(24); // unchanged — no override
+    expect(frame.width).toBe(24);
     expect(page.appendChild).toHaveBeenCalledWith(frame);
     expect(result).toEqual({ ok: true, nodeId: 'F:1', name: 'Logo', type: 'FRAME' });
   });
@@ -67,12 +67,10 @@ describe('import_svg handler', () => {
   it('throws on empty or non-string svg', async () => {
     const { figma: f } = makeFigma();
     await expect(createImportSvgHandler(f)({ svg: '   ' })).rejects.toThrow(/non-empty SVG/);
-    await expect(createImportSvgHandler(f)({ name: 'x' })).rejects.toThrow(/non-empty SVG/);
+    await expect(createImportSvgHandler(f)({ name: 'x' })).rejects.toThrow(/svg: /);
   });
 
-  // An SVG's colours are CSS colours (sRGB), but createNodeFromSvg keeps their channels: in a
-  // Display P3 file they would paint more saturated than the markup. Measured live.
-  describe('in a Display P3 document', () => {
+  describe('in a Display P3 document, the SVG’s sRGB colours', () => {
     const imported = () => {
       const path = {
         fills: [{ type: 'SOLID', visible: true, opacity: 1, color: { r: 0.8, g: 0.4, b: 0.2 } }],
