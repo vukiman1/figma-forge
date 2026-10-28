@@ -1,8 +1,9 @@
 import { ErrorCode } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createToolCall, isPluginBridgeMessage } from '../protocol/bridge.js';
-import { dispatchSandboxMessage, type SandboxHandlers } from '../src/dispatcher.js';
+import { createToolCall, isPluginBridgeMessage } from '../../protocol/bridge.js';
+import { dispatchSandboxMessage } from '../../src/runtime/dispatcher.js';
+import type { SandboxHandlers } from '../../src/runtime/sandbox-handler.js';
 
 describe('dispatchSandboxMessage', () => {
   it('replies with tool-result when handler resolves', async () => {
@@ -53,17 +54,11 @@ describe('dispatchSandboxMessage', () => {
     const outcome = await dispatchSandboxMessage({ raw, handlers, editorType: 'figma' });
     expect(outcome).toMatchObject({
       kind: 'reply',
-      reply: {
-        kind: 'tool-error',
-        code: ErrorCode.Internal,
-        message: expect.stringContaining('handler exploded'),
-      },
+      reply: { kind: 'tool-error', code: ErrorCode.Internal },
     });
+    expect(JSON.stringify(outcome)).toContain('handler exploded');
   });
 
-  // FigJam and Dev Mode reject whole classes of call the tool surface offers, and the plugin API's
-  // own error rarely says which editor raised it. Naming it is what lets an agent re-plan instead
-  // of retrying the same call — see protocol/editor-context.ts.
   it('names the editor when a handler throws in a restricted one', async () => {
     const handlers: SandboxHandlers = {
       boom: () => {
@@ -74,17 +69,11 @@ describe('dispatchSandboxMessage', () => {
 
     const outcome = await dispatchSandboxMessage({ raw, handlers, editorType: 'dev' });
 
-    expect(outcome).toMatchObject({
-      kind: 'reply',
-      reply: {
-        kind: 'tool-error',
-        message: expect.stringContaining('in read-only mode'),
-      },
-    });
+    expect(outcome).toMatchObject({ kind: 'reply', reply: { kind: 'tool-error' } });
+    expect(JSON.stringify(outcome)).toContain('in read-only mode');
     expect((outcome as { reply: { message: string } }).reply.message).toContain('editor: dev');
   });
 
-  // Figma Design is the common case, and it must stay free of the caveat entirely.
   it('adds nothing to an error raised in Figma Design', async () => {
     const handlers: SandboxHandlers = {
       boom: () => {

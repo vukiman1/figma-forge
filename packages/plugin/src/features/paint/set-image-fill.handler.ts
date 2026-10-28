@@ -4,7 +4,7 @@ import {
   setImageFillParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { imagePaintFor } from './image-paint.js';
 import { writePaints } from './write-paints.js';

@@ -1,10 +1,10 @@
-import './shims.js';
+import './runtime/shims.js';
 import { createPluginContextEvent, SELECTION_DETAIL_LIMIT } from '../protocol/bridge.js';
 import { parsePanelControl } from '../protocol/panel-control.js';
-import { resumeHostYield } from './cooperative.js';
-import { dispatchSandboxMessage } from './dispatcher.js';
 import { createSandboxHandlers } from './features/sandbox-handlers.js';
-import { createPanelController } from './panel.js';
+import { resumeHostYield } from './runtime/cooperative.js';
+import { dispatchSandboxMessage } from './runtime/dispatcher.js';
+import { createPanelController } from './runtime/panel.js';
 
 const log = (msg: string): void => console.log(msg);
 

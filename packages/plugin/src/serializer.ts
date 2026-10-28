@@ -23,7 +23,6 @@ import {
   TOOL_RESULT_LIMIT_BYTES,
 } from '@figma-forge/core';
 
-import { TimeSlice } from './cooperative.js';
 import {
   applyRepeat,
   renderBoundsOf,
@@ -34,6 +33,7 @@ import {
 import { cssAngleFromGradientTransform } from './gradient-angle.js';
 import { boundingBoxOf, orientationOf } from './orientation.js';
 import { cssProgressiveBlurLayers } from './progressive-blur.js';
+import { TimeSlice } from './runtime/cooperative.js';
 import { flattenForest } from './traverse.js';
 
 const isGradient = (paint: Paint): paint is GradientPaint =>

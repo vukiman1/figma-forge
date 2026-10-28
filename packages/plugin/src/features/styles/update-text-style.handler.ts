@@ -4,7 +4,7 @@ import {
   updateTextStyleParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { loadFonts, toFigmaFontName } from '../text/fonts.js';
 import { resolveTextStyleBindings } from '../text/text-style-bindings.js';

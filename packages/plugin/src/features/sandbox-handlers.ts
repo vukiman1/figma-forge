@@ -1,6 +1,6 @@
-import type { SandboxHandlers } from '../dispatcher.js';
-import { createIdempotencyCache, idempotent } from '../idempotency.js';
-import { withInstanceIdLookup } from '../node-lookup.js';
+import { createIdempotencyCache, idempotent } from '../runtime/idempotency.js';
+import { withInstanceIdLookup } from '../runtime/node-lookup.js';
+import type { SandboxHandlers } from '../runtime/sandbox-handler.js';
 import { createBatchHandler } from './batch/batch.handler.js';
 import type { HandlerFactories } from './handler-factories.js';
 import { READ_HANDLERS, WRITE_HANDLERS } from './tool-handlers.js';

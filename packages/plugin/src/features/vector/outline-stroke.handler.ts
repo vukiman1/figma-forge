@@ -1,6 +1,6 @@
 import { OUTLINE_STROKE_TOOL_NAME as TOOL, outlineStrokeParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { createdResult } from '../nodes/new-node.js';
 import { parseParams } from '../parse-params.js';
 import { requireNode } from '../require-node.js';

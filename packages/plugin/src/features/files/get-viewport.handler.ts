@@ -1,6 +1,6 @@
 import type { GetViewportResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 
 export const createGetViewportHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>

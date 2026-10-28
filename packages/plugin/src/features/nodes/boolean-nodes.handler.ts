@@ -1,7 +1,7 @@
 import { BOOLEAN_NODES_TOOL_NAME as TOOL, booleanNodesParams } from '@figma-forge/core';
 import type { z } from 'zod';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { writePaints } from '../paint/write-paints.js';
 import { parseParams } from '../parse-params.js';
 import { createdResult } from './new-node.js';

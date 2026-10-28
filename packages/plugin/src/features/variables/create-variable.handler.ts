@@ -4,7 +4,7 @@ import {
   type VariableResult,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { errorMessage } from '../error-message.js';
 import { parseParams } from '../parse-params.js';
 import { requireCollection } from './lookup.js';

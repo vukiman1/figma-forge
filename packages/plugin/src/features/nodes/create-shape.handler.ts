@@ -1,7 +1,7 @@
 import { CREATE_SHAPE_TOOL_NAME as TOOL, createShapeParams } from '@figma-forge/core';
 import type { z } from 'zod';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { applyInitialProps } from './initial-props.js';
 import { createdResult, setNameAndPosition } from './new-node.js';

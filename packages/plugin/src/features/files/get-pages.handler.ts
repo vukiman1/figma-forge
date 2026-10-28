@@ -1,6 +1,6 @@
 import type { GetPagesResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 
 export const createGetPagesHandler =
   (figmaCtx: typeof figma): SandboxToolHandler =>

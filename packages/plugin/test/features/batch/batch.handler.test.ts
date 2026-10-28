@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { createBatchHandler } from '../../../src/features/batch/batch.handler.js';
 import { createSetTextHandler } from '../../../src/features/text/set-text.handler.js';
-import { createIdempotencyCache, idempotent } from '../../../src/idempotency.js';
+import { createIdempotencyCache, idempotent } from '../../../src/runtime/idempotency.js';
 import { makeFigma, realWrites, FAIL } from './batch-fake.js';
 import { type Run, fakeText } from './batch-text-fake.js';
 

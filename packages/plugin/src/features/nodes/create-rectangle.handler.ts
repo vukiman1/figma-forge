@@ -1,6 +1,6 @@
 import { CREATE_RECTANGLE_TOOL_NAME as TOOL, createRectangleParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { applyInitialProps } from './initial-props.js';
 import { createdResult, isSized, setNameAndPosition } from './new-node.js';

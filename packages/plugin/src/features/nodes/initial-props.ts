@@ -1,6 +1,6 @@
 import { initialTextShape, pickDefined } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { errorMessage } from '../error-message.js';
 import { createSetAutoLayoutHandler } from '../layout/set-auto-layout.handler.js';
 import { createSetLayoutPropsHandler } from '../layout/set-layout-props.handler.js';

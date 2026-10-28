@@ -4,7 +4,7 @@ import {
   getVectorParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { serializeVectorNetwork } from './serialize-vector-network.js';
 

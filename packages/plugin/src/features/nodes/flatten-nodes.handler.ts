@@ -1,6 +1,6 @@
 import { FLATTEN_NODES_TOOL_NAME as TOOL, flattenNodesParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { createdResult } from './new-node.js';
 import { resolveSharedParent } from './shared-parent.js';

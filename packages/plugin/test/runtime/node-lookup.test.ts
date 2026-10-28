@@ -1,10 +1,9 @@
 import type { GetNodeMotionResult, MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSandboxHandlers } from '../src/features/sandbox-handlers.js';
-import { withInstanceIdLookup } from '../src/node-lookup.js';
+import { createSandboxHandlers } from '../../src/features/sandbox-handlers.js';
+import { withInstanceIdLookup } from '../../src/runtime/node-lookup.js';
 
-// Figma's own rejection, measured live while the by-id lookup was timing out: a bare string, not an Error.
 const BY_ID_TIMEOUT =
   'Unable to establish connection to Figma after 10 seconds. Please check your internet connection.';
 
@@ -28,7 +27,6 @@ const node = (id: string, children?: FakeNode[], visible = true): FakeNode => {
     visible,
     applyAnimationStyle: () => {},
     animationStyles: [],
-    // The id as a keyframe value, so a read proves which node it resolved to.
     animations: { OPACITY: { keyframes: [{ time: 0, value: id }] } },
     manualKeyframeTracks: {},
     timelines: [],
@@ -47,10 +45,6 @@ const node = (id: string, children?: FakeNode[], visible = true): FakeNode => {
   return n;
 };
 
-/**
- * A file whose by-id lookup either works (`healthy`) or rejects every instance-qualified id with
- * Figma's bare string while plain ids still resolve. Every call to the real lookup is recorded.
- */
 const fakeFigma = (byId: 'healthy' | 'rejects-instance-ids') => {
   const hidden = node('I2:6;2:7', undefined, false);
   const nestedChild = node('I2:6;3:1;3:2');
@@ -68,7 +62,7 @@ const fakeFigma = (byId: 'healthy' | 'rejects-instance-ids') => {
     skipInvisibleInstanceChildren: false,
     getNodeByIdAsync: async (id: string) => {
       lookups.push(id);
-      if (byId === 'rejects-instance-ids' && id.startsWith('I')) throw BY_ID_TIMEOUT; // eslint-disable-line no-throw-literal
+      if (byId === 'rejects-instance-ids' && id.startsWith('I')) throw BY_ID_TIMEOUT;
       return all.get(id) ?? null;
     },
   } as unknown as typeof figma;
@@ -111,7 +105,7 @@ describe('a by-id lookup that rejects instance-qualified ids', () => {
     expect(lookups).toEqual([id, '2:6']);
   });
 
-  it('stops asking Figma by id once it has rejected, for the rest of the run', async () => {
+  it('stops asking Figma by id once it has rejected, for the rest of the run — Figma was seen rejecting such an id after 10 s', async () => {
     const { figmaCtx, lookups, sublayer, nestedChild } = fakeFigma('rejects-instance-ids');
     const ctx = withInstanceIdLookup(figmaCtx);
     expect(await ctx.getNodeByIdAsync('I2:6;2:5')).toBe(sublayer);

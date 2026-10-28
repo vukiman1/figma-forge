@@ -1,6 +1,6 @@
 import { GET_SELECTION_TOOL_NAME as TOOL, type GetSelectionResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { RESULT_LIMIT_LABEL, resultCharBudget, serializeFlatNodes } from '../../serializer.js';
 
 export const createGetSelectionHandler =

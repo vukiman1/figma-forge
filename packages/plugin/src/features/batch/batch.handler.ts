@@ -1,6 +1,6 @@
 import type { BatchResult } from '@figma-forge/core';
 
-import type { SandboxHandlers, SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxHandlers, SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { errorMessage } from '../error-message.js';
 import { type ParsedOp, parseOps } from './batch-ops.js';
 import { type AppliedOp, rollBack } from './batch-rollback.js';

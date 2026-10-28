@@ -1,6 +1,6 @@
 import { LOCK_NODES_TOOL_NAME as TOOL, lockNodesParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { setLocked } from './set-locked.js';
 

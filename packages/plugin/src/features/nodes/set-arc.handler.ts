@@ -1,6 +1,6 @@
 import { type MutateResult, SET_ARC_TOOL_NAME as TOOL, setArcParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 
 const requireEllipse = async (figmaCtx: typeof figma, nodeId: string): Promise<EllipseNode> => {

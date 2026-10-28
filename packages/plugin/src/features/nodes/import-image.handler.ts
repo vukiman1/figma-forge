@@ -1,6 +1,6 @@
 import { IMPORT_IMAGE_TOOL_NAME as TOOL, importImageParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { InvalidParamsError, parseParams } from '../parse-params.js';
 import { createdResult, setNameAndPosition } from './new-node.js';
 import { placeNode } from './place-node.js';

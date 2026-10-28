@@ -1,6 +1,5 @@
 import { vi } from 'vitest';
 
-import type { SandboxHandlers } from '../../../src/dispatcher.js';
 import { createCreateComponentHandler } from '../../../src/features/components/create-component.handler.js';
 import { createCreateFrameHandler } from '../../../src/features/nodes/create-frame.handler.js';
 import { createDeleteNodesHandler } from '../../../src/features/nodes/delete-nodes.handler.js';
@@ -13,6 +12,7 @@ import { createSetFillsHandler } from '../../../src/features/paint/set-fills.han
 import { createSetOpacityHandler } from '../../../src/features/paint/set-opacity.handler.js';
 import { createSetStrokesHandler } from '../../../src/features/paint/set-strokes.handler.js';
 import { createSetTextPropertiesHandler } from '../../../src/features/text/set-text-properties.handler.js';
+import type { SandboxHandlers } from '../../../src/runtime/sandbox-handler.js';
 
 export const MIXED = Symbol('mixed');
 

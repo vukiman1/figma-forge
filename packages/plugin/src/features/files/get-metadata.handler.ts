@@ -1,6 +1,6 @@
 import type { GetMetadataResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { documentColorProfile } from '../color-space.js';
 
 const DEFAULT_MODE = 'default';

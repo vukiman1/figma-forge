@@ -4,7 +4,7 @@ import {
   setVectorParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { drawGeometry, toVectorGeometry } from './vector-geometry.js';
 

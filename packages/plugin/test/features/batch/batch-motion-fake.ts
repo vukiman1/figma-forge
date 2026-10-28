@@ -1,10 +1,10 @@
 import { vi } from 'vitest';
 
-import type { SandboxHandlers } from '../../../src/dispatcher.js';
 import { createApplyAnimationStyleHandler } from '../../../src/features/motion/apply-animation-style.handler.js';
 import { createApplyManualKeyframeTrackHandler } from '../../../src/features/motion/apply-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../../../src/features/motion/set-timeline-duration.handler.js';
 import { createSetFillsHandler } from '../../../src/features/paint/set-fills.handler.js';
+import type { SandboxHandlers } from '../../../src/runtime/sandbox-handler.js';
 
 export const makeMotionFigma = (editorType = 'figma') => {
   const store = new Map<string, Record<string, unknown>>();

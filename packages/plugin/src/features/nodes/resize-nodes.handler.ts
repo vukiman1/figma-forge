@@ -4,7 +4,7 @@ import {
   resizeNodesParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { InvalidParamsError, parseParams } from '../parse-params.js';
 import { type Adjusted, type Box, explainMiss, sameBox } from './resize-outcome.js';
 

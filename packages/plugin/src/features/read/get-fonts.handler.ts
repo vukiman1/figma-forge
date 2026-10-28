@@ -1,6 +1,6 @@
 import type { GetFontsResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { walk } from '../../traverse.js';
 import { variationAxesOf } from './font-axes.js';
 import { tallyFonts } from './font-usage.js';

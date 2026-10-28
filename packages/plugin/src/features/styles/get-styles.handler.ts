@@ -1,6 +1,6 @@
 import type { GetStylesResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { displayP3Marker } from '../color-space.js';
 import {
   serializeEffectStyle,

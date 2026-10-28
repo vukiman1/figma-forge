@@ -5,7 +5,7 @@ import {
   type NodeAnnotations,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { serializeAnnotation } from '../../serializer.js';
 import { walk } from '../../traverse.js';
 import { parseParams } from '../parse-params.js';

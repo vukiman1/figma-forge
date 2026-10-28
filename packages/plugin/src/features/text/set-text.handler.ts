@@ -1,6 +1,6 @@
 import { type MutateResult, SET_TEXT_TOOL_NAME as TOOL, setTextParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { loadTextFonts } from './fonts.js';
 import { keptEdges, replaceRange } from './text-edit.js';

@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { HostYieldMessage } from '../protocol/host-yield.js';
-import { resetThrottleForTests, resumeHostYield, SLICE_MS, TimeSlice } from '../src/cooperative.js';
+import type { HostYieldMessage } from '../../protocol/host-yield.js';
+import {
+  resetThrottleForTests,
+  resumeHostYield,
+  SLICE_MS,
+  TimeSlice,
+} from '../../src/runtime/cooperative.js';
 
 describe('TimeSlice', () => {
   let now = 0;
@@ -29,19 +34,16 @@ describe('TimeSlice', () => {
   it('coarsens slices for a while after the host is slow to hand the thread back', async () => {
     const slice = new TimeSlice();
     now = SLICE_MS;
-    // A hidden page's timer wakes up to a second late: what throttling looks like from inside.
     const yielding = slice.yield();
     now += 1_000;
     await yielding;
 
     now += SLICE_MS;
     expect(slice.due()).toBe(false);
-    // A later run on the same throttled host does not pay for it again.
     const next = new TimeSlice();
     now += SLICE_MS;
     expect(next.due()).toBe(false);
 
-    // Long enough later, it probes again.
     now += 30_000;
     expect(next.due()).toBe(true);
   });
@@ -56,7 +58,7 @@ describe('TimeSlice', () => {
     expect(slice.due()).toBe(true);
   });
 
-  it('hands a sandbox yield to the panel without depending on a background timer', async () => {
+  it('hands a sandbox yield to the panel without depending on a timer, which a background tab can hold back for close to a minute', async () => {
     const postMessage = vi.fn<(message: HostYieldMessage) => void>();
     vi.stubGlobal('figma', { ui: { postMessage } });
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
@@ -65,15 +67,10 @@ describe('TimeSlice', () => {
       now = SLICE_MS;
       const yielding = slice.yield();
 
-      // Timers deliberately never run: hidden Figma files can strand a read here even while
-      // tool messages still arrive. A panel round-trip must be the host-turn boundary instead.
-      expect(postMessage).toHaveBeenCalledWith({
-        tag: '@figma-forge/yield',
-        kind: 'yield-request',
-        id: expect.any(Number),
-      });
-      expect(vi.getTimerCount()).toBe(0);
       const message = postMessage.mock.calls[0]![0];
+      expect(message).toMatchObject({ tag: '@figma-forge/yield', kind: 'yield-request' });
+      expect(typeof message.id).toBe('number');
+      expect(vi.getTimerCount()).toBe(0);
       expect(resumeHostYield({ ...message, kind: 'yield-resume', background: false })).toBe(true);
       await yielding;
       now += SLICE_MS;

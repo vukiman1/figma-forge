@@ -4,7 +4,7 @@ import {
   deleteComponentPropertyParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { propertyDisplayName, requireComponentOwner } from './component-owner.js';
 

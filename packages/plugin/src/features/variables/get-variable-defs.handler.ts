@@ -1,6 +1,6 @@
 import type { GetVariableDefsResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { serializeCodeSyntax } from '../../serializer.js';
 import { displayP3Marker } from '../color-space.js';
 import { serializeVariableValue } from './serialize-variable-value.js';

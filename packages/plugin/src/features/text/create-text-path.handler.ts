@@ -5,7 +5,7 @@ import {
 } from '@figma-forge/core';
 import type { z } from 'zod';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { toFigmaPaintsBound } from '../paint/bound-paints.js';
 import { writePaints } from '../paint/write-paints.js';
 import { parseParams } from '../parse-params.js';

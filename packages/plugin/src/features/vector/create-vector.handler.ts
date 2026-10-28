@@ -1,6 +1,6 @@
 import { CREATE_VECTOR_TOOL_NAME as TOOL, createVectorParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { applyInitialProps } from '../nodes/initial-props.js';
 import { createdResult } from '../nodes/new-node.js';
 import { placeNode } from '../nodes/place-node.js';

@@ -1,4 +1,4 @@
-import { TimeSlice } from './cooperative.js';
+import { TimeSlice } from './runtime/cooperative.js';
 
 const isSceneNode = (node: BaseNode): node is SceneNode =>
   node.type !== 'DOCUMENT' && node.type !== 'PAGE';

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { revealNodes } from '../src/reveal.js';
+import { revealNodes } from '../../src/runtime/reveal.js';
 
 interface FakeNode {
   id: string;
@@ -19,11 +19,6 @@ const node = (id: string, parent: FakeNode | null, over: Partial<FakeNode> = {})
   ...over,
 });
 
-/**
- * A figma stub with just the surface `revealNodes` touches. `zoomAfterFit` models where Figma's own
- * `scrollAndZoomIntoView` would land — a tiny node fits at a huge zoom, a page-sized frame at a
- * small one.
- */
 const fakeFigma = (nodes: FakeNode[], current: FakeNode, zoomAfterFit = 1) => {
   const byId = new Map(nodes.map(n => [n.id, n]));
   const currentPage = { id: current.id, selection: [] as FakeNode[] };
@@ -46,7 +41,6 @@ const fakeFigma = (nodes: FakeNode[], current: FakeNode, zoomAfterFit = 1) => {
   };
 };
 
-// The stub models only what the function uses; casting keeps the test free of the full PluginAPI.
 const asFigma = (f: ReturnType<typeof fakeFigma>): typeof figma => f as unknown as typeof figma;
 
 const MISSED = { revealed: 0, switchedPage: false };
@@ -76,7 +70,6 @@ describe('revealNodes', () => {
     expect(outcome.revealed).toBe(2);
   });
 
-  // The agent may have deleted the node, or the user may have undone the call, since it ran.
   it('skips ids that no longer resolve', async () => {
     const p = page('p1');
     const alive = node('1:1', p);
@@ -110,7 +103,6 @@ describe('revealNodes', () => {
     expect(f.viewport.scrollAndZoomIntoView).not.toHaveBeenCalled();
   });
 
-  // Pages and the document itself can't be selected or zoomed to.
   it('ignores ids that point at a page or the document', async () => {
     const p = page('p1');
     const doc: FakeNode = { id: 'doc', type: 'DOCUMENT', parent: null };
@@ -121,7 +113,7 @@ describe('revealNodes', () => {
     expect(outcome.revealed).toBe(0);
   });
 
-  it('switches to the page the node lives on', async () => {
+  it('switches to the page the node lives on through setCurrentPageAsync, as dynamic-page access requires', async () => {
     const here = page('p1');
     const there = page('p2');
     const target = node('2:1', there);
@@ -133,7 +125,6 @@ describe('revealNodes', () => {
     expect(outcome).toEqual({ revealed: 1, switchedPage: true });
   });
 
-  // A selection can't span pages, so the first id decides which page wins.
   it('keeps only the nodes on the first node’s page', async () => {
     const p1 = page('p1');
     const p2 = page('p2');
@@ -187,8 +178,6 @@ describe('revealNodes', () => {
   });
 
   describe('zoom', () => {
-    // Fitting a small node fills the screen with it and leaves nothing to orient against, so the
-    // reveal backs off far enough to keep its surroundings in frame.
     it('backs off when fitting the node would zoom in too far', async () => {
       const p = page('p1');
       const f = fakeFigma([p, node('1:1', p)], p, 12);

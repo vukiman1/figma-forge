@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { createIdempotencyCache, idempotent } from '../src/idempotency.js';
+import { createIdempotencyCache, idempotent } from '../../src/runtime/idempotency.js';
 
 describe('createIdempotencyCache', () => {
   it('runs once per requestId and replays the cached result', async () => {
@@ -34,10 +34,10 @@ describe('createIdempotencyCache', () => {
     const fn = vi.fn<() => Promise<number>>(async () => 1);
     await cache.run('x', fn);
     clock += 50;
-    await cache.run('x', fn); // within TTL → cached
+    await cache.run('x', fn);
     expect(fn).toHaveBeenCalledTimes(1);
-    clock += 100; // past TTL
-    await cache.run('x', fn); // expired → re-run
+    clock += 100;
+    await cache.run('x', fn);
     expect(fn).toHaveBeenCalledTimes(2);
     expect(cache.size()).toBe(1);
   });
@@ -50,7 +50,6 @@ describe('idempotent wrapper', () => {
     const handler = idempotent(cache, applied);
     const results: unknown[] = [];
     for (let i = 0; i < 5; i += 1) {
-      // eslint-disable-next-line no-await-in-loop -- sequential by design (simulating retries)
       results.push(await handler({ requestId: 'w-1', nodeId: '1:2' }));
     }
     expect(applied).toHaveBeenCalledTimes(1);

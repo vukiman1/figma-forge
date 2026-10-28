@@ -4,7 +4,7 @@ import {
   type CreateResult,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 
 const requireCloneable = async (figmaCtx: typeof figma, nodeId: string): Promise<SceneNode> => {

@@ -4,7 +4,7 @@ import {
   setReactionsParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { requireReactionHost, toFigmaReaction } from './reactions.js';
 

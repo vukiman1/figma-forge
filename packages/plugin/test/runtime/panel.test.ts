@@ -6,8 +6,8 @@ import {
   createPanelReveal,
   PANEL_DEFAULT_SIZE,
   PANEL_MIN_SIZE,
-} from '../protocol/panel-control.js';
-import { createPanelController, STORED_SIZE_KEY } from '../src/panel.js';
+} from '../../protocol/panel-control.js';
+import { createPanelController, STORED_SIZE_KEY } from '../../src/runtime/panel.js';
 
 interface FakeNode {
   id: string;
@@ -16,10 +16,6 @@ interface FakeNode {
   parent: FakeNode | null;
 }
 
-/**
- * A figma stub with just the surface the panel controller touches. `stored` seeds what
- * `clientStorage` already holds; `nodes` seeds what a reveal can find.
- */
 const fakeFigma = (opts: { stored?: unknown; nodes?: FakeNode[]; mode?: string } = {}) => {
   const storage = new Map<string, unknown>();
   if (opts.stored !== undefined) storage.set(STORED_SIZE_KEY, opts.stored);
@@ -57,10 +53,8 @@ const fakeFigma = (opts: { stored?: unknown; nodes?: FakeNode[]; mode?: string }
 
 type Fake = ReturnType<typeof fakeFigma>;
 
-// The stub models only what the controller uses; casting keeps the test free of the full PluginAPI.
 const controllerFor = (f: Fake) => createPanelController(f as unknown as typeof figma);
 
-/** Let the controller's fire-and-forget storage read / reveal settle. */
 const settle = (): Promise<void> => new Promise(resolve => setTimeout(resolve, 0));
 
 describe('createPanelController', () => {
@@ -76,10 +70,6 @@ describe('createPanelController', () => {
       });
     });
 
-    // In Dev Mode's Inspect panel the UI is an iframe Figma sizes and keeps visible. Restoring a
-    // stored size would push a window size at a panel that has none, and the run listener exists to
-    // re-show a window that "run in background" hid — a control the panel withdraws there. Both are
-    // skipped so the sandbox's model of the panel matches the UI's.
     it('does not manage a window that Dev Mode’s Inspect panel owns', async () => {
       const f = fakeFigma({ stored: { width: 420, height: 560 }, mode: 'inspect' });
 
@@ -100,8 +90,6 @@ describe('createPanelController', () => {
       expect(f.ui.resize).toHaveBeenCalledWith(420, 560);
     });
 
-    // A size stored before the current floor existed would otherwise reopen the window at a size
-    // the layout can no longer fill.
     it('clamps a stored size that predates the current floor', async () => {
       const f = fakeFigma({ stored: { width: 100, height: 100 } });
 
@@ -116,7 +104,6 @@ describe('createPanelController', () => {
         const f = fakeFigma(stored === undefined ? {} : { stored });
 
         controllerFor(f).open('<html></html>');
-        // eslint-disable-next-line no-await-in-loop -- each case must settle before the next
         await settle();
 
         expect(f.ui.resize).not.toHaveBeenCalled();
@@ -133,7 +120,6 @@ describe('createPanelController', () => {
       expect(f.ui.resize).not.toHaveBeenCalled();
     });
 
-    // Running the plugin again is the only way back from "run in background".
     it('re-reveals the panel when the plugin is run again', () => {
       const f = fakeFigma();
 
@@ -147,8 +133,7 @@ describe('createPanelController', () => {
   });
 
   describe('panel-hide', () => {
-    // Closing the plugin would drop the relay socket that lives in the panel's iframe.
-    it('hides the iframe rather than closing the plugin', () => {
+    it('hides the iframe rather than closing the plugin, which would drop the relay socket', () => {
       const f = fakeFigma();
 
       controllerFor(f).apply(createPanelHide());
@@ -174,9 +159,7 @@ describe('createPanelController', () => {
       expect(f.ui.resize).toHaveBeenCalledWith(PANEL_MIN_SIZE.width, PANEL_MIN_SIZE.height);
     });
 
-    // Sent on drag-release only, so the store holds the size the user settled on rather than every
-    // intermediate frame of the drag.
-    it('stores the size only when asked to persist', () => {
+    it('stores the size only when asked to persist, which the panel does once on drag release', () => {
       const f = fakeFigma();
       const panel = controllerFor(f);
 
@@ -198,7 +181,6 @@ describe('createPanelController', () => {
       expect(f.clientStorage.setAsync).toHaveBeenCalledWith(STORED_SIZE_KEY, PANEL_MIN_SIZE);
     });
 
-    // A drag must not be interrupted by a storage failure the user can do nothing about.
     it('survives storage rejecting', () => {
       const f = fakeFigma();
       f.clientStorage.setAsync.mockRejectedValueOnce(new Error('quota'));
@@ -228,8 +210,6 @@ describe('createPanelController', () => {
       expect(f.notify).not.toHaveBeenCalled();
     });
 
-    // Silence on a miss would read as a broken button — the usual cause is the call being undone,
-    // or the agent deleting what it made.
     it('says so when nothing could be found', async () => {
       const f = fakeFigma();
 

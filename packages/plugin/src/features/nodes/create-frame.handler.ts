@@ -1,6 +1,6 @@
 import { CREATE_FRAME_TOOL_NAME as TOOL, createFrameParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { parseParams } from '../parse-params.js';
 import { applyInitialProps, type InitialProps } from './initial-props.js';
 import { createdResult, isSized, setNameAndPosition } from './new-node.js';

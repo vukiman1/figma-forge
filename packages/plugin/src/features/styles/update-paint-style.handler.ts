@@ -4,7 +4,7 @@ import {
   updatePaintStyleParams,
 } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { toFigmaPaintsBound } from '../paint/bound-paints.js';
 import { parseParams } from '../parse-params.js';
 import { requireStyleOf } from './require-style.js';

@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import type { SandboxToolHandler } from '../../../src/dispatcher.js';
 import { createApplyAnimationStyleHandler } from '../../../src/features/motion/apply-animation-style.handler.js';
 import { createApplyManualKeyframeTrackHandler } from '../../../src/features/motion/apply-manual-keyframe-track.handler.js';
 import { createRemoveAnimationStyleHandler } from '../../../src/features/motion/remove-animation-style.handler.js';
 import { createRemoveManualKeyframeTrackHandler } from '../../../src/features/motion/remove-manual-keyframe-track.handler.js';
 import { createSetTimelineDurationHandler } from '../../../src/features/motion/set-timeline-duration.handler.js';
+import type { SandboxToolHandler } from '../../../src/runtime/sandbox-handler.js';
 
 const FIELD = { type: 'PROPERTY', name: 'OPACITY' };
 

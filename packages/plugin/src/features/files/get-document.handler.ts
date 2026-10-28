@@ -1,6 +1,6 @@
 import { GET_DOCUMENT_TOOL_NAME as TOOL, type GetDocumentResult } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { resultCharBudget, serializeTrees, treeTooLargeError } from '../../serializer.js';
 
 export const createGetDocumentHandler =

@@ -1,6 +1,6 @@
 import { SEARCH_NODES_TOOL_NAME as TOOL, searchNodesParams } from '@figma-forge/core';
 
-import type { SandboxToolHandler } from '../../dispatcher.js';
+import type { SandboxToolHandler } from '../../runtime/sandbox-handler.js';
 import { resultCharBudget, serializeFlatNodes, toNodeListResult } from '../../serializer.js';
 import { collectMatches, resolveScope } from '../../traverse.js';
 import { parseParams } from '../parse-params.js';
