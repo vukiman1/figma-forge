@@ -17,7 +17,6 @@ const payload = (over: Partial<ActivityPayload> = {}): ActivityPayload => ({
   ...over,
 });
 
-/** Apply a transition the way the client does: merge the returned partial onto the state. */
 const apply = (state: RelayClientState, partial: Partial<RelayClientState>): RelayClientState => ({
   ...state,
   ...partial,
@@ -43,9 +42,7 @@ describe('recordCallStart', () => {
     expect(state.activity[0]).toMatchObject({ method: 'set_fills', status: 'pending' });
   });
 
-  // Totals are counted here rather than derived from the list, so they stay honest once the list
-  // has rolled over.
-  it('counts every call against the lifetime total', () => {
+  it('counts every call against the lifetime total, which stays honest once the list has rolled over', () => {
     let state = initialRelayState();
     for (let i = 0; i < ACTIVITY_LIMIT + 5; i++) state = started(state, { id: `req-${i}` });
 
@@ -61,9 +58,7 @@ describe('recordCallStart', () => {
     expect(entryOf(state, `req-${ACTIVITY_LIMIT}`)).toBeDefined();
   });
 
-  // Absent rather than empty: the row treats "no ids" as "nothing to reveal", and an empty array
-  // would make the reveal control appear for a call that named nothing.
-  it('omits an empty node list rather than storing it', () => {
+  it('omits an empty node list, so the row offers no reveal for a call that named nothing', () => {
     const state = started(initialRelayState(), { nodeIds: [] });
 
     expect(entryOf(state, 'req-1')).not.toHaveProperty('nodeIds');
@@ -117,8 +112,7 @@ describe('recordCallEnd', () => {
   });
 
   describe('node ids', () => {
-    // A create call only names the node it made in its result, so those have to be folded in.
-    it('adds ids the result named to those the params carried', () => {
+    it('adds ids the result named to those the params carried, since a create call names its node only in the result', () => {
       const state = settle(started(initialRelayState(), { nodeIds: ['1:2'] }), {
         nodeIds: ['3:4'],
       });
@@ -143,9 +137,7 @@ describe('recordCallEnd', () => {
     });
   });
 
-  // The failure counter is about the session, not about what is still on screen — so a call whose
-  // row has already rolled off still moves it.
-  it('still counts a failure whose row has been dropped', () => {
+  it('still counts a failure whose row has been dropped, because the count is about the session, not the screen', () => {
     let state = initialRelayState();
     state = started(state, { id: 'old' });
     for (let i = 0; i < ACTIVITY_LIMIT; i++) state = started(state, { id: `req-${i}` });

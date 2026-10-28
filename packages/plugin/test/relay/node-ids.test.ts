@@ -15,9 +15,7 @@ describe('extractNodeIds', () => {
     expect(extractNodeIds({ nodeId: 'I422:1234;422:1200' })).toEqual(['I422:1234;422:1200']);
   });
 
-  // The id of a newly created node is only in the result — that's exactly the call you want to jump
-  // to, so params and result are both scanned.
-  it('finds the node a create call returned', () => {
+  it('finds the node a create call returned, which only its result names', () => {
     const params = { name: 'Card', width: 100 };
     const result = { ok: true, nodeId: '9:9', name: 'Card', type: 'FRAME' };
     expect(extractNodeIds(params, result)).toEqual(['9:9']);
@@ -41,15 +39,13 @@ describe('extractNodeIds', () => {
     expect(extractNodeIds({ nodeId: '1:1' }, { nodeId: '1:1' })).toEqual(['1:1']);
   });
 
-  it('ignores values under the key that are not ids', () => {
+  it('ignores sentinel values under the key that are not ids', () => {
     expect(extractNodeIds({ nodeId: 'selection' })).toEqual([]);
     expect(extractNodeIds({ nodeId: '' })).toEqual([]);
     expect(extractNodeIds({ nodeId: 42 })).toEqual([]);
   });
 
-  // Only keys that name the operation's subject count; a parent or component reference is context,
-  // not what the call acted on.
-  it('ignores ids under other keys', () => {
+  it('ignores ids under other keys, since a parent or component reference is context, not the subject', () => {
     expect(extractNodeIds({ parentId: '1:1', componentId: '2:2', instanceId: '3:3' })).toEqual([]);
   });
 
@@ -57,13 +53,12 @@ describe('extractNodeIds', () => {
     expect(extractNodeIds(null, undefined, 'text', 7, [])).toEqual([]);
   });
 
-  it('caps how many ids one call can contribute', () => {
+  it('caps how many ids one call can contribute, since a batch can carry hundreds of ops', () => {
     const many = Array.from({ length: 200 }, (_, i) => `1:${i}`);
     expect(extractNodeIds({ nodeIds: many })).toHaveLength(50);
   });
 
-  // A cyclic or pathologically deep payload must not hang the panel.
-  it('stops at a depth floor instead of recursing forever', () => {
+  it('stops at a depth floor, so a cyclic or pathologically deep payload cannot hang the panel', () => {
     const deep: Record<string, unknown> = {};
     let cursor = deep;
     for (let i = 0; i < 30; i++) {

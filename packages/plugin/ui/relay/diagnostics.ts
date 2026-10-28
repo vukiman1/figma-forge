@@ -1,28 +1,19 @@
-// Builds a one-shot diagnostic bundle a user can copy into a bug report so the issue can be
-// reproduced: versions + the connected context + the ordered sequence of tool calls, each with its
-// request params and the result (or error) it produced. Pure + testable; the UI just feeds it state.
-//
-// Payloads are the same elided/capped snapshots the Activity inspector shows (base64 images are
-// elided, huge trees capped). The bundle therefore contains the user's design content + file/page
-// names — the caller surfaces that before copying.
-
 import type { PluginContextEvent } from '../../protocol/bridge.js';
 import type { ActivityPayload } from './payload.js';
-import type { RelayClientState } from './state.js';
+import type { ActivityEntry, RelayClientState } from './state.js';
 
 export const DIAGNOSTIC_SCHEMA = 'figma-forge-diagnostic@1';
+
+const PRETTY_PRINT_INDENT = 2;
 
 export interface DiagnosticMeta {
   pluginVersion: string;
   protocolVersion: string;
   sessionId: string;
   userAgent?: string;
-  /** Override "now" for deterministic tests. */
   now?: number;
 }
 
-// A non-truncated snapshot is valid JSON (elision markers are just string values), so parse it back
-// to nest cleanly in the bundle; a truncated one isn't, so keep it as a flagged string.
 const decodePayload = (p: ActivityPayload): unknown => {
   if (p.truncated) return { truncated: true, preview: p.preview };
   try {
@@ -32,7 +23,40 @@ const decodePayload = (p: ActivityPayload): unknown => {
   }
 };
 
-/** Serialize the current client state + context into a diagnostic bundle JSON string. */
+const describeVersions = (
+  state: RelayClientState,
+  context: PluginContextEvent | null,
+  meta: DiagnosticMeta,
+): Record<string, unknown> => ({
+  plugin: meta.pluginVersion,
+  protocol: meta.protocolVersion,
+  server: state.serverVersion,
+  editorType: context?.editorType ?? null,
+  mode: context?.mode ?? null,
+  apiVersion: context?.apiVersion ?? null,
+  ...(meta.userAgent === undefined ? {} : { userAgent: meta.userAgent }),
+});
+
+const describeContext = (context: PluginContextEvent | null): Record<string, unknown> | null =>
+  context === null
+    ? null
+    : {
+        fileName: context.fileName,
+        pageName: context.pageName,
+        selectionCount: context.selectionCount,
+        selection: context.selection,
+      };
+
+const describeCall = (entry: ActivityEntry): Record<string, unknown> => ({
+  method: entry.method,
+  status: entry.status,
+  startedAt: new Date(entry.startedAt).toISOString(),
+  ...(entry.durationMs === undefined ? {} : { durationMs: entry.durationMs }),
+  ...(entry.request === undefined ? {} : { request: decodePayload(entry.request) }),
+  ...(entry.payload === undefined ? {} : { result: decodePayload(entry.payload) }),
+  ...(entry.error === undefined ? {} : { error: entry.error }),
+});
+
 export const buildDiagnosticBundle = (
   state: RelayClientState,
   context: PluginContextEvent | null,
@@ -41,45 +65,14 @@ export const buildDiagnosticBundle = (
   const bundle = {
     schema: DIAGNOSTIC_SCHEMA,
     exportedAt: new Date(meta.now ?? Date.now()).toISOString(),
-    versions: {
-      plugin: meta.pluginVersion,
-      protocol: meta.protocolVersion,
-      server: state.serverVersion,
-      editorType: context?.editorType ?? null,
-      // Paired with editorType because the two answer different questions in a bug report: which
-      // editor's API the session had, and whether the panel was a floating window or an iframe in
-      // Dev Mode's Inspect panel.
-      mode: context?.mode ?? null,
-      apiVersion: context?.apiVersion ?? null,
-      ...(meta.userAgent === undefined ? {} : { userAgent: meta.userAgent }),
-    },
-    context:
-      context === null
-        ? null
-        : {
-            fileName: context.fileName,
-            pageName: context.pageName,
-            selectionCount: context.selectionCount,
-            selection: context.selection,
-          },
+    versions: describeVersions(state, context, meta),
+    context: describeContext(context),
     session: {
       id: meta.sessionId,
       reconnectCount: state.reconnectCount,
       totalCalls: state.totalCalls,
     },
-    // Activity is most-recent-first; reverse so the bundle reads as the sequence that happened.
-    calls: state.activity.toReversed().map(e => {
-      const call: Record<string, unknown> = {
-        method: e.method,
-        status: e.status,
-        startedAt: new Date(e.startedAt).toISOString(),
-      };
-      if (e.durationMs !== undefined) call.durationMs = e.durationMs;
-      if (e.request !== undefined) call.request = decodePayload(e.request);
-      if (e.payload !== undefined) call.result = decodePayload(e.payload);
-      if (e.error !== undefined) call.error = e.error;
-      return call;
-    }),
+    calls: state.activity.toReversed().map(describeCall),
   };
-  return JSON.stringify(bundle, null, 2);
+  return JSON.stringify(bundle, null, PRETTY_PRINT_INDENT);
 };

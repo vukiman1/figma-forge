@@ -32,9 +32,20 @@ const context = {
 
 const meta = { pluginVersion: '0.1.0', protocolVersion: '0.1.0', sessionId: 'sess-1', now: 0 };
 
+interface BundleView {
+  schema: string;
+  exportedAt: string;
+  versions: Record<string, unknown>;
+  context: Record<string, unknown> | null;
+  session: Record<string, unknown>;
+  calls: Record<string, unknown>[];
+}
+
+const parseBundle = (json: string): BundleView => JSON.parse(json) as BundleView;
+
 describe('buildDiagnosticBundle', () => {
   it('captures schema, versions, context and session', () => {
-    const bundle = JSON.parse(buildDiagnosticBundle(baseState([]), context, meta));
+    const bundle = parseBundle(buildDiagnosticBundle(baseState([]), context, meta));
     expect(bundle.schema).toBe(DIAGNOSTIC_SCHEMA);
     expect(bundle.exportedAt).toBe(new Date(0).toISOString());
     expect(bundle.versions).toMatchObject({
@@ -49,8 +60,7 @@ describe('buildDiagnosticBundle', () => {
     expect(bundle.session).toEqual({ id: 'sess-1', reconnectCount: 2, totalCalls: 0 });
   });
 
-  it('orders calls chronologically and nests request + result as objects', () => {
-    // Activity is most-recent-first; the bundle should reverse it.
+  it('orders calls oldest-first though activity is newest-first, nesting request and result as objects rather than escaped strings', () => {
     const activity: ActivityEntry[] = [
       {
         id: 't-2',
@@ -71,15 +81,11 @@ describe('buildDiagnosticBundle', () => {
         payload: summarizePayload({ nodes: [] }),
       },
     ];
-    const bundle = JSON.parse(buildDiagnosticBundle(baseState(activity), context, meta));
-    expect(bundle.calls.map((c: { method: string }) => c.method)).toEqual([
-      'get_design_context',
-      'set_fills',
-    ]);
-    // request/result are real nested objects, not escaped strings
-    expect(bundle.calls[0].request).toEqual({ nodeId: '3:21', detail: 'full' });
-    expect(bundle.calls[0].result).toEqual({ nodes: [] });
-    expect(bundle.calls[0].startedAt).toBe(new Date(1_000).toISOString());
+    const bundle = parseBundle(buildDiagnosticBundle(baseState(activity), context, meta));
+    expect(bundle.calls.map(c => c.method)).toEqual(['get_design_context', 'set_fills']);
+    expect(bundle.calls[0]?.request).toEqual({ nodeId: '3:21', detail: 'full' });
+    expect(bundle.calls[0]?.result).toEqual({ nodes: [] });
+    expect(bundle.calls[0]?.startedAt).toBe(new Date(1_000).toISOString());
   });
 
   it('carries an error and omits result for a failed call', () => {
@@ -94,9 +100,9 @@ describe('buildDiagnosticBundle', () => {
         error: 'node not found',
       },
     ];
-    const bundle = JSON.parse(buildDiagnosticBundle(baseState(activity), context, meta));
+    const bundle = parseBundle(buildDiagnosticBundle(baseState(activity), context, meta));
     expect(bundle.calls[0]).toMatchObject({ status: 'error', error: 'node not found' });
-    expect(bundle.calls[0].result).toBeUndefined();
+    expect(bundle.calls[0]?.result).toBeUndefined();
   });
 
   it('keeps a truncated payload as a flagged string rather than invalid JSON', () => {
@@ -110,12 +116,12 @@ describe('buildDiagnosticBundle', () => {
         payload: summarizePayload(big),
       },
     ];
-    const bundle = JSON.parse(buildDiagnosticBundle(baseState(activity), context, meta));
-    expect(bundle.calls[0].result).toMatchObject({ truncated: true });
+    const bundle = parseBundle(buildDiagnosticBundle(baseState(activity), context, meta));
+    expect(bundle.calls[0]?.result).toMatchObject({ truncated: true });
   });
 
   it('tolerates a null context', () => {
-    const bundle = JSON.parse(buildDiagnosticBundle(baseState([]), null, meta));
+    const bundle = parseBundle(buildDiagnosticBundle(baseState([]), null, meta));
     expect(bundle.context).toBeNull();
     expect(bundle.versions.editorType).toBeNull();
   });
