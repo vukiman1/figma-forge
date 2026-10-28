@@ -5,7 +5,7 @@ import { WIRE_TOOL_SCHEMAS } from '../packages/mcp/src/tools/wire-schema.js';
 import { toToolDefinition } from '../packages/mcp/test/tool-schema.js';
 import { BATCHABLE_TOOLS } from '../packages/plugin/src/features/batch/inverses.js';
 import { NON_BATCHABLE } from '../packages/plugin/src/features/batch/non-batchable.js';
-import { createSandboxHandlers } from '../packages/plugin/src/handlers/registry.js';
+import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
 
 // Cross-package guard: a tool is wired across ~6 places (server def + ListTools + WRITE set, plugin
 // handler + idempotent wrap + batch inverse). Forgetting one fails silently at runtime. These tests

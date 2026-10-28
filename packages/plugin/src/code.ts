@@ -3,7 +3,7 @@ import { createPluginContextEvent, SELECTION_DETAIL_LIMIT } from '../protocol/br
 import { parsePanelControl } from '../protocol/panel-control.js';
 import { resumeHostYield } from './cooperative.js';
 import { dispatchSandboxMessage } from './dispatcher.js';
-import { createSandboxHandlers } from './handlers/registry.js';
+import { createSandboxHandlers } from './features/sandbox-handlers.js';
 import { createPanelController } from './panel.js';
 
 const log = (msg: string): void => console.log(msg);

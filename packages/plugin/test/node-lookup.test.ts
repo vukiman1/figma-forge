@@ -1,7 +1,7 @@
 import type { GetNodeMotionResult, MutateResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { createSandboxHandlers } from '../src/handlers/registry.js';
+import { createSandboxHandlers } from '../src/features/sandbox-handlers.js';
 import { withInstanceIdLookup } from '../src/node-lookup.js';
 
 // Figma's own rejection, measured live while the by-id lookup was timing out: a bare string, not an Error.
