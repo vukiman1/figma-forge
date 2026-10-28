@@ -1,12 +1,11 @@
-// @vitest-environment happy-dom
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { h } from 'vue';
 
-/**
- * The clipboard itself is VueUse's problem, and the browser API it reaches for isn't available
- * under happy-dom. What belongs to the button is _what it hands over_ — so `useClipboard` is
- * stubbed at the module boundary and the tests assert on the handover and the resulting UI state.
- */
+import UiCopyButton from '../../ui/components/UiCopyButton.vue';
+import UiMetaRow from '../../ui/components/UiMetaRow.vue';
+import UiSection from '../../ui/components/UiSection.vue';
+
 const clipboard = vi.hoisted(() => ({ copy: vi.fn<(text: string) => void>() }));
 
 vi.mock('@vueuse/core', async importOriginal => {
@@ -14,7 +13,6 @@ vi.mock('@vueuse/core', async importOriginal => {
   const { ref } = await import('vue');
   return {
     ...actual,
-    // A fresh `copied` per call, mirroring the real per-instance flag.
     useClipboard: () => {
       const copied = ref(false);
       return {
@@ -28,10 +26,6 @@ vi.mock('@vueuse/core', async importOriginal => {
   };
 });
 
-const { default: UiCopyButton } = await import('../../ui/components/UiCopyButton.vue');
-const { default: UiMetaRow } = await import('../../ui/components/UiMetaRow.vue');
-const { default: UiSection } = await import('../../ui/components/UiSection.vue');
-
 describe('UiMetaRow', () => {
   const mountRow = (props: Record<string, unknown> = {}) =>
     mount(UiMetaRow, { props: { label: 'Session', ...props }, slots: { default: 'abcdefgh' } });
@@ -43,15 +37,12 @@ describe('UiMetaRow', () => {
     expect(wrapper.find('dd').text()).toBe('abcdefgh');
   });
 
-  // A name the user chose can run arbitrarily long, and the panel is 280px at its floor.
   it('cuts a long value off rather than widening the row, when asked', () => {
     expect(mountRow({ truncate: true }).find('dd').classes()).toEqual(
       expect.arrayContaining(['min-w-0', 'truncate']),
     );
   });
 
-  // A version or an id is short and its tail matters — truncating one would hide the part you came
-  // to read.
   it('leaves values whole by default', () => {
     expect(mountRow().find('dd').classes()).not.toContain('truncate');
   });
@@ -63,14 +54,12 @@ describe('UiMetaRow', () => {
     expect(classes).not.toContain('tabular-nums');
   });
 
-  // Digits line up column-wise, so a number that changes doesn't make the row twitch.
   it('renders data values monospaced with tabular figures', () => {
     expect(mountRow({ mono: true }).find('dd').classes()).toEqual(
       expect.arrayContaining(['font-mono', 'tabular-nums', 'text-meta']),
     );
   });
 
-  // The fallthrough class lands on the row, so tinting the value needs its own way in.
   it('applies caller classes to the value, not to the row', () => {
     const wrapper = mountRow({ valueClass: 'text-danger' });
 
@@ -90,7 +79,6 @@ describe('UiSection', () => {
     expect(wrapper.text()).toContain('body');
   });
 
-  // A lead-in block carries content that needs no heading of its own.
   it('omits the heading when untitled', () => {
     const wrapper = mountSection();
 
@@ -98,8 +86,6 @@ describe('UiSection', () => {
     expect(wrapper.text()).toContain('body');
   });
 
-  // Separators come from the parent's `divide-y`, so a section never has to know it is first —
-  // it only flattens its own outer padding.
   it('keeps its edges flush so the parent owns the rules between sections', () => {
     expect(mountSection().classes()).toEqual(expect.arrayContaining(['first:pt-0', 'last:pb-0']));
   });
@@ -128,7 +114,6 @@ describe('UiCopyButton', () => {
     expect(wrapper.text()).toBe('Copied');
   });
 
-  // Each button owns its own flag, so copying one block must not light up another's.
   it('keeps the copied state local to one button', async () => {
     const first = mountButton({ value: 'a' });
     const second = mountButton({ value: 'b' });
@@ -139,7 +124,6 @@ describe('UiCopyButton', () => {
     expect(second.text()).toBe('Copy');
   });
 
-  // The diagnostic bundle embeds every recorded call, so it must only be serialized on click.
   describe('a value that is expensive to produce', () => {
     it('is not built until the button is clicked', async () => {
       const build = vi.fn<() => string>(() => 'built');
@@ -162,14 +146,10 @@ describe('UiCopyButton', () => {
     expect(clipboard.copy).not.toHaveBeenCalled();
   });
 
-  // These sit inside rows that are themselves toggle buttons; copying must never also expand or
-  // collapse what you were reading.
   it('does not let the click bubble to an enclosing toggle', async () => {
     const onClick = vi.fn<() => void>();
     const wrapper = mount({
-      components: { UiCopyButton },
-      setup: () => ({ onClick }),
-      template: `<div @click="onClick"><UiCopyButton label="Copy" value="x" /></div>`,
+      setup: () => () => h('div', { onClick }, [h(UiCopyButton, { label: 'Copy', value: 'x' })]),
     });
 
     await wrapper.find('button').trigger('click');

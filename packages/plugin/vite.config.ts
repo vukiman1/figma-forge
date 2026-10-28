@@ -4,8 +4,6 @@ import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
 import pkg from '../mcp/package.json' with { type: 'json' };
-
-// Single product version, sourced from the published package (@figma-forge/mcp).
 const { version } = pkg;
 
 export default defineConfig({

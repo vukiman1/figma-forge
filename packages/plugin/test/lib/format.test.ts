@@ -21,7 +21,6 @@ describe('formatSize', () => {
 });
 
 describe('formatClockTime', () => {
-  // Built from local components so the expectation holds in any timezone the suite runs in.
   const at = (h: number, m: number, s: number): number => new Date(2026, 6, 25, h, m, s).getTime();
 
   it('renders wall-clock time as HH:MM:SS', () => {
@@ -62,9 +61,7 @@ describe('formatRelativeTime', () => {
     expect(formatRelativeTime(NOW - 25 * 60 * 60_000, NOW)).toBe('25h');
   });
 
-  // The panel renders timestamps from the relay, whose clock can be marginally ahead of the
-  // iframe's. Without the clamp that would show a negative age.
-  it('clamps future timestamps to "now" instead of going negative', () => {
+  it('clamps a timestamp from a relay clock running ahead to "now" instead of going negative', () => {
     expect(formatRelativeTime(NOW + 5_000, NOW)).toBe('now');
   });
 });

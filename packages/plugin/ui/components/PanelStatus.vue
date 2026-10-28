@@ -19,7 +19,6 @@ const STATUS_LABEL = {
   disconnected: 'Disconnected',
 } satisfies Record<RelayStatus, string>;
 
-// The dot is `bg-current`, so a text color drives both the fill and its glow.
 const STATUS_TONE = {
   idle: 'text-faint',
   connecting: 'text-warning',
@@ -30,8 +29,7 @@ const STATUS_TONE = {
 
 const now = useSharedNow();
 
-// A connection that is still settling gets a pulsing ring; a live one gets a steady glow.
-const settling = computed(() => props.status === 'connecting' || props.status === 'reconnecting');
+const isSettling = computed(() => props.status === 'connecting' || props.status === 'reconnecting');
 
 const meta = computed(() => {
   if (props.status !== 'connected') return '';
@@ -47,7 +45,7 @@ const meta = computed(() => {
 <template>
   <div class="flex items-center gap-2.5">
     <span class="relative flex size-2 shrink-0" :class="STATUS_TONE[status]">
-      <span v-if="settling" class="absolute inset-0 animate-ping-ring rounded-full bg-current" />
+      <span v-if="isSettling" class="absolute inset-0 animate-ping-ring rounded-full bg-current" />
       <span
         class="relative size-2 rounded-full bg-current"
         :class="status === 'connected' ? 'shadow-[0_0_7px_currentColor]' : ''"

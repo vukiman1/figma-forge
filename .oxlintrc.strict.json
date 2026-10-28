@@ -50,20 +50,5 @@
       }
     }
   ],
-  "ignorePatterns": [
-    "**/dist/**",
-    "**/node_modules/**",
-    "packages/mcp/**",
-    "packages/plugin/ui/**",
-    "packages/plugin/protocol/**",
-    "packages/plugin/*.ts",
-    "test/**",
-    "packages/plugin/test/*.ts",
-    "packages/plugin/test/components/**",
-    "packages/plugin/test/composables/**",
-    "packages/plugin/test/lib/**",
-    "packages/plugin/test/protocol/**",
-    "packages/plugin/test/relay/**",
-    "packages/plugin/test/sandbox/**"
-  ]
+  "ignorePatterns": ["**/dist/**", "**/node_modules/**", "packages/mcp/**", "test/**"]
 }
