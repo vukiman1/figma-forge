@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import { createBatchHandler } from '../../../src/features/batch/batch.handler.js';
 import { createApplyAnimationStyleHandler } from '../../../src/features/motion/apply-animation-style.handler.js';
 import { createApplyManualKeyframeTrackHandler } from '../../../src/features/motion/apply-manual-keyframe-track.handler.js';
-import { createBatchHandler } from '../../../src/handlers/batch.js';
 
 const VARIABLES: Record<string, { id: string; name: string; resolvedType: string }> = {
   'V:ease': { id: 'V:ease', name: 'motion/ease', resolvedType: 'EASING' },

@@ -1,4 +1,5 @@
 import type { SandboxHandlers } from '../dispatcher.js';
+import { createBatchHandler } from '../features/batch/batch.handler.js';
 import { createAddComponentPropertyHandler } from '../features/components/add-component-property.handler.js';
 import { createBindComponentPropertyHandler } from '../features/components/bind-component-property.handler.js';
 import { createCombineAsVariantsHandler } from '../features/components/combine-as-variants.handler.js';
@@ -127,7 +128,6 @@ import { createOutlineStrokeHandler } from '../features/vector/outline-stroke.ha
 import { createSetVectorHandler } from '../features/vector/set-vector.handler.js';
 import { createIdempotencyCache, idempotent } from '../idempotency.js';
 import { withInstanceIdLookup } from '../node-lookup.js';
-import { createBatchHandler } from './batch.js';
 
 /**
  * Build the full sandbox handler map. Read handlers run as-is; write handlers are wrapped with

@@ -1,8 +1,8 @@
 import type { ImageFillResult } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
+import { createBatchHandler } from '../../../src/features/batch/batch.handler.js';
 import { createSetImageFillHandler } from '../../../src/features/paint/set-image-fill.handler.js';
-import { createBatchHandler } from '../../../src/handlers/batch.js';
 
 const MIXED = Symbol('mixed');
 const SOLID = {

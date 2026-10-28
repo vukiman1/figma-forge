@@ -1,8 +1,8 @@
 import type { VariableModeResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
+import { createBatchHandler } from '../../../src/features/batch/batch.handler.js';
 import { createSetNodeVariableModeHandler } from '../../../src/features/variables/set-node-variable-mode.handler.js';
-import { createBatchHandler } from '../../../src/handlers/batch.js';
 
 const COLLECTION = {
   id: 'VariableCollectionId:1:2',
