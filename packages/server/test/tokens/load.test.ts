@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { analyzeProject, type ProjectProfile } from '../../src/profile/profile.js';
+import { analyzeProject, type ProjectProfile } from '../../src/profile/project-profile.js';
 import { loadProjectTokens, resolveTokenSource } from '../../src/tokens/load.js';
 
 /** A profile carrying only what resolveTokenSource reads. */

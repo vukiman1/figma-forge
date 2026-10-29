@@ -1,6 +1,6 @@
 import { scanComponentsParams } from '@figma-forge/core';
 
-import { analyzeProject, type ProjectProfile } from '../profile/profile.js';
+import { analyzeProject, type ProjectProfile } from '../profile/project-profile.js';
 import { truncationNote } from '../repo-walk.js';
 import { scanComponents, type ScannedComponent } from '../scan/scan.js';
 

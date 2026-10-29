@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { RepoSvg } from '../../src/icons/repo-icons.js';
 import { collectFigmaIcons, iconLabel, joinIcons } from '../../src/join/icon-map.js';
-import type { ProjectProfile } from '../../src/profile/profile.js';
+import type { ProjectProfile } from '../../src/profile/project-profile.js';
 
 const svgProfile = (
   mode: 'component' | 'url',

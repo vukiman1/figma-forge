@@ -6,12 +6,9 @@ import {
 
 import { detectIconLibraries, scanRepoSvgs } from '../icons/repo-icons.js';
 import { collectFigmaIcons, type IconMapping, joinIcons } from '../join/icon-map.js';
-import {
-  analyzeProject,
-  isUtilityFirst,
-  type ProjectProfile,
-  readProjectDeps,
-} from '../profile/profile.js';
+import { readProjectDeps } from '../profile/package-manifest.js';
+import { analyzeProject, type ProjectProfile } from '../profile/project-profile.js';
+import { isUtilityFirst } from '../profile/styling-system.js';
 import { truncationNote } from '../repo-walk.js';
 
 const DEFAULT_THRESHOLD = 0.7;

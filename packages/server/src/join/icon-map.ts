@@ -1,7 +1,7 @@
 import type { DesignContextNode, SerializedPaint } from '@figma-forge/core';
 
 import type { RepoSvg, SvgColorContract } from '../icons/repo-icons.js';
-import type { ProjectProfile } from '../profile/profile.js';
+import type { ProjectProfile } from '../profile/project-profile.js';
 import { casefold } from './casefold.js';
 import { diceSimilarity, type MappingStatus } from './component-map.js';
 import { statusFor } from './status.js';

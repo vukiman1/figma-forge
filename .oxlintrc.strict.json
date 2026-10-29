@@ -58,12 +58,14 @@
     "!packages/server/src/routing/**",
     "!packages/server/src/election/**",
     "!packages/server/src/relay/**",
+    "!packages/server/src/profile/**",
     "!packages/server/src/error-message.ts",
     "!packages/server/src/parse-json.ts",
     "!packages/server/test/",
     "!packages/server/test/routing/**",
     "!packages/server/test/election/**",
     "!packages/server/test/relay/**",
+    "!packages/server/test/profile/**",
     "test/**"
   ]
 }

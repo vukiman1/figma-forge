@@ -1,7 +1,9 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { type ProjectProfile, readProjectDeps, type StylingSystem } from '../profile/profile.js';
+import { readProjectDeps } from '../profile/package-manifest.js';
+import type { ProjectProfile } from '../profile/project-profile.js';
+import type { StylingSystem } from '../profile/styling-system.js';
 import { truncationNote } from '../repo-walk.js';
 import { detectTokenBuildTool, findGeneratedStylesheets } from './generated-tokens.js';
 import { parseTailwindConfig, parseUnoConfig } from './js-config.js';

@@ -7,7 +7,8 @@ import type {
   ProjectTokenMatch,
 } from '@figma-forge/core';
 
-import { analyzeProject, isUtilityFirst } from '../profile/profile.js';
+import { analyzeProject } from '../profile/project-profile.js';
+import { isUtilityFirst } from '../profile/styling-system.js';
 import { normHex } from './hex.js';
 import { loadProjectTokens } from './load.js';
 import { type ProjectToken, refOf } from './tokens.js';

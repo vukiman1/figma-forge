@@ -1,33 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
-import { detectProfile, isUtilityFirst, type ProjectInput } from '../../src/profile/profile.js';
+import type { ProjectInput } from '../../src/profile/project-input.js';
+import { detectProfile, type ProfileStyling } from '../../src/profile/project-profile.js';
+import { isUtilityFirst } from '../../src/profile/styling-system.js';
 
-// The styling cascade decides two things a caller acts on — which file the tokens are read from, and
-// whether a token's utility base is a real class — so an ordering mistake in it produces confidently
-// wrong code rather than a missing match. Three such mistakes reached review one at a time, each
-// found only because someone happened to imagine that combination of signals.
-//
-// So this pins the whole matrix rather than another scenario: every meaningful pairing of the five
-// signals detection reads, with the answer written out. A new branch that changes any pairing has to
-// change a row here and say so — which is the property the one-off tests never had.
-//
-// Signals, strongest evidence first by design:
-//   1. a root `tailwind.config.*`            → Tailwind v3
-//   2. a root `uno.config.*`                 → UnoCSS
-//   3. a repo CSS file with @import/@theme   → Tailwind v4, but only when a dep backs it
-//   4. a tailwindcss / @tailwindcss/* dep    → Tailwind
-//   5. an UnoCSS dep that carries a theme    → UnoCSS
+interface Signals {
+  readonly v3?: boolean;
+  readonly uno?: boolean;
+  readonly css?: boolean;
+  readonly deps?: Record<string, string>;
+  readonly unoVocab?: boolean;
+}
 
-type Signals = {
-  v3?: boolean;
-  uno?: boolean;
-  css?: boolean;
-  deps?: Record<string, string>;
-  /** What the uno config was found to load; undefined = no config, or its presets were unreadable. */
-  unoVocab?: boolean;
-};
-
-const detect = ({ v3, uno, css, deps, unoVocab }: Signals) => {
+const detect = ({ v3, uno, css, deps, unoVocab }: Signals): ProfileStyling => {
   const presentConfigFiles: string[] = [];
   if (v3 === true) presentConfigFiles.push('tailwind.config.ts');
   if (uno === true) presentConfigFiles.push('uno.config.ts');
@@ -50,7 +35,6 @@ const UNO = { unocss: '^66.0.0' };
 describe('styling cascade matrix', () => {
   const cases: [name: string, signals: Signals, system: string, configPath: string | undefined][] =
     [
-      // — single signals —
       ['v3 config alone', { v3: true, deps: TW3 }, 'tailwind', 'tailwind.config.ts'],
       ['uno config alone', { uno: true, deps: UNO }, 'unocss', 'uno.config.ts'],
       ['v4 CSS marker + dep', { css: true, deps: TW4 }, 'tailwind', 'src/app.css'],
@@ -58,7 +42,6 @@ describe('styling cascade matrix', () => {
       ['unocss dep alone', { deps: UNO }, 'unocss', undefined],
       ['nothing', {}, 'unknown', undefined],
 
-      // — config file beats a bare dependency of the other framework —
       [
         'uno config vs tailwind dep',
         { uno: true, deps: { ...UNO, ...TW3 } },
@@ -72,7 +55,6 @@ describe('styling cascade matrix', () => {
         'tailwind.config.ts',
       ],
 
-      // — both config files present: Tailwind's v3 config leads, explicitly —
       [
         'both config files',
         { v3: true, uno: true, deps: { ...TW3, ...UNO } },
@@ -80,23 +62,18 @@ describe('styling cascade matrix', () => {
         'tailwind.config.ts',
       ],
 
-      // — the v4 exception: v4 has no JS config, so a *dep-backed* CSS marker outranks a uno config —
       [
         'uno config vs live v4',
         { uno: true, css: true, deps: { ...UNO, ...TW4 } },
         'tailwind',
         'src/app.css',
       ],
-      // — …but an unbacked marker is migration residue, and the uno config wins —
       [
-        'uno config vs orphan CSS marker',
+        'uno config vs orphan CSS marker left by a migration',
         { uno: true, css: true, deps: UNO },
         'unocss',
         'uno.config.ts',
       ],
-      // — a leftover *v3* dep is residue too, not proof of a live v4 setup: keeping `tailwindcss`
-      //   alive for prettier-plugin-tailwindcss is the signal this cascade already calls residue,
-      //   and the CSS marker regex is unanchored enough that a comment can match it —
       [
         'uno config vs CSS marker backed only by a v3 dep',
         { uno: true, css: true, deps: { ...UNO, ...TW3 } },
@@ -104,11 +81,8 @@ describe('styling cascade matrix', () => {
         'uno.config.ts',
       ],
 
-      // — a config that loads no vocabulary preset is UnoCSS-for-icons, not a utility-first project.
-      //   It must overrule the `unocss` umbrella dependency such a project still installs, which is
-      //   why the dependency denylist alone never fixed this shape —
       [
-        'icons-only uno config, umbrella dep present',
+        'icons-only uno config overrules the umbrella dep it still installs',
         { uno: true, deps: UNO, unoVocab: false },
         'unknown',
         undefined,
@@ -119,9 +93,12 @@ describe('styling cascade matrix', () => {
         'unocss',
         'uno.config.ts',
       ],
-      // — unreadable presets are not a "no": assume the setup almost every UnoCSS project has —
-      ['uno config with unreadable presets', { uno: true, deps: UNO }, 'unocss', 'uno.config.ts'],
-      // — and an icons-only config must not fall through to some other framework's evidence —
+      [
+        'uno config with unreadable presets, assumed to load a wind preset',
+        { uno: true, deps: UNO },
+        'unocss',
+        'uno.config.ts',
+      ],
       [
         'icons-only uno config beside sass',
         { uno: true, deps: { ...UNO, sass: '^1.0.0' }, unoVocab: false },
@@ -129,16 +106,12 @@ describe('styling cascade matrix', () => {
         undefined,
       ],
 
-      // — packages that generate no utility are not evidence of UnoCSS —
       ['@unocss/reset only', { deps: { '@unocss/reset': '^66.0.0' } }, 'unknown', undefined],
       ['icons-only UnoCSS', { deps: { '@unocss/preset-icons': '^66.0.0' } }, 'unknown', undefined],
-      // — but the integrations are, since both default to a wind preset —
       ['@unocss/nuxt', { deps: { '@unocss/nuxt': '^66.0.0' } }, 'unocss', undefined],
 
-      // — a v3 config with no dependency still identifies Tailwind (the file is the stronger signal) —
       ['v3 config, no dep', { v3: true }, 'tailwind', 'tailwind.config.ts'],
 
-      // — sass only ranks once no utility framework is found —
       ['sass alone', { deps: { sass: '^1.0.0' } }, 'scss', undefined],
       ['sass loses to unocss', { deps: { sass: '^1.0.0', ...UNO } }, 'unocss', undefined],
     ];
