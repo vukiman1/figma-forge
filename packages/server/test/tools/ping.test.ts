@@ -2,8 +2,9 @@ import { pingTool } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
 import type { Follower } from '../../src/election/follower.js';
-import { portConflictMessage } from '../../src/election/leader-lock.js';
-import { type Node, NodeRole } from '../../src/election/node.js';
+import { NodeRole } from '../../src/election/node-role.js';
+import type { Node } from '../../src/election/node.js';
+import { portConflictMessage } from '../../src/election/port-conflict-message.js';
 import { PluginInstallStatus } from '../../src/plugin-install/install-plugin.js';
 import { handlePing } from '../../src/tools/ping.handler.js';
 import { toToolDefinition } from '../tool-schema.js';

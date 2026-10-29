@@ -1,7 +1,8 @@
 import { ErrorCode, getFollowerBudget, getRelayBudget } from '@figma-forge/core';
 
 import type { Follower } from './election/follower.js';
-import { type Node, NodeRole } from './election/node.js';
+import { NodeRole } from './election/node-role.js';
+import type { Node } from './election/node.js';
 import type { PluginSessionInfo } from './routing/sessions.js';
 import { getFileTarget, resolveFileTarget } from './routing/target.js';
 import { namedSessions, type SessionDispatch } from './tools/list-files.handler.js';

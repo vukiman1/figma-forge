@@ -1,6 +1,7 @@
 import { dispatchTargeted } from '../dispatch.js';
 import type { Follower } from '../election/follower.js';
-import { type Node, NodeRole } from '../election/node.js';
+import { NodeRole } from '../election/node-role.js';
+import type { Node } from '../election/node.js';
 import type { PluginInstallResult } from '../plugin-install/install-plugin.js';
 import { pluginSetupHint } from '../plugin-install/setup-hint.js';
 import { getFileTarget } from '../routing/target.js';
@@ -243,5 +244,5 @@ export const handlePing = async (ctx: PingContext): Promise<PingResult> => {
 
 export const formatPingResult = (result: PingResult): string => JSON.stringify(result, null, 2);
 
-// re-export to keep call-sites stable; NodeRole is the canonical role enum from election/node
+// re-export to keep call-sites stable; NodeRole is the canonical role enum from election/node-role
 export { NodeRole };

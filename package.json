@@ -17,7 +17,7 @@
   "scripts": {
     "build": "pnpm -r run build && node scripts/pack-server-assets.ts",
     "clean": "pnpm -r exec rm -rf dist *.tsbuildinfo",
-    "comments:check": "node scripts/check-comments.ts --check 'scripts/*.ts' 'packages/core/**/*.ts' 'packages/plugin/**/*.ts' 'packages/server/src/relay/**/*.ts' 'packages/server/src/error-message.ts' 'packages/server/test/relay/**/*.ts'",
+    "comments:check": "node scripts/check-comments.ts --check 'scripts/*.ts' 'packages/core/**/*.ts' 'packages/plugin/**/*.ts' 'packages/server/src/election/**/*.ts' 'packages/server/src/routing/**/*.ts' 'packages/server/src/relay/**/*.ts' 'packages/server/src/error-message.ts' 'packages/server/src/parse-json.ts' 'packages/server/test/election/**/*.ts' 'packages/server/test/routing/**/*.ts' 'packages/server/test/relay/**/*.ts'",
     "comments:report": "node scripts/check-comments.ts --report 'packages/**/*.ts'",
     "deps:check": "depcruise packages --config .dependency-cruiser.json",
     "dev": "pnpm -r --parallel run dev",
