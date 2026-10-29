@@ -1,6 +1,17 @@
-# Figma Forge
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo-full-dark.svg">
+    <img alt="Figma Forge" src=".github/assets/logo-full-light.svg" width="440">
+  </picture>
+</h1>
 
 A two-way Figma MCP server. A coding agent reads a Figma file as structured design context and edits the canvas through a Figma plugin.
+
+<p align="center">
+  <img alt="Figma to code" src=".github/assets/illustration-figma-to-code.png" width="260">
+  <img alt="Code to Figma" src=".github/assets/illustration-code-to-figma.png" width="260">
+  <img alt="Plugin relay" src=".github/assets/illustration-sync.png" width="260">
+</p>
 
 Figma Forge is a hard fork of [Figwright](https://github.com/awdr74100/figwright) (MIT, © Roya).
 

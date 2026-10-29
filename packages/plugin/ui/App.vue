@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 
 import { isEmbeddedInPanel } from '../protocol/editor-context.js';
+import BrandMark from './components/BrandMark.vue';
 import PanelBackgroundButton from './components/PanelBackgroundButton.vue';
 import PanelFooter from './components/PanelFooter.vue';
 import PanelGrip from './components/PanelGrip.vue';
@@ -33,6 +34,7 @@ const isEmbedded = computed(() => context.value !== null && isEmbeddedInPanel(co
 
     <header class="relative shrink-0 border-b border-line px-3 pt-2.5 pb-2">
       <div class="flex items-center gap-1.5">
+        <BrandMark class="size-3.5 shrink-0" />
         <PanelStatus
           class="min-w-0 flex-1"
           :status="state.status"

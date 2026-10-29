@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vukiman1/figma-forge/main/.github/assets/logo-full-dark.svg">
+    <img alt="Figma Forge" src="https://raw.githubusercontent.com/vukiman1/figma-forge/main/.github/assets/logo-full-light.svg" width="440">
+  </picture>
+</p>
+
 # @figma-forge/mcp
 
 > The MCP server for **[Figma Forge](https://github.com/vukiman1/figma-forge)**: a two-way Figma agent for Claude Code, Cursor, Codex, and other MCP clients.
