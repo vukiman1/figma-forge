@@ -1,4 +1,3 @@
-// @vitest-environment happy-dom
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
@@ -11,7 +10,6 @@ const mountStatus = (props: {
   connectedAt?: number | null;
 }) => mount(PanelStatus, { props: { port: null, connectedAt: null, ...props } });
 
-/** The pulsing ring is the absolutely-positioned span inside the dot. */
 const hasPingRing = (wrapper: ReturnType<typeof mountStatus>): boolean =>
   wrapper.find('span.animate-ping-ring').exists();
 
@@ -30,7 +28,6 @@ describe('PanelStatus', () => {
     }
   });
 
-  // The ring communicates "in flight". A settled connection — good or bad — must not pulse.
   it('pulses only while the connection is still settling', () => {
     expect(hasPingRing(mountStatus({ status: 'connecting' }))).toBe(true);
     expect(hasPingRing(mountStatus({ status: 'reconnecting' }))).toBe(true);
@@ -40,8 +37,6 @@ describe('PanelStatus', () => {
   });
 
   it('gives the dot a glow only when live', () => {
-    // The dot itself is the relative rounded span; the wrapper is a flex box and the ping ring is
-    // absolutely positioned, so this selector matches neither.
     const dot = (status: RelayStatus) => mountStatus({ status }).find('span.relative.rounded-full');
 
     expect(dot('connected').classes().join(' ')).toContain('shadow-');
@@ -72,7 +67,6 @@ describe('PanelStatus', () => {
       expect(wrapper.text()).not.toContain(':');
     });
 
-    // Port and uptime describe a live connection; showing them while reconnecting would be a lie.
     it('stays blank unless connected', () => {
       const wrapper = mountStatus({
         status: 'reconnecting',

@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev]
   pull_request:
 
 # Cancel superseded runs on the same ref to save minutes.
@@ -39,6 +39,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm knip
+      - run: pnpm deps:check
+      - run: pnpm comments:check
 
   # What actually differs across platforms is the filesystem, process spawning and path
   # handling — so this is the half that gets a matrix. Windows is the one platform no

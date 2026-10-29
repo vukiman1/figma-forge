@@ -1,386 +1,70 @@
-> [!NOTE]
-> **Figma Forge** is a fork of [Figwright](https://github.com/awdr74100/figwright) (MIT, © Roya). It keeps Figwright's tools and adds its own on top. What differs from upstream:
->
-> - The plugin installs as **Figma Forge** (`id: figma-forge`) and the relay listens on **127.0.0.1:3056**, so it can run beside a stock Figwright on 3055.
-> - It is not published to npm. Build it from source (`pnpm install && pnpm build`), point your MCP client at `node /path/to/figma-forge/packages/mcp/dist/index.mjs`, and import `packages/plugin/manifest.json` in Figma.
-> - Releases go through this repo only — don't run `pnpm release`, which publishes `@figwright/mcp`.
->
-> The rest of this README is upstream's.
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo-full-dark.svg">
+    <img alt="Figma Forge" src=".github/assets/logo-full-light.svg" width="440">
+  </picture>
+</h1>
 
-<div align="center">
-
-<br />
-
-<picture><source media="(prefers-color-scheme: dark)" srcset="./.github/assets/logo-full-dark.svg"><source media="(prefers-color-scheme: light)" srcset="./.github/assets/logo-full-light.svg"><img alt="Figwright" src="./.github/assets/logo-full-light.svg" width="499" height="150"></picture>
-
-<br />
+A two-way Figma MCP server. A coding agent reads a Figma file as structured design context and edits the canvas through a Figma plugin.
 
 <p align="center">
-  A free, two-way Figma MCP server for coding agents.
-  <br />
-  Pairs with a Figma plugin, not a Dev Mode seat.
+  <img alt="Figma to code" src=".github/assets/illustration-figma-to-code.png" width="260">
+  <img alt="Code to Figma" src=".github/assets/illustration-code-to-figma.png" width="260">
+  <img alt="Plugin relay" src=".github/assets/illustration-sync.png" width="260">
 </p>
 
-[About](#about) · [Setup](#setup) · [Skills](#skills) · [Tools](#tools) · [Plugin](#plugin) · [FAQ](#faq) · [Contributing](#contributing)
-
-[![npm](https://img.shields.io/npm/v/@figwright/mcp?logo=npm&color=cb3837)](https://www.npmjs.com/package/@figwright/mcp)
-[![CI](https://github.com/awdr74100/figwright/actions/workflows/ci.yml/badge.svg)](https://github.com/awdr74100/figwright/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-
-<a href="https://trendshift.io/repositories/68274?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-68274" target="_blank" rel="noopener noreferrer"><img alt="Figwright on Trendshift" src="https://trendshift.io/api/badge/trendshift/repositories/68274/daily?language=TypeScript" width="250" height="55"></a>
-
-</div>
-
-## About
-
-Figwright connects an **MCP server** to a **Figma plugin** over a local WebSocket relay, so an AI agent (Claude Code, Cursor, Codex, or any other MCP client) can work _with_ Figma instead of just looking at it.
-
-It works in both directions:
-
-**Read**: turn a Figma selection into framework-aware code, grounded on faithful, de-duplicated design context (layout, typography, variables, components).
-
-<p align="center">
-  <img alt="Figwright turning a Figma selection into code" src="./.github/assets/figma-to-code.gif" width="820">
-</p>
-
-**Write**: author and edit the canvas directly, from frames and text to auto-layout, styles, variables, components, whole screens.
-
-<p align="center">
-  <img alt="Figwright building a design directly on the Figma canvas" src="./.github/assets/code-to-figma.gif" width="820">
-</p>
-
-Everything runs on your machine: the server, the relay, and the plugin. Your designs are never sent anywhere.
-
-## Why Figwright
-
-- **Not gated**: the official Dev Mode MCP is behind a paid Dev Mode seat. Figwright runs on the free tier.
-- **Bidirectional**: not read-only. **135 tools** span reading _and_ writing the canvas, so an agent can both implement designs and build them.
-- **Provider-first codegen**: Figwright detects your real stack (framework + styling system) and reuses your existing components, tokens, and icons, instead of emitting generic markup you have to rewrite.
-- **One agent per file**: several agents can work at once, each claiming its own open Figma file. Switching tabs no longer sends one agent's edits into another's design — see [working across files](#faq).
-- **Open & extensible**: the read/write workflows ship as installable [skills](#skills) you can adopt or fork.
+Figma Forge is a hard fork of [Figwright](https://github.com/awdr74100/figwright) (MIT, © Roya).
 
 ## Setup
 
-You need an **MCP client** (Claude Code, Cursor, …), **Node.js 20.19+ or 22.12+**, and **Figma**. The free Figma tier is enough, though the desktop app is needed to import the plugin. The server runs via `npx` as its own process, so its Node version is independent of the one your project builds with; Node 18/21 and 22.0–22.11 are not supported.
+You need Node.js 24.11+ and the Figma desktop app.
 
-### 1. Add the server to your MCP client
+1. Add the server to your MCP client:
 
-For Claude Code, add this to your `.mcp.json` (other clients use the same shape):
+   ```bash
+   claude mcp add figma-forge -- npx -y @figma-forge/mcp@latest
+   ```
 
-```json
-{
-  "mcpServers": {
-    "figwright": {
-      "command": "npx",
-      "args": ["-y", "@figwright/mcp@latest"]
-    }
-  }
-}
-```
+   Other clients take the same command in their config:
 
-`npx` fetches and runs the published server, so no global install is needed.
+   ```json
+   {
+     "mcpServers": {
+       "figma-forge": {
+         "command": "npx",
+         "args": ["-y", "@figma-forge/mcp@latest"]
+       }
+     }
+   }
+   ```
 
-### 2. Install the Figma plugin
+2. Start your MCP client once. The server copies the plugin to `~/Figma Forge/`.
+3. In Figma, go to **Plugins → Development → Import plugin from manifest…** and pick `~/Figma Forge/manifest.json`. You do this once; later server versions update the files in place.
+4. Run **Figma Forge** in your file and wait for the panel to show **Connected**.
+5. Ask your agent to run `ping`. If the plugin is not connected, `ping` says what is missing.
 
-The plugin isn't on the Figma Community marketplace yet, so install it from the latest release:
+The relay listens on `127.0.0.1:3056`. Set `FIGMA_FORGE_PLUGIN_DIR` to copy the plugin somewhere else.
 
-1. Download the plugin zip from the [**latest GitHub Release**](https://github.com/awdr74100/figwright/releases/latest) and unzip it.
-2. In the Figma **desktop app**: **Menu → Plugins → Development → Import plugin from manifest…** and pick the unzipped `manifest.json`.
+## Development
 
-### 3. Connect
-
-Open the Figwright plugin in Figma (**Plugins → Development → Figwright**). It connects to the local server automatically and shows **Connected**. Ask your agent to run `ping` to confirm the link.
-
-### 4. (Optional) Install the skills
-
-The [skills](#skills) make agents reach for Figwright at the right moment and follow the grounded workflows:
+Build from source with pnpm 12:
 
 ```bash
-npx skills add awdr74100/figwright/skills
+pnpm install && pnpm build
 ```
 
-### 5. Try it
+Point your MCP client at `node /path/to/figma-forge/packages/server/dist/index.mjs`, and import `packages/plugin/manifest.json` in Figma so plugin rebuilds take effect without a version bump.
 
-With a frame selected in Figma, prompt your agent:
-
-> _Code this Figma selection as a React component._
-
-or, the other direction:
-
-> _Build a pricing section in Figma from this spec._
-
-### Updating
-
-Each release ships the server and the plugin together, so update both. The skills are optional and update the same way you installed them.
-
-**1. Restart the server.** With the `@latest` config above there is nothing to install, because every launch fetches the newest release. A session that is already open keeps the server it started with, so new tools don't appear until you restart it: in Claude Code, run `/mcp`, pick **figwright** and choose **Reconnect** (or restart Claude Code); in other clients, restart the client. Do this in each client you use Figwright from.
-
-If you installed the package instead of using `@latest` (see the [FAQ](#faq)), update it before restarting: `npm i -D @figwright/mcp@latest`, or `npm i -g @figwright/mcp@latest` for a global install.
-
-**2. Replace the plugin.** Download the zip from the [latest release](https://github.com/awdr74100/figwright/releases/latest), unzip it, and copy its `manifest.json` and `dist` into the folder you imported the plugin from, replacing the old ones. Figma runs a development plugin straight from that folder, so you don't import it again. Close the plugin and run it again.
-
-**3. Update the skills.** Run `npx skills update`. Agent sessions you start after that use the new version.
-
-To confirm, open the plugin's **Debug** tab: it lists the server and plugin versions side by side. If the plugin is still too old for the server, the panel header says so, and so does every tool result (see [the FAQ](#faq)).
-
-## Skills
-
-Agent skills orchestrate Figwright's tools. They are model-invoked: your agent loads one automatically when the task matches its description.
-
-| Skill                                              | What it does                                                                                        |
-| :------------------------------------------------- | :-------------------------------------------------------------------------------------------------- |
-| [`figma‑codegen`](./skills/figma-codegen/SKILL.md) | Turn a Figma selection into framework-aware code, grounded on your stack and existing components.   |
-| [`figma‑build`](./skills/figma-build/SKILL.md)     | Build a Figma design from code or a description, reusing the file's existing components and styles. |
-
-Install across any supported agent with the [`skills`](https://www.skills.sh) CLI:
+Run the same checks CI runs:
 
 ```bash
-npx skills add awdr74100/figwright/skills      # both
-npx skills add https://github.com/awdr74100/figwright/tree/main/skills/figma-codegen  # one
+pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm build && pnpm test
 ```
 
-> [!NOTE]
-> Skills need the `@figwright/mcp` server connected. On their own they have no tools to drive.
+After you change the server, rebuild and reconnect your MCP client. After you change the plugin, rebuild and run the plugin again.
 
-## Tools
-
-Figwright exposes **135 MCP tools** in three groups:
-
-- **Read**: selection, document and node inspection, styles, variables, components, fonts, prototype reactions and flows, motion (animation) state, screenshots, original image-fill assets, PDF export, and video export of animated frames (MP4 / GIF / WebM); plus `list_files` / `use_file` for working across more than one open Figma file at once.
-- **Write**: create and edit frames, text, shapes (lines, polygons, stars, boolean operations, flattening), auto-layout, alignment and distribution, effects, images (as a new layer or into an existing layer's fill), styles, variables (including importing a team library's variables and styles, and switching a frame to a mode such as Dark), components (including authoring their boolean/text/instance-swap properties), pages, prototype reactions and flows, Motion animations (keyframes, animation-style presets, timelines), and Figma Draw (vector paths drawn and edited point by point from any SVG path data, outlined strokes, repeat groups, text on a path, brush / dynamic / variable-width strokes, pattern fills); plus a `batch` tool to apply many edits at once.
-- **Grounding**: `get_design_context` for faithful, de-duplicated design context, and `component_map` / `token_map` / `icon_map`, which join Figma data to your codebase so codegen reuses what you already have; plus `design_diff`, which reports what changed in a design against a saved baseline so you update only the affected code.
-
-> [!TIP]
-> Your MCP client lists every tool at connect time, which is always the authoritative, up-to-date catalog.
-
-## Plugin
-
-The Figma-side plugin isn't a black box. It shows every call as it happens, lets you inspect the exact payload sent to the model, and surfaces its own connection health.
-
-<p align="center">
-  <img alt="The Figwright panel: an activity log of tool calls, an expanded call showing the exact payload sent to the model, and a debug tab with connection and call statistics" src="./.github/assets/plugin-panel.png" width="820">
-</p>
-
-<p align="center">
-  <sub><b>Activity</b>: every call, with timing and a jump to the nodes it touched · <b>Payload</b>: exactly what the model received · <b>Debug</b>: health, versions, and a one-click diagnostic bundle</sub>
-</p>
-
-And it follows your Figma theme, light or dark.
-
-<p align="center">
-  <img alt="The same panel side by side in Figma's light and dark themes" src="./.github/assets/plugin-theme.png" width="616">
-</p>
-
-The window is yours to arrange. Drag the bottom-right corner to resize it. A taller panel keeps more of the log in view, and the size is remembered next time you open it. Or put it away: **Run in background**, in the panel header right under Figma's own ✕, hides the panel while the connection stays live, so a long-running agent keeps working. Run the plugin again to bring it back. The ✕ above it closes the plugin instead, connection and all.
-
-<p align="center">
-  <img alt="The same panel at two sizes: a narrow one showing three calls with its resize corner highlighted, and a wider one showing five, with the run-in-background button highlighted in the header" src="./.github/assets/plugin-window.png" width="602">
-</p>
-
-<p align="center">
-  <sub><b>Resize</b>: drag the corner, the size sticks · <b>Background</b>: the panel hides, the relay stays connected</sub>
-</p>
-
-## How it works
-
-Your MCP client launches the `@figwright/mcp` server and talks to it over stdio. The server relays each tool call over a local WebSocket to the Figwright plugin, which carries it out through Figma's Plugin API. Every agent runs its own server process; the processes elect a leader that holds the plugin connections, and the rest forward to it. The plugin runs in every file you open it in, so several agents can each work in their own file at once, and the whole path is built to ride out dropped sockets, leader handovers and long reads:
-
-```text
-┌─────────────────────────────────────────────────────────────────────┐
-│ MCP CLIENTS  ·  each agent's client launches its own server         │
-│ Claude Code · Cursor · Claude · any MCP-capable client              │
-└─────────────────────────────────────────────────────────────────────┘
-                                   │  MCP protocol over stdio
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ @figwright/mcp  ·  the server processes elect one leader            │
-│                                                                     │
-│ LEADER   (holds every plugin connection)                            │
-│    • WebSocket relay on 127.0.0.1:3055, Host- and Origin-checked    │
-│    • routes each agent to the file it claimed with use_file,        │
-│      otherwise to the file the user was last active in              │
-│    • session resume: a dropped plugin has 30 s to reconnect, and    │
-│      calls bound for it wait instead of failing                     │
-│    • "busy ≠ dead" heartbeat: a busy plugin isn't taken for dead    │
-│    • endpoints:  /ws (plugins) · /ping (health) · /rpc (followers)  │
-│                  /abdicate (hand over to a newer build)             │
-│                                                                     │
-│ FOLLOWERS                                                           │
-│    • forward tool calls to the leader over HTTP /rpc                │
-│    • retry a call caught in a leader handover                       │
-│    • take over automatically if the leader exits, and ask an older  │
-│      leader to step down once it goes idle                          │
-└─────────────────────────────────────────────────────────────────────┘
-                                   │  local WebSocket · msgpack (binary)
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ FIGMA  (desktop or browser)  ·  one plugin per file it's open in    │
-│                                                                     │
-│ ┌─────────────────────────────────────────────────────────────────┐ │
-│ │ Figwright plugin                                                │ │
-│ │   • UI (Vue 3 iframe): WebSocket client, heartbeat, reconnect   │ │
-│ │   • sandbox: executes Figma Plugin API calls                    │ │
-│ │       – replays a retried write instead of applying it twice    │ │
-│ │       – long reads yield every ~40 ms to keep Figma responsive  │ │
-│ └─────────────────────────────────────────────────────────────────┘ │
-│                                                                     │
-│              │ Figma Plugin API                                     │
-│              ▼                                                      │
-│            Canvas                                                   │
-└─────────────────────────────────────────────────────────────────────┘
-```
-
-By design Figwright is **provider-first**: rather than a fixed compiler pipeline, the tools surface honest design context and let the model generate code that matches _your_ codebase. The [`figma-codegen`](#skills) skill encodes this approach.
-
-## Security
-
-Figwright runs entirely on your machine: your client launches the server over stdio, the server relays to the plugin over a WebSocket on `127.0.0.1:3055`, and nothing is sent anywhere else. The plugin uses only Figma's public Plugin API, so it reaches the file you have open and nothing beyond it.
-
-Loopback is not on its own a boundary, since a web page you visit can still reach a local port, so the relay gates every request on two headers a page cannot forge: **`Host`**, which must name loopback (this is what stops DNS rebinding), and **`Origin`**, which admits the plugin's sandboxed handshake and refuses browsers everywhere else. The leader's HTTP endpoints additionally require a media type that cannot be sent without a CORS preflight. See [MCP Security Best Practices](https://modelcontextprotocol.io/docs/tutorials/security/security_best_practices) for the wider picture, and [SECURITY.md](./SECURITY.md) for Figwright's threat model, what is in and out of scope, and how to report a vulnerability privately.
-
-**Figwright is not a substitute for reviewing what your agent does.** Its write tools change your Figma file and its export tools write files to paths the agent chooses; an agent acting on a malicious design or a prompt-injected instruction can misuse both. Your MCP client's tool-approval controls are the boundary that matters.
-
-## FAQ
-
-<details>
-<summary><strong>The server won't start: <code>command not found</code>, or it fails / disconnects with <code>-32000</code> ("Connection closed").</strong></summary>
-
-Both come down to how your MCP client launches the server: it spawns the `command` directly, **not** through your interactive shell, so it inherits none of what your shell sets up. That bites hardest when Node is managed by a version manager (**fnm, nvm, asdf, volta, mise**), since those configure `PATH` and npm from shell hooks that only run in a real terminal. It is not specific to Figwright; it affects any `npx`-launched MCP server. There are two symptoms, with two different fixes.
-
-**`command not found`: the client can't find `npx` / `node` on its `PATH`.**
-
-- **Use an absolute path.** In a normal terminal run `which npx` (or `which node`) and use that full path as `command`:
-
-  ```json
-  {
-    "mcpServers": {
-      "figwright": {
-        "command": "/Users/you/.local/share/fnm/node-versions/v24.x.x/installation/bin/npx",
-        "args": ["-y", "@figwright/mcp@latest"]
-      }
-    }
-  }
-  ```
-
-- **Or pass `PATH` through `env`.** If your client supports a per-server `env`, add your version manager's `bin` directory to `env.PATH`.
-
-**`-32000` / "Connection closed" / it just never connects: `npx` runs, but the server exits before the handshake.**
-
-`npx … @latest` re-resolves the package from the registry on **every** launch. In a directly-spawned environment that step can fail or stall (empty or different npm config, a corporate proxy or private registry that is not configured there, or no network), so the process dies before MCP connects and the client reports the connection as closed. (A missing `node` for the binary's shebang lands here too.)
-
-The fix is to install the package so launch needs no registry fetch:
-
-- **As a project dependency, the quickest unblock.** Install it, then **drop `@latest`** from your config. The `@latest` tag is what forces the registry round-trip; without it, `npx` uses the copy already in `node_modules` (a project-scoped config like Claude Code's `.mcp.json` runs from your project root):
-
-  ```bash
-  pnpm add -D @figwright/mcp   # or: npm i -D @figwright/mcp
-  ```
-
-  ```json
-  {
-    "mcpServers": {
-      "figwright": {
-        "command": "npx",
-        "args": ["-y", "@figwright/mcp"]
-      }
-    }
-  }
-  ```
-
-- **Or globally, pinned to the binary.** Install once, then point `command` straight at it, with no `npx` and no per-launch resolution. Use the absolute path from `which figwright-mcp`:
-
-  ```bash
-  npm i -g @figwright/mcp
-  which figwright-mcp
-  ```
-
-  ```json
-  {
-    "mcpServers": {
-      "figwright": {
-        "command": "/absolute/path/to/figwright-mcp"
-      }
-    }
-  }
-  ```
-
-</details>
-
-<details>
-<summary><strong>The plugin stays on "Waiting" and never connects.</strong></summary>
-
-The server is launched by your MCP client, so it only runs while that client is open. Check that:
-
-- your MCP client is running and has Figwright configured (try a `ping`);
-- the plugin is open in the **same** Figma app on the same machine (the relay is local-only, `127.0.0.1`);
-- nothing is blocking local loopback connections (some firewall / security tools do).
-
-</details>
-
-<details>
-<summary><strong>How do I know the server and plugin are in sync?</strong></summary>
-
-The plugin's **Debug** tab lists both versions side by side, so a mismatch is visible in one place.
-
-Mostly you don't need to look. The two halves update through different channels — the server re-resolves itself on every launch via `npx @latest`, while the plugin is a zip you imported by hand and then stop thinking about — so drifting apart is the normal state here rather than an edge case. It is also a silent one: a handler that predates an argument ignores it without erroring, so a write can report success having done only part of what was asked. When your plugin is old enough for that, the panel says so and tells you how to update ([Updating](#updating) has the steps), and every tool result tells your agent the result is unverified.
-
-It stays quiet on a difference that cannot bite — a plugin a version behind a server that changed no arguments is fine — so when the warning does appear it is worth acting on.
-
-</details>
-
-<details>
-<summary><strong>Do I need a paid Figma plan or Dev Mode?</strong></summary>
-
-No. Figwright talks to Figma through a plugin, so the free tier is enough. No Dev Mode seat or paid tier required.
-
-</details>
-
-<details>
-<summary><strong>Does it work in Dev Mode and FigJam?</strong></summary>
-
-It runs in both, with less available than in Figma Design, because those editors give plugins less rather than because Figwright holds anything back.
-
-- **Figma Design**: everything.
-- **Dev Mode** (Inspect panel): reads and exports only. Figma makes plugins read-only there, so screenshots, PDF export and every inspection tool work, while every write fails: nodes, pages, variables and styles alike. That suits the codegen direction; use Design mode to build. (The panel's own window controls — resize and **Run in background** — aren't there either: Figma owns that frame.)
-- **FigJam**: frames, sections, shapes and text work; components, variables, styles and Motion don't exist in that editor, so the tools for them don't apply.
-
-`get_metadata` reports the editor (`editorType` / `mode`), and any tool that fails because of the editor says so in its error, so an agent can re-plan rather than retry.
-
-</details>
-
-<details>
-<summary><strong>Can more than one agent use the same plugin at once?</strong></summary>
-
-Yes. Several MCP servers can share a single plugin via leader/follower **election**: one leads, the others follow, with a graceful handoff if the leader goes away.
-
-</details>
-
-<details>
-<summary><strong>Can two agents work on two different Figma files at the same time?</strong></summary>
-
-Yes, once each agent claims its file.
-
-By default calls follow whichever file you last touched, so switching tabs switches what the agent sees — the right behaviour for one agent, and the wrong one for two, since the agent whose file isn't in front would silently get the other file's nodes. Whenever more than one file is open and an agent hasn't claimed one, every result it gets says so, so it can claim one before building anything on the wrong file.
-
-`list_files` shows every file that currently has the plugin open, and `use_file` claims one for that agent:
-
-```text
-> use the marketing site file
-  → use_file({ fileName: "Marketing Site" })
-```
-
-The claim belongs to that agent's own server process, so it never affects the other agent, it survives closing and reopening the plugin panel, and calls keep reaching the file even while its tab sits in the background. That process is also the unit: one per MCP client, so the agents have to be separate clients — two editors, or two terminals. Everything inside one of them, subagents included, shares a server and therefore shares a claim. If two open files share a name (`x` and a second `x`), `use_file` refuses the name and asks for the `sessionId` that `list_files` prints, rather than guessing. Release it with `use_file({ release: true })` to go back to following the foreground file.
-
-</details>
-
-## Contributing
-
-Contributions are welcome. See **[CONTRIBUTING.md](./CONTRIBUTING.md)** for how to get set up and open a pull request, and **[AGENTS.md](./AGENTS.md)** for the architecture, repo layout, tech stack, and conventions.
-
-## What's in the name
-
-`figwright` follows the **_-wright_** tradition, an old English word for a maker or craftsman: a **playwright** writes plays, a **shipwright** builds ships, a **wheelwright**, wheels. The name is a nod to [**Playwright**](https://playwright.dev), which automates the browser. Where Playwright drives the browser, **Figwright** drives Figma, a maker of designs that both reads the canvas and crafts work back onto it.
+Conventions are in [AGENTS.md](./AGENTS.md).
 
 ## License
 
-[MIT](./LICENSE) © Roya
+MIT. See [LICENSE](./LICENSE).

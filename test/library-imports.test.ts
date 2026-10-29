@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS, WRITE_TOOL_NAMES } from '../packages/mcp/src/tools/registry.js';
-import { WIRE_TOOL_SCHEMAS } from '../packages/mcp/src/tools/wire-schema.js';
-import { createSandboxHandlers } from '../packages/plugin/src/handlers/registry.js';
+import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
+import { ALL_TOOL_SPECS, WRITE_TOOL_NAMES } from '../packages/server/src/tools/registry.js';
+import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire-schema.js';
 
 // Only Figma's external library API is replaced. The real schemas, registry, idempotency and
 // binding/apply handlers consume the imported target-file references, never a guessed source id.
@@ -146,7 +146,7 @@ describe('library imports', () => {
       expect(WIRE_TOOL_SCHEMAS.has(name)).toBe(true);
       for (const input of [{}, { [key]: '' }, { [key]: null }, { [key]: 123 }]) {
         expect(spec!.inputSchema.safeParse(input).success).toBe(false);
-        await expect(target.handlers[name]!(input)).rejects.toThrow(/key.*non-empty string/i);
+        await expect(target.handlers[name]!(input)).rejects.toThrow(new RegExp(key));
       }
       // Source ids and caller-owned retry ids are not alternative spellings of a published key.
       expect(spec!.inputSchema.safeParse({ [key]: 'key', variableId: 'source-id' }).success).toBe(

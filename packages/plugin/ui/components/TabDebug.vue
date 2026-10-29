@@ -11,21 +11,16 @@ import UiSection from './UiSection.vue';
 const props = defineProps<{
   state: RelayClientState;
   sessionId: string;
-  /** Shown next to the server's, so a version skew between the two is visible in one place. */
   pluginVersion: string;
-  /** Built lazily — the bundle embeds every recorded call, so only serialize on click. */
   buildDiagnostics: () => string;
 }>();
 
+const SHORT_ID_LENGTH = 8;
+
 const now = useSharedNow();
-const shortId = computed(() => `${props.sessionId.slice(0, 8)}…`);
+const shortId = computed(() => `${props.sessionId.slice(0, SHORT_ID_LENGTH)}…`);
 const errorEntries = computed(() => props.state.activity.filter(e => e.status === 'error'));
 
-/**
- * Mean duration of the calls still in the recent list. Unlike the totals, this can only be measured
- * over what's retained (ACTIVITY_LIMIT), which is why it's labelled as recent — it's a health
- * signal, not an accounting figure. Pending calls have no duration yet and are left out.
- */
 const averageMs = computed(() => {
   const settled = props.state.activity.filter(e => e.durationMs !== undefined);
   if (settled.length === 0) return null;

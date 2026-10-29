@@ -5,10 +5,10 @@
     ".": {
       "project": ["*.{ts,js}"]
     },
-    "packages/shared": {
+    "packages/core": {
       "project": ["src/**/*.ts"]
     },
-    "packages/mcp": {
+    "packages/server": {
       "project": ["src/**/*.ts"]
     },
     "packages/plugin": {

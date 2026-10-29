@@ -51,9 +51,8 @@ describe('sandbox commands', () => {
     });
   });
 
-  // Closing would drop the relay socket that lives in this iframe.
   describe('hidePanel', () => {
-    it('asks the sandbox to hide rather than close', () => {
+    it('asks the sandbox to hide rather than close, which would drop the relay socket', () => {
       hidePanel();
 
       expect(sent()).toEqual([createPanelHide()]);
@@ -75,14 +74,12 @@ describe('sandbox commands', () => {
       expect(sent()).toEqual([createPanelReveal(['1:1', '2:2'])]);
     });
 
-    // Nothing to frame, so don't make the sandbox surface a "nodes are gone" notice.
-    it('stays silent when there is nothing to reveal', () => {
+    it('stays silent when there is nothing to reveal, rather than prompting a nodes-are-gone notice', () => {
       revealOnCanvas([]);
 
       expect(postMessage).not.toHaveBeenCalled();
     });
 
-    // The entry's ids are readonly state; the message must not carry a live reference to them.
     it('sends a copy of the ids rather than the caller’s array', () => {
       const ids = ['1:1'];
       revealOnCanvas(ids);

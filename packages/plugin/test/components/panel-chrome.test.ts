@@ -1,19 +1,11 @@
-// @vitest-environment happy-dom
 import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 
 import { createPluginContextEvent, type PluginContextEvent } from '../../protocol/bridge.js';
+import App from '../../ui/App.vue';
 import type { RelayClientState } from '../../ui/relay/state.js';
 
-/**
- * The panel draws its own window chrome — a resize grip and a run-in-background button — because
- * Figma gives a plugin window neither. In Dev Mode's Inspect panel there is none to act on,
- * confirmed live with the guard disabled: dragging the grip does nothing, and run-in-background
- * empties the panel with no way back short of closing the plugin — which drops the relay socket the
- * button exists to keep. Both controls have to withdraw, and nothing else in the suite would notice
- * if a refactor dropped the `v-if`.
- */
 const contextRef = ref<PluginContextEvent | null>(null);
 
 const state: RelayClientState = {
@@ -36,12 +28,10 @@ vi.mock('../../ui/composables/useRelaySession.js', () => ({
     state: ref(state),
     context: contextRef,
     busy: ref(false),
-    sessionId: ref('sess-1'),
+    sessionId: 'sess-1',
     buildDiagnostics: (): string => '{}',
   }),
 }));
-
-const { default: App } = await import('../../ui/App.vue');
 
 const context = (mode: string): PluginContextEvent =>
   createPluginContextEvent({
@@ -55,7 +45,6 @@ const context = (mode: string): PluginContextEvent =>
     apiVersion: '1.0.0',
   });
 
-/** The grip is a bare div, identified the way a user finds it: the resize cursor and its tooltip. */
 const grip = (wrapper: ReturnType<typeof mount>) => wrapper.find('[title="Drag to resize"]');
 const backgroundButton = (wrapper: ReturnType<typeof mount>) =>
   wrapper.find('[aria-label="Run in background"]');
@@ -70,7 +59,7 @@ describe('App window chrome', () => {
     expect(backgroundButton(wrapper).exists()).toBe(true);
   });
 
-  it('withdraws both when embedded in Dev Mode’s Inspect panel', () => {
+  it('withdraws both in Dev Mode’s Inspect panel, where resize is inert and hiding strands the plugin', () => {
     contextRef.value = context('inspect');
 
     const wrapper = mount(App);
@@ -79,17 +68,10 @@ describe('App window chrome', () => {
     expect(backgroundButton(wrapper).exists()).toBe(false);
   });
 
-  // The sandbox pushes context on startup, so the unknown window is a frame or two. It has to
-  // default to the floating case: a plugin window flashing its own chrome away is worse than the
-  // Inspect panel showing it for one frame, and the floating window is the overwhelmingly common
-  // case.
-  it('states an out-of-date plugin in the header, as a warning it can still work through', () => {
-    // A skew notice cannot be cleared by reconnecting — only by updating the plugin — so it belongs
-    // where the user already is rather than in the Debug tab. It is amber, not red: every call
-    // still runs, and dressing a survivable state as a failure teaches people to ignore the colour.
+  it('states an out-of-date plugin in the header as a warning, since every call still runs', () => {
     contextRef.value = context('default');
     state.status = 'connected';
-    state.versionNotice = 'Figwright plugin v0.3.0 is older than this server (v0.4.0).';
+    state.versionNotice = 'Figma Forge plugin v0.3.0 is older than this server (v0.4.0).';
 
     const wrapper = mount(App);
     const banner = wrapper.find('p.wrap-break-word');
@@ -99,9 +81,7 @@ describe('App window chrome', () => {
     state.versionNotice = null;
   });
 
-  it('states a refusal in the header as an error, since nothing works', () => {
-    // The remaining hard refusal: a wire format the two sides cannot exchange at all. Severity is
-    // read off the connection — a refused plugin never reaches 'connected'.
+  it('states a refusal in the header as an error, read off a connection that never came up', () => {
     contextRef.value = context('default');
     state.status = 'disconnected';
     state.versionNotice = 'protocol mismatch: server speaks 0.1.0, plugin speaks 9.9.9';
@@ -114,6 +94,15 @@ describe('App window chrome', () => {
     state.status = 'connected';
   });
 
+  it('pads the scrolled panel rather than the scroller, whose bottom padding Chromium leaves out of the overflow', () => {
+    contextRef.value = context('default');
+
+    const scroller = mount(App).find('section.overflow-y-auto');
+
+    expect(scroller.classes()).not.toContain('pb-2');
+    expect(scroller.find('.min-h-full').classes()).toContain('pb-2');
+  });
+
   it('shows no banner when there is nothing to say about the version', () => {
     contextRef.value = context('default');
 
@@ -122,7 +111,7 @@ describe('App window chrome', () => {
     expect(wrapper.find('p.wrap-break-word').exists()).toBe(false);
   });
 
-  it('assumes a floating window until the sandbox has said otherwise', () => {
+  it('assumes a floating window until the sandbox has said otherwise, so its chrome never flashes in', () => {
     contextRef.value = null;
 
     const wrapper = mount(App);

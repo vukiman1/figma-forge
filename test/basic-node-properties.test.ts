@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../packages/mcp/src/tools/registry.js';
-import { WIRE_TOOL_SCHEMAS } from '../packages/mcp/src/tools/wire-schema.js';
-import { project } from '../packages/plugin/src/handlers/get-design-context.js';
-import { createSandboxHandlers } from '../packages/plugin/src/handlers/registry.js';
-import { serializeFlatSync } from '../packages/plugin/src/serializer.js';
-import { DesignContextNodeSchema, SerializedNodeSchema } from '../packages/shared/src/index.js';
+import { DesignContextNodeSchema, SerializedNodeSchema } from '../packages/core/src/index.js';
+import { project } from '../packages/plugin/src/features/design-context/project-node.js';
+import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
+import { serializeFlatSync } from '../packages/plugin/src/serialize/serialize-node.js';
+import { ALL_TOOL_SPECS } from '../packages/server/src/tools/registry.js';
+import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire-schema.js';
 
 // Figma is the external boundary. Schemas, dispatch, writes, reads and batch rollback stay real.
 const setup = () => {
@@ -182,7 +182,7 @@ describe('basic node property round-trips', () => {
     const spec = ALL_TOOL_SPECS.find(tool => tool.name === name)!;
     expect(spec.inputSchema.safeParse(input).success).toBe(false);
     expect(WIRE_TOOL_SCHEMAS.get(name)!.safeParse(input).success).toBe(false);
-    await expect(target.handlers[name]!(input)).rejects.toThrow(/must be/);
+    await expect(target.handlers[name]!(input)).rejects.toThrow(/must be|invalid params/);
     expect(target.frame).toMatchObject({ clipsContent: true, cornerSmoothing: 0.2 });
     expect(target.line.width).toBe(100);
   });

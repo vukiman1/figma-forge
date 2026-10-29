@@ -6,7 +6,7 @@
  * changes theme. Mapping our palette onto those tokens is what makes the panel follow Figma instead
  * of staying a hardcoded dark rectangle in a light workspace.
  *
- * Every token keeps a literal fallback (the palette this file used before) so the panel still
+ * Every Figma-mapped token keeps a literal fallback (the palette this file used before) so the panel still
  * renders if Figma ever stops providing one.
  */
 @theme {
@@ -21,7 +21,7 @@
   --color-fg: var(--figma-color-text, #ffffff);
   --color-dim: var(--figma-color-text-secondary, #a0a0a0);
   --color-faint: var(--figma-color-text-tertiary, #7d7d7d);
-  --color-brand: var(--figma-color-text-brand, #18a0fb);
+  --color-brand: #fd652c;
   --color-danger: var(--figma-color-text-danger, #f24822);
   --color-success: var(--figma-color-text-success, #14ae5c);
   --color-warning: var(--figma-color-text-warning, #e5a400);

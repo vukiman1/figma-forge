@@ -32,7 +32,7 @@
   },
   "overrides": [
     {
-      "files": ["packages/mcp/src/**", "packages/shared/src/**"],
+      "files": ["packages/server/src/**", "packages/core/src/**"],
       "rules": {
         "no-console": ["error", { "allow": ["error", "warn"] }]
       }

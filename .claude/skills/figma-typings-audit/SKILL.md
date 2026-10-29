@@ -3,7 +3,7 @@ name: figma-typings-audit
 description: 'Upgrade @figma/plugin-typings and absorb what the new version exposes. Diffs the .d.ts between the installed and the target version (that package ships no changelog), sorts the changes into breakage / new API / silently-added fields, maps each onto the sandbox handlers, the hand-written Zod mirrors in shared, and the tool registry — then bumps the package and builds whatever the user picks. Use whenever the user wants @figma/plugin-typings updated or audited, or asks what a new plugin-typings version would break or newly enable — including a Renovate bump PR for that package.'
 ---
 
-Absorbing a `@figma/plugin-typings` release into Figwright, end to end: audit → upgrade →
+Absorbing a `@figma/plugin-typings` release into Figma Forge, end to end: audit → upgrade →
 implement what's worth having.
 
 **One hard ordering constraint: diff before upgrading.** The audit compares the *installed* version
@@ -96,7 +96,7 @@ Sort the rest into three buckets:
    changed signature, or a newly-added `@deprecated`. Look at `-` lines first.
 2. **New API** — a new method, node type, enum member, or namespace. A new *capability*, so a
    candidate for a new tool or a new argument on an existing one.
-3. **New field on an existing type** — an added property on something Figwright already reads
+3. **New field on an existing type** — an added property on something Figma Forge already reads
    (`Paint`, `Effect`, `TextStyle`, a node interface…). ⚠️ **The dangerous bucket.** No compiler will
    ever flag it and the read path will keep silently omitting the dimension. It is this repo's
    recurring bug class: a multi-dimensional Figma property collapsed to one field or dropped on the
@@ -110,14 +110,14 @@ The three source trees have completely different exposure. Don't treat them alik
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
 | `packages/plugin/src/**`  | **Real.** The only tree that calls `figma.*` and loads the global types (`tsconfig.json` → `types: ["@figma/plugin-typings"]`)                                              | `tsc`               |
 | `packages/plugin/ui/**`   | None — the Vue panel never touches the Figma API                                                                                                                            | n/a, skip           |
-| `packages/shared/src/**`  | ★ **None — and that's the trap.** `serialized-node.ts`, `styles.ts`, `queries.ts` are *hand-written Zod mirrors* of Figma shapes; `shared/tsconfig.json` never loads typings | **Nobody but this audit** |
+| `packages/core/src/**`  | ★ **None — and that's the trap.** `serialized-node.ts`, `styles.ts`, `queries.ts` are *hand-written Zod mirrors* of Figma shapes; `shared/tsconfig.json` never loads typings | **Nobody but this audit** |
 
 - **Bucket 1** — grep the affected symbols under `packages/plugin/src/` (handlers, `serializer.ts`,
   `traverse.ts`, `reveal.ts`). Confirm with Stage 4 rather than reasoning about it.
-- **Bucket 3** — for each added field, check whether the Zod mirror in `packages/shared/src/` carries
+- **Bucket 3** — for each added field, check whether the Zod mirror in `packages/core/src/` carries
   it, and whether `serializer.ts` or `handlers/get-design-context.ts` projects it. A miss here is a
   real fidelity gap with every gate green.
-- **Bucket 2** — check coverage against `packages/mcp/src/tools/registry.ts` (`ALL_TOOL_SPECS` is the
+- **Bucket 2** — check coverage against `packages/server/src/tools/registry.ts` (`ALL_TOOL_SPECS` is the
   authority on the tool count; prose in READMEs is hand-written and stale).
 
 ## Stage 4 — Sandbox typecheck (only if Stage 2 found bucket 1)
@@ -213,9 +213,9 @@ Choosing where a new capability lands is the part worth thinking about:
   a sibling field, and say so in the JSDoc.
 - **Smallest change that closes the gap**: a field on an existing result < a new argument < a new
   tool. The tool count is already large; a new tool needs to earn itself.
-- A new read dimension usually touches four places: the Zod schema in `packages/shared/src/`, the
+- A new read dimension usually touches four places: the Zod schema in `packages/core/src/`, the
   sandbox handler in `packages/plugin/src/handlers/`, the tool description in
-  `packages/mcp/src/tools/` (it is the LLM's only spec — fix it if it misreports the shape), and a
+  `packages/server/src/tools/` (it is the LLM's only spec — fix it if it misreports the shape), and a
   test.
 - `exactOptionalPropertyTypes` is on: assign optional fields conditionally
   (`if (x !== undefined) result.x = x`), never `result.x = undefined`.

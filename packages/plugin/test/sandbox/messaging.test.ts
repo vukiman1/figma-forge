@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// @vitest-environment happy-dom
 import { createPluginContextEvent, createToolResult } from '../../protocol/bridge.js';
 import { createPanelHide } from '../../protocol/panel-control.js';
 import { onSandboxContext, onSandboxMessage, postToSandbox } from '../../ui/sandbox/messaging.js';
@@ -18,7 +17,6 @@ const context = createPluginContextEvent({
   apiVersion: '1.0.0',
 });
 
-/** Deliver a message the way the sandbox does — wrapped in its envelope. */
 const deliver = (pluginMessage: unknown): void => {
   globalThis.dispatchEvent(new MessageEvent('message', { data: { pluginMessage } }));
 };
@@ -36,9 +34,7 @@ describe('postToSandbox', () => {
     expect(postMessage).toHaveBeenCalledWith({ pluginMessage: createPanelHide() }, '*');
   });
 
-  // The panel also renders in contexts without a parent frame (tests, a plain browser tab); a
-  // missing parent must not throw and take the whole UI down.
-  it('is a no-op when there is no parent frame', () => {
+  it('is a no-op without a parent frame, so the panel still renders in tests and plain browser tabs', () => {
     vi.stubGlobal('parent', undefined);
 
     expect(() => postToSandbox(createPanelHide())).not.toThrow();
@@ -70,8 +66,7 @@ describe('onSandboxMessage', () => {
     expect(listener).toHaveBeenCalledWith({ hello: true });
   });
 
-  // Figma's own iframe traffic shares this window; anything without the envelope isn't ours.
-  it('ignores messages that carry no pluginMessage', () => {
+  it('ignores Figma’s own iframe traffic, which carries no pluginMessage envelope', () => {
     const listener = listen();
 
     globalThis.dispatchEvent(new MessageEvent('message', { data: { other: 1 } }));
@@ -81,9 +76,7 @@ describe('onSandboxMessage', () => {
     expect(listener).not.toHaveBeenCalled();
   });
 
-  // An explicitly-null payload is still a message from our sandbox, so it is delivered as-is and
-  // left for the channel's own validator to reject.
-  it('delivers a null payload that was explicitly sent', () => {
+  it('delivers an explicitly sent null payload, leaving its rejection to the channel’s validator', () => {
     const listener = listen();
 
     deliver(null);
@@ -123,13 +116,11 @@ describe('onSandboxContext', () => {
     expect(listener).toHaveBeenCalledWith(context);
   });
 
-  // The tool bridge shares this window and validates its own traffic; each subscriber must pass
-  // over the other's messages rather than treat them as malformed.
-  it('ignores tool traffic and anything else on the wire', () => {
+  it('passes over tool traffic and anything else on the wire rather than treating it as malformed', () => {
     const listener = listen();
 
     deliver(createToolResult({ id: 'req-1', result: { ok: true } }));
-    deliver({ tag: '@figwright/bridge', kind: 'context' });
+    deliver({ tag: '@figma-forge/bridge', kind: 'context' });
     deliver('not an object');
 
     expect(listener).not.toHaveBeenCalled();

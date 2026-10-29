@@ -1,0 +1,82 @@
+import { z } from 'zod';
+
+import type { ToolSpec } from '../tool-spec.js';
+
+export const SET_LAYOUT_PROPS_TOOL_NAME = 'set_layout_props';
+
+export const setLayoutPropsParams = z.object({
+  nodeId: z.string().describe('Node id — a frame-like container, or an auto-layout child'),
+  clipsContent: z.boolean().optional().describe('Clip children to the container bounds'),
+  layoutSizingHorizontal: z
+    .enum(['FIXED', 'HUG', 'FILL'])
+    .optional()
+    .describe('Horizontal sizing: HUG fits content, FILL fills the parent, FIXED keeps width'),
+  layoutSizingVertical: z
+    .enum(['FIXED', 'HUG', 'FILL'])
+    .optional()
+    .describe('Vertical sizing: HUG fits content, FILL fills the parent, FIXED keeps height'),
+  layoutAlign: z
+    .enum(['STRETCH', 'INHERIT'], {
+      error:
+        'layoutAlign MIN / CENTER / MAX no longer does anything in Figma — every child of an ' +
+        'auto-layout frame shares its counterAxisAlignItems. To align one child alone, wrap it in ' +
+        'its own auto-layout frame, or set layoutPositioning ABSOLUTE and use align_nodes.',
+    })
+    .optional()
+    .describe('STRETCH fills the counter axis; INHERIT follows the parent'),
+  layoutGrow: z
+    .number()
+    .min(0)
+    .optional()
+    .describe('1 = grow to fill the primary axis, 0 = hug content'),
+  layoutPositioning: z
+    .enum(['AUTO', 'ABSOLUTE'])
+    .optional()
+    .describe('ABSOLUTE takes the node out of the auto-layout flow'),
+  minWidth: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Minimum width in px (null clears the bound)'),
+  maxWidth: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Maximum width in px (null clears the bound)'),
+  minHeight: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Minimum height in px (null clears the bound)'),
+  maxHeight: z
+    .number()
+    .positive()
+    .nullable()
+    .optional()
+    .describe('Maximum height in px (null clears the bound)'),
+});
+
+export const setLayoutPropsTool: ToolSpec = {
+  name: SET_LAYOUT_PROPS_TOOL_NAME,
+  description:
+    "Set a node's sizing, child properties and content clipping. clipsContent controls whether " +
+    'a frame-like container clips its children; it also works without auto-layout. layoutSizingHorizontal / ' +
+    'layoutSizingVertical (HUG = shrink to fit children, FILL = stretch to fill the auto-layout ' +
+    'parent, FIXED = keep the current size) are the preferred way to size a frame to its content ' +
+    '(HUG) or make a child fill its container (FILL) — reach for these instead of guessing pixel ' +
+    'sizes with resize_nodes. layoutAlign (STRETCH = fill the counter axis, INHERIT = default) and ' +
+    'layoutGrow (1 = fill the primary axis, 0 = hug) are the older per-axis equivalents. Figma ' +
+    'has no per-child alignment: every child of an auto-layout frame shares the frame’s ' +
+    'counterAxisAlignItems, so to centre one child alone wrap it in its own auto-layout frame, or ' +
+    'make it ABSOLUTE and use align_nodes. ' +
+    'layoutPositioning (ABSOLUTE = ignore the flow and position freely, AUTO = participate in ' +
+    'layout). minWidth / maxWidth / minHeight / maxHeight set responsive size bounds (→ min-w / ' +
+    'max-w); pass null to clear a bound. Bounds apply to auto-layout frames and their direct ' +
+    'children. HUG needs an auto-layout frame (or text); FILL needs an auto-layout parent. Any ' +
+    'field may be omitted to leave it unchanged. Returns { ok, nodeId }.',
+  inputSchema: setLayoutPropsParams,
+  kind: 'write',
+};

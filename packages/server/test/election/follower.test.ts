@@ -1,0 +1,395 @@
+import { createServer, type Server as HttpServer } from 'node:http';
+import type { AddressInfo } from 'node:net';
+
+import {
+  createRequest,
+  createResponse,
+  decodeEnvelope,
+  encodeEnvelope,
+  ErrorCode,
+  MIN_PLUGIN_VERSION,
+  newId,
+  PROTOCOL_VERSION,
+  type HelloParams,
+  SystemMethod,
+} from '@figma-forge/core';
+import { decode } from '@msgpack/msgpack';
+import { afterEach, describe, expect, it } from 'vitest';
+import { WebSocket } from 'ws';
+
+import { Follower } from '../../src/election/follower.js';
+import { attachLeaderEndpoints } from '../../src/election/leader-endpoints.js';
+import { Relay } from '../../src/relay/relay.js';
+
+interface Bound {
+  http: HttpServer;
+  relay: Relay;
+  port: number;
+  detach: () => void;
+  plugins: WebSocket[];
+}
+
+const all: Bound[] = [];
+
+afterEach(async () => {
+  await Promise.all(
+    all.map(async b => {
+      for (const ws of b.plugins) ws.close();
+      b.detach();
+      await b.relay.stop();
+      await new Promise<void>(resolve => b.http.close(() => resolve()));
+    }),
+  );
+  all.length = 0;
+});
+
+const startLeader = async (): Promise<Bound> => {
+  const http = createServer();
+  await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
+  const port = (http.address() as AddressInfo).port;
+  const relay = new Relay({ serverVersion: '1.0.0', server: http });
+  const detach = attachLeaderEndpoints(http, { relay, serverVersion: '1.0.0' });
+  const b: Bound = { http, relay, port, detach, plugins: [] };
+  all.push(b);
+  return b;
+};
+
+const startLeaderWithTimeout = async (rpcTimeoutMs: number): Promise<Bound> => {
+  const http = createServer();
+  await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
+  const port = (http.address() as AddressInfo).port;
+  const relay = new Relay({ serverVersion: '1.0.0', server: http });
+  const detach = attachLeaderEndpoints(http, {
+    relay,
+    serverVersion: '1.0.0',
+    rpcTimeoutMs,
+  });
+  const b: Bound = { http, relay, port, detach, plugins: [] };
+  all.push(b);
+  return b;
+};
+
+const attachFakePlugin = async (
+  b: Bound,
+  handle: (method: string, params: unknown) => Promise<unknown>,
+): Promise<void> => {
+  const ws = new WebSocket(`ws://127.0.0.1:${b.port}`);
+  ws.binaryType = 'arraybuffer';
+  await new Promise<void>(resolve => ws.once('open', () => resolve()));
+
+  let helloResolved: (() => void) | null = null;
+  const helloReceived = new Promise<void>(resolve => {
+    helloResolved = resolve;
+  });
+  ws.on('message', async (data: ArrayBuffer) => {
+    const env = decodeEnvelope(data);
+    if (env.kind === 'res' && helloResolved !== null) {
+      helloResolved();
+      helloResolved = null;
+      return;
+    }
+    if (
+      env.kind === 'req' &&
+      env.method !== SystemMethod.Ping &&
+      env.method !== SystemMethod.Hello
+    ) {
+      const result = await handle(env.method, env.params);
+      ws.send(encodeEnvelope(createResponse({ id: env.id, sessionId: env.sessionId, result })));
+    }
+  });
+
+  ws.send(
+    encodeEnvelope(
+      createRequest({
+        id: 'h',
+        sessionId: newId(),
+        method: SystemMethod.Hello,
+        params: {
+          clientType: 'plugin',
+          clientVersion: MIN_PLUGIN_VERSION,
+          protocolVersion: PROTOCOL_VERSION,
+        } satisfies HelloParams,
+      }),
+    ),
+  );
+  await helloReceived;
+  b.plugins.push(ws);
+};
+
+describe('Follower HTTP client', () => {
+  it('ping returns true when leader is up', async () => {
+    const b = await startLeader();
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+    expect(await f.ping()).toBe(true);
+  });
+
+  it('ping returns false for unreachable leader', async () => {
+    const f = new Follower({
+      leaderUrl: 'http://127.0.0.1:1',
+      pingTimeoutMs: 200,
+    });
+    expect(await f.ping()).toBe(false);
+  });
+
+  it('ping returns false when the port is held by a non-figma-forge server', async () => {
+    const http = createServer((_req, res) => {
+      res.writeHead(200, { 'content-type': 'text/plain' });
+      res.end('not a figma-forge leader');
+    });
+    await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
+    const port = (http.address() as AddressInfo).port;
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${port}` });
+    try {
+      expect(await f.ping()).toBe(false);
+    } finally {
+      await new Promise<void>(resolve => http.close(() => resolve()));
+    }
+  });
+
+  it('sendRpc round-trips through leader to plugin', async () => {
+    const b = await startLeader();
+    await attachFakePlugin(b, async (method, params) => {
+      expect(method).toBe('get_design_context');
+      expect(params).toEqual({ depth: 2 });
+      return { name: 'My Doc', pages: 3 };
+    });
+
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+    const resp = await f.sendRpc('get_design_context', { depth: 2 }, 'r-42');
+    if (resp.kind !== 'ok') throw new Error(`expected ok, got ${resp.kind}`);
+    expect(resp.requestId).toBe('r-42');
+    expect(resp.result).toEqual({ name: 'My Doc', pages: 3 });
+  });
+
+  it('sendRpc surfaces leader-side err response', async () => {
+    const b = await startLeaderWithTimeout(50);
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+    const resp = await f.sendRpc('get_document', undefined, 'r-no-plugin');
+    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
+    expect(resp.code).toBe(ErrorCode.Timeout);
+    expect(resp.requestId).toBe('r-no-plugin');
+  });
+
+  it('sendRpc returns Internal err when transport fails', async () => {
+    const f = new Follower({
+      leaderUrl: 'http://127.0.0.1:1',
+      rpcTimeoutMs: 200,
+    });
+    const resp = await f.sendRpc('get_document', undefined, 'r-dead');
+    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
+    expect(resp.code).toBe(ErrorCode.Internal);
+    expect(resp.requestId).toBe('r-dead');
+  });
+
+  it('sendRpc ends early when the caller aborts, without waiting out its budget', async () => {
+    // A leader that never answers — the shape of a wedged one. The budget here is 60s, so the only
+    // thing that can end this call in test time is the abort actually reaching the request.
+    const b = await startLeader();
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+    const abort = new AbortController();
+    const started = Date.now();
+    const pending = f.sendRpc('get_document', {}, 'r-abort', undefined, 60_000, abort.signal);
+    setTimeout(() => abort.abort(new Error('port conflict')), 50);
+
+    const resp = await pending;
+    const elapsed = Date.now() - started;
+    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
+    expect(resp.code).toBe(ErrorCode.Internal);
+    expect(resp.message).toMatch(/transport/);
+    expect(elapsed).toBeLessThan(5_000);
+  });
+
+  it('sendRpc still honours its own budget when no abort signal is given', async () => {
+    const b = await startLeader();
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+    const started = Date.now();
+    const resp = await f.sendRpc('get_document', {}, 'r-budget', undefined, 300);
+    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
+    expect(Date.now() - started).toBeGreaterThanOrEqual(250);
+  });
+
+  it("sendRpc declares this process's build on every call", async () => {
+    // The leader uses it to decide whether its own tool schemas are authoritative for the call, so
+    // a follower that stopped sending it would quietly start being judged by a stranger's schemas.
+    const sent: unknown[] = [];
+    const f = new Follower({
+      leaderUrl: 'http://127.0.0.1:1',
+      buildId: 4_242,
+      rpcTimeoutMs: 200,
+      fetch: async (_url, init) => {
+        const body = init?.body as Buffer;
+        // Offset + length, not the whole underlying pool: Node hands out Buffers that share one.
+        sent.push(decode(new Uint8Array(body.buffer, body.byteOffset, body.byteLength)));
+        throw new Error('probe');
+      },
+    });
+    await f.sendRpc('get_document', {}, 'r-build');
+    expect(sent).toEqual([
+      { requestId: 'r-build', toolName: 'get_document', args: {}, buildId: 4_242 },
+    ]);
+  });
+
+  it('sendRpc declares 0 when this process has no build stamp', async () => {
+    // An unbundled process (vitest, tsx). 0 is the oldest thing in the room, which is the side of
+    // the comparison that gets validated — the safe default for something that is not a release.
+    const sent: unknown[] = [];
+    const f = new Follower({
+      leaderUrl: 'http://127.0.0.1:1',
+      rpcTimeoutMs: 200,
+      fetch: async (_url, init) => {
+        const body = init?.body as Buffer;
+        // Offset + length, not the whole underlying pool: Node hands out Buffers that share one.
+        sent.push(decode(new Uint8Array(body.buffer, body.byteOffset, body.byteLength)));
+        throw new Error('probe');
+      },
+    });
+    await f.sendRpc('get_document', undefined, 'r-nobuild');
+    expect(sent).toEqual([{ requestId: 'r-nobuild', toolName: 'get_document', buildId: 0 }]);
+  });
+
+  it('resolveActiveSession reads the leader-picked session id', async () => {
+    const b = await startLeader();
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+    // No plugin yet → undefined, caller falls back to unpinned routing.
+    expect(await f.resolveActiveSession()).toBeUndefined();
+
+    await attachFakePlugin(b, async () => ({ noop: true }));
+    expect(await f.resolveActiveSession()).toBe(b.relay.pickActiveSessionId());
+  });
+
+  it('resolveActiveSession returns undefined when the leader is unreachable', async () => {
+    const f = new Follower({ leaderUrl: 'http://127.0.0.1:1', pingTimeoutMs: 200 });
+    expect(await f.resolveActiveSession()).toBeUndefined();
+  });
+
+  it('leaderInfo reports version and buildId of a confirmed leader', async () => {
+    const http = createServer();
+    await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
+    const port = (http.address() as AddressInfo).port;
+    const relay = new Relay({ serverVersion: 'test-2.0.0', server: http });
+    const detach = attachLeaderEndpoints(http, {
+      relay,
+      serverVersion: 'test-2.0.0',
+      buildId: 777,
+    });
+    all.push({ http, relay, port, detach, plugins: [] });
+
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${port}` });
+    expect(await f.leaderInfo()).toEqual({ serverVersion: 'test-2.0.0', buildId: 777 });
+  });
+
+  it('leaderInfo is undefined for a non-figma-forge responder and an unreachable leader', async () => {
+    const http = createServer((_req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ hello: 'world' }));
+    });
+    await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
+    const port = (http.address() as AddressInfo).port;
+    try {
+      const f = new Follower({ leaderUrl: `http://127.0.0.1:${port}` });
+      expect(await f.leaderInfo()).toBeUndefined();
+    } finally {
+      await new Promise<void>(resolve => http.close(() => resolve()));
+    }
+
+    const dead = new Follower({ leaderUrl: 'http://127.0.0.1:1', pingTimeoutMs: 200 });
+    expect(await dead.leaderInfo()).toBeUndefined();
+  });
+
+  it('requestAbdication maps a 404 (pre-abdication leader) to unsupported', async () => {
+    const http = createServer((_req, res) => {
+      res.writeHead(404, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'not found' }));
+    });
+    await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
+    const port = (http.address() as AddressInfo).port;
+    try {
+      const f = new Follower({ leaderUrl: `http://127.0.0.1:${port}` });
+      expect(await f.requestAbdication(200)).toBe('unsupported');
+    } finally {
+      await new Promise<void>(resolve => http.close(() => resolve()));
+    }
+  });
+
+  it('requestAbdication maps transport failure to error', async () => {
+    const f = new Follower({ leaderUrl: 'http://127.0.0.1:1', pingTimeoutMs: 200 });
+    expect(await f.requestAbdication(200)).toBe('error');
+  });
+
+  /**
+   * A response whose body reports whether anything released it. `fetch` streams the body separately
+   * from the status, so a branch that returns on `res.status` alone leaves the stream — and the
+   * socket behind it — held until the request times out.
+   */
+  const bodyWatcher = (
+    status: number,
+    onCancel: () => void = () => {},
+  ): { res: Response; cancelled: () => boolean } => {
+    let cancelled = false;
+    const body = new ReadableStream({
+      cancel() {
+        cancelled = true;
+        onCancel();
+      },
+    });
+    return { res: new Response(body, { status }), cancelled: () => cancelled };
+  };
+
+  it('releases the response body when a ping is answered with a non-2xx', async () => {
+    const { res, cancelled } = bodyWatcher(503);
+    const f = new Follower({
+      leaderUrl: 'http://127.0.0.1:1',
+      pingTimeoutMs: 200,
+      fetch: async () => res,
+    });
+    expect(await f.ping()).toBe(false);
+    expect(cancelled()).toBe(true);
+  });
+
+  it('releases the response body on the abdication paths that never read it', async () => {
+    // 404 is the leader-predates-the-endpoint branch and 500 the generic failure; both return on
+    // the status alone, so both have to let the body go.
+    for (const [status, outcome] of [
+      [404, 'unsupported'],
+      [500, 'error'],
+    ] as const) {
+      const { res, cancelled } = bodyWatcher(status);
+      const f = new Follower({
+        leaderUrl: 'http://127.0.0.1:1',
+        pingTimeoutMs: 200,
+        fetch: async () => res,
+      });
+      expect(await f.requestAbdication(200)).toBe(outcome);
+      expect(cancelled()).toBe(true);
+    }
+  });
+
+  it('still reports the diagnosed outcome when releasing the body itself fails', async () => {
+    // Why the release is fire-and-forget rather than awaited: these callers sit inside a try/catch
+    // that maps any throw to 'error', so awaiting a rejected cancel would turn "this leader is too
+    // old to abdicate" into an indistinguishable transport failure.
+    const { res } = bodyWatcher(404, () => {
+      throw new Error('cancel failed');
+    });
+    const f = new Follower({
+      leaderUrl: 'http://127.0.0.1:1',
+      pingTimeoutMs: 200,
+      fetch: async () => res,
+    });
+    expect(await f.requestAbdication(200)).toBe('unsupported');
+  });
+
+  it('sendRpc threads sessionId so the leader pins the call', async () => {
+    const b = await startLeader();
+    await attachFakePlugin(b, async () => ({ ok: true }));
+    const sid = b.relay.pickActiveSessionId();
+    const f = new Follower({ leaderUrl: `http://127.0.0.1:${b.port}` });
+
+    const ok = await f.sendRpc('get_design_context', {}, 'r-pin', sid);
+    expect(ok.kind).toBe('ok');
+
+    const bad = await f.sendRpc('get_design_context', {}, 'r-ghost', 'ghost-session');
+    if (bad.kind !== 'err') throw new Error(`expected err, got ${bad.kind}`);
+    expect(bad.code).toBe(ErrorCode.PluginDisconnected);
+  });
+});

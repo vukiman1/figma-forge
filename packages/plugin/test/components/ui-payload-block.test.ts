@@ -1,12 +1,9 @@
-// @vitest-environment happy-dom
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { h } from 'vue';
 
-/**
- * The clipboard itself is VueUse's problem, and the browser API it reaches for isn't available
- * under happy-dom. What belongs to this component is _what it hands over_ — so `useClipboard` is
- * stubbed at the module boundary and the tests assert on the handover and the resulting UI state.
- */
+import UiPayloadBlock from '../../ui/components/UiPayloadBlock.vue';
+
 const clipboard = vi.hoisted(() => ({ copy: vi.fn<(text: string) => void>() }));
 
 vi.mock('@vueuse/core', async importOriginal => {
@@ -14,7 +11,6 @@ vi.mock('@vueuse/core', async importOriginal => {
   const { ref } = await import('vue');
   return {
     ...actual,
-    // A fresh `copied` per call, mirroring the real per-instance flag.
     useClipboard: () => {
       const copied = ref(false);
       return {
@@ -27,8 +23,6 @@ vi.mock('@vueuse/core', async importOriginal => {
     },
   };
 });
-
-const { default: UiPayloadBlock } = await import('../../ui/components/UiPayloadBlock.vue');
 
 const mountPreview = (props: Record<string, unknown> = {}) =>
   mount(UiPayloadBlock, { props: { label: 'Payload → LLM', preview: '{"ok":true}', ...props } });
@@ -49,8 +43,7 @@ describe('UiPayloadBlock', () => {
     expect(mountPreview({ bytes: 4096 }).text()).toContain('4.0 KB');
   });
 
-  // The request block has no meaningful "size fed to the LLM", so it passes no bytes at all.
-  it('omits the size when none is given', () => {
+  it('omits the size for a request block, which passes no bytes', () => {
     expect(mountPreview().text()).not.toContain('KB');
   });
 
@@ -76,8 +69,7 @@ describe('UiPayloadBlock', () => {
     expect(wrapper.find('button').text()).toBe('Copied');
   });
 
-  // Each block owns its own flag, so copying the request must not light up the payload's button.
-  it('keeps the copied state local to one block', async () => {
+  it('keeps the copied state local to one block, so copying the request leaves the payload’s button alone', async () => {
     const first = mountPreview({ preview: 'a' });
     const second = mountPreview({ preview: 'b' });
 
@@ -87,13 +79,10 @@ describe('UiPayloadBlock', () => {
     expect(second.find('button').text()).toBe('Copy');
   });
 
-  // The row itself is a toggle button; a copy click inside it must not also collapse the row.
   it('does not let the copy click bubble to the row toggle', async () => {
     const onClick = vi.fn<() => void>();
     const wrapper = mount({
-      components: { UiPayloadBlock },
-      setup: () => ({ onClick }),
-      template: `<div @click="onClick"><UiPayloadBlock label="L" preview="p" /></div>`,
+      setup: () => () => h('div', { onClick }, [h(UiPayloadBlock, { label: 'L', preview: 'p' })]),
     });
 
     await wrapper.find('button').trigger('click');

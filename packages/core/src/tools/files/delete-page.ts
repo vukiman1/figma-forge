@@ -1,0 +1,19 @@
+import { z } from 'zod';
+
+import type { ToolSpec } from '../tool-spec.js';
+
+export const DELETE_PAGE_TOOL_NAME = 'delete_page';
+
+export const deletePageParams = z.object({
+  pageId: z.string().describe('Page id to delete'),
+});
+
+export const deletePageTool: ToolSpec = {
+  name: DELETE_PAGE_TOOL_NAME,
+  description:
+    'Delete a page by id. The current page and the last remaining page cannot be deleted. ' +
+    'Returns { ok, nodeId }.',
+  inputSchema: deletePageParams,
+  kind: 'write',
+  destructive: true,
+};

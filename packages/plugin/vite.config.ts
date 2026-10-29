@@ -3,9 +3,7 @@ import vue from '@vitejs/plugin-vue';
 import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 
-import pkg from '../mcp/package.json' with { type: 'json' };
-
-// Single product version, sourced from the published package (@figwright/mcp).
+import pkg from '../server/package.json' with { type: 'json' };
 const { version } = pkg;
 
 export default defineConfig({

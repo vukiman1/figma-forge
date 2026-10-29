@@ -1,15 +1,11 @@
-// @vitest-environment happy-dom
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import TabActivityRow from '../../ui/components/TabActivityRow.vue';
 import type { ActivityEntry } from '../../ui/relay/state.js';
 
-// The row's job is to hand the right ids to the canvas; posting them to the sandbox is that
-// module's concern, so it's stubbed at the boundary.
 const reveal = vi.hoisted(() => vi.fn<(ids: readonly string[]) => void>());
 vi.mock('../../ui/sandbox/commands.js', () => ({ revealOnCanvas: reveal }));
-
-const { default: TabActivityRow } = await import('../../ui/components/TabActivityRow.vue');
 
 const payload = (over: Partial<ActivityEntry['payload']> = {}) => ({
   preview: '{"node":"ok"}',
@@ -29,11 +25,9 @@ const entry = (over: Partial<ActivityEntry> = {}): ActivityEntry => ({
 const mountRow = (over: Partial<ActivityEntry> = {}) =>
   mount(TabActivityRow, { props: { entry: entry(over) } });
 
-/** The expand container is the grid whose rows animate between 0fr and 1fr. */
 const isExpanded = (wrapper: ReturnType<typeof mountRow>): boolean =>
   wrapper.find('.grid-rows-\\[1fr\\]').exists();
 
-/** The reveal control is the only button carrying the crosshair glyph. */
 const revealButton = (wrapper: ReturnType<typeof mountRow>) =>
   wrapper.find('button:has(.lucide-crosshair)');
 
@@ -59,11 +53,7 @@ describe('TabActivityRow', () => {
       expect(wrapper.find('.lucide-x').exists()).toBe(true);
     });
 
-    // The reason a call failed used to exist only in the diagnostic bundle: the row rendered a red
-    // X, and expanding it showed the request and nothing else — so an editor-caused failure (FigJam
-    // has no styles, Dev Mode is read-only) read as an unexplained red line to the person watching
-    // the panel. Found live in FigJam.
-    it('shows why a call failed when the row is expanded', async () => {
+    it('shows why a call failed, so an editor-caused failure such as FigJam’s missing styles is explained', async () => {
       const message = 'not a function (editor: figjam — FigJam has no components…)';
       const wrapper = mountRow({ status: 'error', error: message });
 
@@ -73,16 +63,13 @@ describe('TabActivityRow', () => {
       expect(wrapper.text()).toContain(message);
     });
 
-    // The base entry carries neither request nor payload, so this is a failure whose only content
-    // is the error — it still has to open, or the reason stays unreachable.
-    it('opens a failed call that carries nothing but the error', () => {
+    it('opens a failed call that carries nothing but the error, or the reason stays unreachable', () => {
       const wrapper = mountRow({ status: 'error', error: 'boom' });
 
       expect(wrapper.find('button').exists()).toBe(true);
     });
 
-    // A pending call has no glyph yet — just a dot that breathes so it reads as in-flight.
-    it('shows no status glyph while pending, and breathes', () => {
+    it('shows a breathing dot instead of a glyph while pending', () => {
       const wrapper = mountRow({ status: 'pending' });
       expect(wrapper.find('.lucide-check').exists()).toBe(false);
       expect(wrapper.find('.lucide-x').exists()).toBe(false);
@@ -112,18 +99,16 @@ describe('TabActivityRow', () => {
     });
   });
 
-  // The list shows relative ages because that reads best for what just happened; the wall clock is
-  // for reconciling a specific call against a log or a recording.
   describe('wall-clock time', () => {
     const startedAt = new Date(2026, 6, 25, 14, 22, 1).getTime();
 
-    it('spells out the start time in the expanded detail', () => {
+    it('spells out the wall-clock start time in the expanded detail, for reconciling against a log', () => {
       const wrapper = mountRow({ startedAt, payload: payload() });
 
       expect(wrapper.text()).toContain('Started 14:22:01');
     });
 
-    it('also carries it as a hover title on the age', () => {
+    it('carries the wall-clock time as a hover title on the relative age', () => {
       const title = mountRow({ startedAt }).find('[title]').attributes('title');
 
       expect(title).toBe('14:22:01');
@@ -131,11 +116,10 @@ describe('TabActivityRow', () => {
   });
 
   describe('expansion', () => {
-    it('is not interactive when there is nothing to show', () => {
+    it('is not interactive when there is nothing to show, leaving the chevron column as a spacer', () => {
       const wrapper = mountRow();
 
       expect(wrapper.find('button').exists()).toBe(false);
-      // No chevron either — the column stays as an empty spacer so rows keep aligning.
       expect(wrapper.find('.lucide-chevron-right').exists()).toBe(false);
     });
 
@@ -145,18 +129,13 @@ describe('TabActivityRow', () => {
       expect(wrapper.find('.lucide-chevron-right').exists()).toBe(true);
     });
 
-    /**
-     * The request snapshot is recorded at dispatch, so it is readable while the call is still
-     * running — which is when it matters most, since a call that is taking too long is the one
-     * whose arguments you want to see.
-     */
     describe('while the call is still in flight', () => {
       const inFlight = {
         status: 'pending' as const,
         request: payload({ preview: '{"nodeId":"1:2"}' }),
       };
 
-      it('opens on a pending call that has recorded its params', async () => {
+      it('opens on a pending call, since its request params are recorded at dispatch', async () => {
         const wrapper = mountRow(inFlight);
         expect(wrapper.find('button').exists()).toBe(true);
 
@@ -167,9 +146,7 @@ describe('TabActivityRow', () => {
         expect(wrapper.text()).toContain('nodeId');
       });
 
-      // Absence is the signal: the breathing dot and empty duration already say "running", and a
-      // placeholder would only add a second layout shift when the real block lands.
-      it('shows no result block until there is a result', async () => {
+      it('shows no result placeholder while in flight, avoiding a second layout shift', async () => {
         const wrapper = mountRow(inFlight);
 
         await wrapper.find('button').trigger('click');
@@ -177,7 +154,7 @@ describe('TabActivityRow', () => {
         expect(wrapper.text()).not.toContain('Payload → LLM');
       });
 
-      it('slides the result in under a row the user already opened', async () => {
+      it('slides the result in under an open row without collapsing it when the call settles', async () => {
         const wrapper = mountRow(inFlight);
         await wrapper.find('button').trigger('click');
         expect(isExpanded(wrapper)).toBe(true);
@@ -186,11 +163,18 @@ describe('TabActivityRow', () => {
           entry: entry({ ...inFlight, status: 'ok', durationMs: 42, payload: payload() }),
         });
 
-        // Still open — settling a call must not collapse what the user was reading.
         expect(isExpanded(wrapper)).toBe(true);
         expect(wrapper.text()).toContain('Payload → LLM');
         expect(wrapper.text()).toContain('Request');
       });
+    });
+
+    it('toggles when a click lands in the gap between the row’s controls', async () => {
+      const wrapper = mountRow({ payload: payload() });
+
+      await wrapper.find('li > div').trigger('click');
+
+      expect(isExpanded(wrapper)).toBe(true);
     });
 
     it('starts collapsed and toggles open and shut on click', async () => {
@@ -243,14 +227,12 @@ describe('TabActivityRow', () => {
       expect(revealButton(mountRow({ nodeIds: ['1:1'] })).exists()).toBe(true);
     });
 
-    // The control is icon-only, so it needs a name of its own to be announced at all.
-    it('names the reveal control after the call it belongs to', () => {
+    it('names the icon-only reveal control after the call it belongs to', () => {
       const label = revealButton(mountRow({ nodeIds: ['1:1'] })).attributes('aria-label');
 
       expect(label).toBe('Reveal the nodes get_design_context touched');
     });
 
-    // A read-only query that touched no node has nothing to jump to.
     it('offers nothing when the call named no node', () => {
       expect(revealButton(mountRow()).exists()).toBe(false);
       expect(revealButton(mountRow({ nodeIds: [] })).exists()).toBe(false);
@@ -264,8 +246,7 @@ describe('TabActivityRow', () => {
       expect(reveal).toHaveBeenCalledWith(['1:1', '2:2']);
     });
 
-    // The row underneath is a toggle; revealing must not also expand it.
-    it('does not expand the row', async () => {
+    it('does not expand the row it sits in', async () => {
       const wrapper = mountRow({ nodeIds: ['1:1'], payload: payload() });
 
       await revealButton(wrapper).trigger('click');

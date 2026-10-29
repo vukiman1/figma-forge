@@ -1,0 +1,255 @@
+import {
+  type GetStylesResult,
+  type GetVariableDefsResult,
+  type SerializedMotionEasing,
+  type SerializedVariable,
+  type SerializedVariableCollection,
+  type SerializedVariableComposedColor,
+  type SerializedVariableValue,
+  toHex,
+} from '@figma-forge/core';
+
+// Figma token extraction — the left-hand (neutral provenance) side of the token join. Flattens
+// get_variable_defs into { name, value, type } pairs by reading each variable at its collection's
+// default mode, following VARIABLE_ALIAS chains to a concrete value, and rendering colors as the same
+// hex form the grounding output uses (so value-matching against project tokens lines up). A variable
+// in a multi-mode collection whose value actually changes across modes additionally carries `modes`
+// (mode name → resolved value): the per-theme values (Light/Dark) that codegen must keep
+// theme-aware rather than collapse into the default mode's literal. Pure.
+
+/** A resolved concrete value: hex string for color, primitive otherwise; null if unresolved. */
+type FigmaTokenValue = string | number | boolean | null;
+
+const OPACITY_PERCENT_SCALE = 100;
+
+export interface FigmaToken {
+  /** Figma variable name, group separators kept, e.g. "Primary/500". */
+  name: string;
+  /** Resolved value at the collection's default mode. */
+  value: FigmaTokenValue;
+  /** Figma resolvedType: COLOR | FLOAT | STRING | BOOLEAN | EASING | TIMING. */
+  type: string;
+  /**
+   * Display name of the variable's collection, e.g. "font" / "color" / "size". Lets the join
+   * disambiguate overloaded names — a "size/*" in a typography collection is a font size, while the
+   * same name in a dimension collection is a width/height. Absent if the collection has no name.
+   */
+  collection?: string;
+  /**
+   * Per-theme values keyed by mode name (e.g. { Light: "#FFFFFF", Dark: "#0A0A0A" }), present only
+   * when the variable's collection has more than one mode AND at least two modes resolve to
+   * different values — i.e. the token is genuinely theme-dependent. `value` is only the default
+   * mode; a consumer must not emit it as the token's sole literal when `modes` is set.
+   */
+  modes?: Record<string, FigmaTokenValue>;
+  /**
+   * Where Figma offers the variable, carried through from get_variable_defs and present only when
+   * the designer narrowed it (the default ALL_SCOPES is omitted upstream). Authoritative statement
+   * of what the token is _for_, which the join uses where it would otherwise have to guess from a
+   * collection's name. Absent for paint-style pseudo-tokens, which have no such notion.
+   */
+  scopes?: readonly string[];
+  /**
+   * Set to 'style' when this token was derived from a shared paint style rather than a variable —
+   * the design-token mechanism of pre-variables Figma files. Absent for variables.
+   */
+  source?: 'style';
+}
+
+const isAlias = (val: SerializedVariableValue): val is { type: 'VARIABLE_ALIAS'; id: string } =>
+  typeof val === 'object' && val !== null && (val as { type?: string }).type === 'VARIABLE_ALIAS';
+
+const isRgba = (
+  val: SerializedVariableValue,
+): val is { r: number; g: number; b: number; a: number } =>
+  typeof val === 'object' && val !== null && 'r' in val && 'g' in val && 'b' in val;
+
+/** A composed color: a colour and its opacity authored separately, at least one half an alias. */
+const isComposedColor = (val: SerializedVariableValue): val is SerializedVariableComposedColor =>
+  typeof val === 'object' && val !== null && 'color' in val && 'opacity' in val;
+
+/**
+ * `hex` re-rendered at `alpha`. The channels are parsed back out and handed to toHex rather than
+ * having the alpha byte appended here, so the result keeps one spelling of a colour (uppercase,
+ * alpha only when below 1) instead of growing a second one that only nearly matches.
+ */
+const withAlpha = (hex: string, alpha: number): string | null => {
+  if (!/^#[0-9a-f]{6}/i.test(hex)) return null;
+  const channel = (at: number): number => Number.parseInt(hex.slice(at, at + 2), 16) / 255;
+  return toHex({ r: channel(1), g: channel(3), b: channel(5) }, alpha);
+};
+
+/**
+ * An EASING variable's curve flattened to a scalar, since a token value is one. A custom bezier
+ * becomes the CSS `cubic-bezier(...)` literal — lossless and what a code-side easing token actually
+ * looks like — and a custom spring keeps its bounce rather than dropping it. Every other curve is a
+ * named Figma preset, so the name is the whole value.
+ *
+ * Preset names stay as Figma spells them instead of being mapped onto CSS keywords: only a few have
+ * a real CSS counterpart (BOUNCY, GENTLE, HOLD and the BACK curves have none), and inventing one
+ * would assert an equivalence Figma never stated. The name join still matches on the variable
+ * name.
+ */
+const formatEasing = (val: SerializedMotionEasing): string => {
+  const bezier = val.easingFunctionCubicBezier;
+  if (bezier !== undefined) {
+    return `cubic-bezier(${bezier.x1}, ${bezier.y1}, ${bezier.x2}, ${bezier.y2})`;
+  }
+  if (val.easingFunctionSpring !== undefined) return `spring(${val.easingFunctionSpring.bounce})`;
+  return val.type;
+};
+
+/** The mode being resolved, carried across alias hops so Light keeps chasing Light. */
+interface ModeContext {
+  modeId: string;
+  name: string;
+}
+
+/**
+ * The mode of `collection` to read under `ctx`: the exact mode when the hop stays in the same
+ * collection, else the same-named mode (designers name theme modes identically across collections —
+ * Light/Dark in both the semantic and the primitive collection, and matching by name is how the
+ * themes are meant to switch together), else the collection's default — which mirrors Figma's own
+ * resolution, where a collection that doesn't carry the consuming mode resolves at its default. A
+ * null ctx (the plain default-mode read) always uses the default.
+ */
+const modeIn = (collection: SerializedVariableCollection, ctx: ModeContext | null): string => {
+  if (ctx !== null) {
+    if (collection.modes.some(m => m.modeId === ctx.modeId)) return ctx.modeId;
+    const named =
+      collection.modes.find(m => m.name === ctx.name) ??
+      collection.modes.find(m => m.name.toLowerCase() === ctx.name.toLowerCase());
+    if (named !== undefined) return named.modeId;
+  }
+  return collection.defaultModeId;
+};
+
+/**
+ * Resolve get_variable_defs into a flat list of concrete Figma tokens. Aliases are chased to a
+ * concrete value — at the collection's default mode for `value`, and once per mode (the mode
+ * context following the alias across collections) for `modes` — with a visited-set cycle guard so a
+ * self/mutual reference yields null rather than looping.
+ */
+export const resolveFigmaTokens = (defs: GetVariableDefsResult): FigmaToken[] => {
+  const collectionById = new Map(defs.collections.map(c => [c.id, c]));
+  const byId = new Map(defs.variables.map(varDef => [varDef.id, varDef]));
+
+  /** Raw value of `variable` under `ctx` (falls back to its first mode when the mode is absent). */
+  const valueAt = (
+    variable: SerializedVariable,
+    ctx: ModeContext | null,
+  ): SerializedVariableValue | undefined => {
+    const collection = collectionById.get(variable.collectionId);
+    if (collection !== undefined) {
+      const modeId = modeIn(collection, ctx);
+      if (modeId in variable.valuesByMode) return variable.valuesByMode[modeId];
+    }
+    return Object.values(variable.valuesByMode)[0];
+  };
+
+  /** Follow one alias hop, carrying the visited set so a chain that returns to itself stops. */
+  const chase = (id: string, ctx: ModeContext | null, seen: Set<string>): FigmaTokenValue => {
+    const target = byId.get(id);
+    return target === undefined ? null : resolve(target, ctx, seen);
+  };
+
+  /**
+   * A composed colour flattened to one hex, because a token value is one scalar. Each half is
+   * resolved on its own — either may be an alias — and the opacity becomes the colour's alpha:
+   * Figma authors the two separately precisely so the opacity _is_ the resulting alpha, so a base
+   * colour carrying its own alpha has it replaced rather than multiplied. Figma stores the opacity
+   * as a percentage (0–100, plugin-typings: "a separate opacity percentage"), not a 0–1 alpha.
+   *
+   * Either half failing to resolve to the right kind of value yields null rather than a colour that
+   * is half true — an unresolved token is readable as such, a plausible wrong hex is not.
+   *
+   * This is the one place two chains leave the same value, so each gets its own copy of the visited
+   * set: the guard means "this chain came back to itself", and sharing one set between siblings
+   * would silently widen it to "some other chain has already been here". No pair of halves can
+   * legitimately meet at the same variable today — one must end at a colour and the other at a
+   * number — so this buys exactness rather than fixing a reachable bug.
+   */
+  const resolveComposedColor = (
+    raw: SerializedVariableComposedColor,
+    ctx: ModeContext | null,
+    seen: Set<string>,
+  ): FigmaTokenValue => {
+    const base = isAlias(raw.color) ? chase(raw.color.id, ctx, new Set(seen)) : toHex(raw.color, 1);
+    const opacityPercent =
+      typeof raw.opacity === 'number' ? raw.opacity : chase(raw.opacity.id, ctx, new Set(seen));
+    if (typeof base !== 'string' || typeof opacityPercent !== 'number') return null;
+    return withAlpha(base, opacityPercent / OPACITY_PERCENT_SCALE);
+  };
+
+  const resolve = (
+    variable: SerializedVariable,
+    ctx: ModeContext | null,
+    seen: Set<string>,
+  ): FigmaTokenValue => {
+    if (seen.has(variable.id)) return null;
+    seen.add(variable.id);
+    const raw = valueAt(variable, ctx);
+    if (raw === undefined) return null;
+    if (isAlias(raw)) return chase(raw.id, ctx, seen);
+    if (isRgba(raw)) return toHex(raw, raw.a);
+    if (isComposedColor(raw)) return resolveComposedColor(raw, ctx, seen);
+    // The only object-shaped value left is an EASING curve — flatten it to a scalar token value.
+    if (typeof raw === 'object' && raw !== null) return formatEasing(raw);
+    return raw;
+  };
+
+  /**
+   * Per-theme values for a variable in a multi-mode collection, or undefined when every mode
+   * resolves to the same value (an identical-everywhere value isn't theme-dependent, and emitting
+   * it would bloat every mapping in a multi-mode file for no signal).
+   */
+  const modesOf = (variable: SerializedVariable): FigmaToken['modes'] => {
+    const collection = collectionById.get(variable.collectionId);
+    if (collection === undefined || collection.modes.length < 2) return undefined;
+    const out: NonNullable<FigmaToken['modes']> = {};
+    for (const mode of collection.modes) {
+      // Duplicate mode names can't be told apart as record keys; qualify the later one by id.
+      const key = mode.name in out ? `${mode.name} (${mode.modeId})` : mode.name;
+      out[key] = resolve(variable, { modeId: mode.modeId, name: mode.name }, new Set());
+    }
+    const values = Object.values(out);
+    return values.some(v => v !== values[0]) ? out : undefined;
+  };
+
+  return defs.variables.map(variable => {
+    const collection = collectionById.get(variable.collectionId);
+    const name = collection?.name;
+    const modes = modesOf(variable);
+    return {
+      name: variable.name,
+      value: resolve(variable, null, new Set()),
+      type: variable.resolvedType,
+      ...(name === undefined || name.length === 0 ? {} : { collection: name }),
+      ...(modes === undefined ? {} : { modes }),
+      ...(variable.scopes === undefined ? {} : { scopes: variable.scopes }),
+    };
+  });
+};
+
+/**
+ * Pseudo-tokens from shared paint styles — the design-token mechanism of pre-variables Figma files
+ * (a document can carry a full palette as paint styles and zero variables, leaving the variable
+ * join empty-handed). Only a style that is exactly one visible SOLID paint converts: that is the
+ * shape that IS a color token by another name. Multi-paint, gradient, and image styles are looks,
+ * not tokens, and are skipped. Pure.
+ */
+export const resolvePaintStyleTokens = (paints: GetStylesResult['paints']): FigmaToken[] => {
+  const out: FigmaToken[] = [];
+  for (const style of paints) {
+    const visible = style.paints.filter(p => p.visible !== false);
+    const only = visible.length === 1 ? visible[0] : undefined;
+    if (only === undefined || only.type !== 'SOLID' || !('color' in only)) continue;
+    out.push({
+      name: style.name,
+      value: toHex(only.color, only.opacity),
+      type: 'COLOR',
+      source: 'style',
+    });
+  }
+  return out;
+};

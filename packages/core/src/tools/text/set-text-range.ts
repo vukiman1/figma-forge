@@ -1,0 +1,74 @@
+import { z } from 'zod';
+
+import { fontNameSchema } from '../shared/font-name-schema.js';
+import { paintItemSchema } from '../shared/paint-schema.js';
+import { letterSpacingSchema, lineHeightSchema } from '../shared/text-metrics-schema.js';
+import type { ToolSpec } from '../tool-spec.js';
+
+export const SET_TEXT_RANGE_TOOL_NAME = 'set_text_range';
+
+const rangeSchema = z.object({
+  start: z.number().describe('Start char offset (inclusive)'),
+  end: z.number().describe('End char offset (exclusive)'),
+  fontName: fontNameSchema.optional(),
+  fontSize: z.number().optional(),
+  fills: z
+    .array(paintItemSchema)
+    .optional()
+    .describe('Run colour (SOLID or gradient), like set_fills'),
+  textDecoration: z.enum(['NONE', 'UNDERLINE', 'STRIKETHROUGH']).optional(),
+  textCase: z
+    .enum(['ORIGINAL', 'UPPER', 'LOWER', 'TITLE', 'SMALL_CAPS', 'SMALL_CAPS_FORCED'])
+    .optional(),
+  lineHeight: lineHeightSchema.optional(),
+  letterSpacing: letterSpacingSchema.optional(),
+  hyperlink: z
+    .union([z.object({ type: z.enum(['URL', 'NODE']), value: z.string() }), z.null()])
+    .optional()
+    .describe('Make the run a link ({ type, value }); null clears it'),
+  listOptions: z
+    .enum(['ORDERED', 'UNORDERED', 'NONE'])
+    .optional()
+    .describe('Turn the run into an ordered/unordered list item; NONE clears it'),
+  indentation: z.number().optional().describe('List / block indentation depth'),
+  textWrapStyle: z
+    .enum(['AUTO', 'BALANCE', 'PRETTY'])
+    .optional()
+    .describe(
+      'Line-break balancing (CSS text-wrap). Paragraph-scoped, unlike the other fields here: it ' +
+        'applies to every paragraph the range touches, not just the selected characters',
+    ),
+  textStyleId: z.string().optional().describe('Bind the run to a shared text style (its id)'),
+  fillStyleId: z.string().optional().describe('Bind the run to a shared fill style (its id)'),
+  boundVariables: z
+    .record(z.string(), z.union([z.string(), z.null()]))
+    .optional()
+    .describe(
+      'Per-run variable bindings: { field: variableId }; null unbinds. `fills` binds a COLOR variable ' +
+        'onto the run (a colour token on an inline link); other fields (fontSize / lineHeight / ' +
+        'letterSpacing / fontFamily / fontStyle / fontWeight / paragraphSpacing / paragraphIndent) bind a token',
+    ),
+});
+
+export const setTextRangeParams = z.object({
+  nodeId: z.string().describe('TEXT node id whose ranges to style'),
+  ranges: z.array(rangeSchema).describe('Character ranges + the run properties to apply to each'),
+});
+
+export const setTextRangeTool: ToolSpec = {
+  name: SET_TEXT_RANGE_TOOL_NAME,
+  description:
+    'Style character ranges of an existing TEXT node — the write-side mirror of a read segment, for ' +
+    'inline rich text (a link inside a sentence, a bold word, a coloured span, a bulleted list, a ' +
+    "smaller /mo after a price). Each range gives start/end (char offsets into the node's characters) " +
+    'plus any subset of run properties: fontName / fontSize / fills / textDecoration / textCase / ' +
+    'lineHeight / letterSpacing / hyperlink / listOptions / indentation / textWrapStyle, and design-system bindings ' +
+    'textStyleId / fillStyleId / boundVariables. Ranges apply in order (a later range overrides an ' +
+    'earlier one on overlap). Fonts are loaded automatically. Set the whole node first with create_text ' +
+    '/ set_text; use set_text_properties for node-level typography & overflow. Text on a path ' +
+    '(TEXT_PATH) takes the run fields it draws — fontName, fontSize, fills, textCase, ' +
+    'letterSpacing, hyperlink and the bindings — and refuses decoration, lineHeight, lists and ' +
+    'textWrapStyle. Returns { ok, nodeId }.',
+  inputSchema: setTextRangeParams,
+  kind: 'write',
+};

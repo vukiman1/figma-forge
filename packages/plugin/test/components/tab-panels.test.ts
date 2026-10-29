@@ -1,7 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
-// @vitest-environment happy-dom
 import { createPluginContextEvent, type PluginContextEvent } from '../../protocol/bridge.js';
 import TabActivity from '../../ui/components/TabActivity.vue';
 import TabContext from '../../ui/components/TabContext.vue';
@@ -45,8 +44,6 @@ describe('TabActivity', () => {
     expect(wrapper.text()).toContain('set_fills');
   });
 
-  // The empty state has to distinguish "nothing has happened yet" from "we aren't even connected",
-  // because the action the user needs to take is different.
   it('tells a connected user that the panel is simply idle', () => {
     const wrapper = mount(TabActivity, { props: { activity: [], connected: true } });
 
@@ -112,7 +109,6 @@ describe('TabContext', () => {
     expect(wrapper.text()).toContain('320×420');
   });
 
-  // The sandbox caps how many nodes it serializes, so a large selection must still report its size.
   it('counts the nodes the sandbox did not serialize', () => {
     const wrapper = mount(TabContext, {
       props: {
@@ -154,9 +150,7 @@ describe('TabDebug', () => {
     expect(wrapper.text()).toContain('ECONNREFUSED');
   });
 
-  // Plugin and server ship separately, so a skew between them is a real diagnosis; showing both
-  // here is what makes it visible at a glance.
-  it('pairs the plugin version with the server’s', () => {
+  it('pairs the plugin version with the server’s, so a version skew shows at a glance', () => {
     const wrapper = mount(TabDebug, { props: props({ serverVersion: '0.4.0' }) });
 
     expect(wrapper.text()).toContain('Plugin');
@@ -165,8 +159,7 @@ describe('TabDebug', () => {
     expect(wrapper.text()).toContain('v0.4.0');
   });
 
-  // The server version is only known after the hello handshake.
-  it('still reports the plugin version before the server is known', () => {
+  it('still reports the plugin version before the hello handshake names the server', () => {
     const wrapper = mount(TabDebug, { props: props({ serverVersion: null }) });
 
     expect(wrapper.text()).toContain('v0.3.0');
@@ -193,8 +186,7 @@ describe('TabDebug', () => {
     expect(wrapper.text()).toContain('No errors.');
   });
 
-  // Nothing to report before any call has happened, so the button would produce an empty bundle.
-  it('disables the diagnostics button until there is activity', () => {
+  it('disables the diagnostics button until there is activity to bundle', () => {
     const empty = mount(TabDebug, { props: props({ activity: [] }) });
     expect(empty.find('button').attributes('disabled')).toBeDefined();
 
@@ -208,8 +200,6 @@ describe('TabDebug', () => {
   });
 
   describe('call statistics', () => {
-    // Totals come from the uncapped counters, not from the retained list, so they stay honest once
-    // the recent list has rolled over.
     it('reports the lifetime totals, not just what is still listed', () => {
       const wrapper = mount(TabDebug, {
         props: props({ totalCalls: 500, failedCalls: 7, activity: [entry()] }),
@@ -237,7 +227,6 @@ describe('TabDebug', () => {
       expect(wrapper.text()).toContain('200ms');
     });
 
-    // A call still in flight has no duration yet and would drag the mean toward zero.
     it('leaves pending calls out of the average', () => {
       const wrapper = mount(TabDebug, {
         props: props({

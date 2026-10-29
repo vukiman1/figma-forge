@@ -1,9 +1,9 @@
 ---
 name: mcp-sdk-audit
-description: 'Upgrade @modelcontextprotocol/server (the MCP TypeScript SDK v2) and prove the wire contract survived. The SDK is a runtime dependency whose breakage lands on the wire, not in the type checker — so this sorts each release by which SDK source files it touched (Figwright uses only the server + stdio slice of a client/server/multi-runtime package family), then diffs what a real MCP client observes — negotiated protocol version, every tool JSON Schema, annotations, prompts — before and after the bump. Use whenever the user wants @modelcontextprotocol/server or the other @modelcontextprotocol/* packages updated or audited, asks what a new SDK version changes for the server or its clients, or lands on a Renovate bump PR for that package.'
+description: 'Upgrade @modelcontextprotocol/server (the MCP TypeScript SDK v2) and prove the wire contract survived. The SDK is a runtime dependency whose breakage lands on the wire, not in the type checker — so this sorts each release by which SDK source files it touched (Figma Forge uses only the server + stdio slice of a client/server/multi-runtime package family), then diffs what a real MCP client observes — negotiated protocol version, every tool JSON Schema, annotations, prompts — before and after the bump. Use whenever the user wants @modelcontextprotocol/server or the other @modelcontextprotocol/* packages updated or audited, asks what a new SDK version changes for the server or its clients, or lands on a Renovate bump PR for that package.'
 ---
 
-Absorbing a `@modelcontextprotocol/server` release into Figwright, end to end: audit → upgrade → prove
+Absorbing a `@modelcontextprotocol/server` release into Figma Forge, end to end: audit → upgrade → prove
 the wire contract is unchanged.
 
 **Do not reason about this the way `figma-typings-audit` reasons about plugin typings.** That package
@@ -13,7 +13,7 @@ release can leave every type identical and still change what clients see. `pnpm 
 green through it.
 
 **Unlike every other dependency here, this one has a dedicated gate — use it.**
-`packages/mcp/test/e2e/mcp-wire.test.ts` spawns the built `dist` over real stdio, speaks raw
+`packages/server/test/e2e/mcp-wire.test.ts` spawns the built `dist` over real stdio, speaks raw
 JSON-RPC at it, and asserts the advertised contract against what the specs declare. It runs in
 `pnpm test`. That gate answers *did anything break*; it does not answer *what moved*, which is what
 an audit is for — Stage 5 covers the difference.
@@ -24,7 +24,7 @@ the *SDK* — it catches an SDK that stops asking Zod the same question — but 
 changes what it answers, both sides move together and the equality still holds. An SDK bump that
 also moves the resolved `zod` version (its range is `^4.2.0`, so it shares the repo's copy) can
 therefore reshape every client's schema with this gate green.
-`packages/mcp/test/json-schema-generation.test.ts` covers that half by pinning each construct's
+`packages/server/test/json-schema-generation.test.ts` covers that half by pinning each construct's
 rendering by hand — if a bump moves the Zod version, read its diff too, and let `probe.mjs` name
 which tools changed.
 
@@ -33,20 +33,20 @@ Target version: whatever the user named, otherwise the latest `@modelcontextprot
 ## Stage 0 — Resolve versions
 
 ```bash
-grep '@modelcontextprotocol' packages/mcp/package.json          # declared range
+grep '@modelcontextprotocol' packages/server/package.json          # declared range
 grep -m1 '@modelcontextprotocol/server@' pnpm-lock.yaml         # what is installed
 npm view @modelcontextprotocol/server version dist-tags --json  # latest
 gh api repos/modelcontextprotocol/typescript-sdk/releases --jq '.[0:15][] | "\(.tag_name)\t\(.published_at)"'
 ```
 
-Figwright is on **v2** — the package family (`@modelcontextprotocol/server` + its transitive
+Figma Forge is on **v2** — the package family (`@modelcontextprotocol/server` + its transitive
 `/core`, with `/client`, `/node`, `/express`, `/hono`, `/fastify`, `/server-legacy`, `/codemod`
 alongside). It depends on exactly one of them.
 
 Two things the releases list will show that are **not** upgrades for us:
 
 - Bare `1.30.0`-style tags are the **v1 legacy line** (`@modelcontextprotocol/sdk`, source on the
-  long-lived `v1.x` branch). Figwright left it; a v1 tag is not our concern.
+  long-lived `v1.x` branch). Figma Forge left it; a v1 tag is not our concern.
 - `@modelcontextprotocol/{client,express,fastify,hono,node,server-legacy,codemod}@X` tags ship on
   the same version number as `server` but are packages we do not install.
 
@@ -74,12 +74,12 @@ is how the hunk that mattered gets missed.
 
 ## Stage 2 — Sort by file path
 
-Figwright imports exactly two entry points (`packages/mcp/src/index.ts`, `src/prompts/*`,
+Figma Forge imports exactly two entry points (`packages/server/src/index.ts`, `src/prompts/*`,
 `test/tool-schema.ts`, `test/e2e/mcp-wire.test.ts`): `@modelcontextprotocol/server` and
 `@modelcontextprotocol/server/stdio`. That narrow slice is what makes this audit cheap — most of any
 given release is about parts of the family this server never loads.
 
-| SDK path                                                           | Bearing on Figwright                                                                              |
+| SDK path                                                           | Bearing on Figma Forge                                                                              |
 | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
 | `packages/server/src/server/mcp.ts`, `server.ts`                   | **Load-bearing.** `registerTool` / `registerPrompt` / result serialization                          |
 | `packages/server/src/server/serveStdio.ts`, `stdio.ts`             | **Load-bearing.** The entry point and the only transport this server runs                           |
@@ -91,9 +91,9 @@ given release is about parts of the family this server never loads.
 | `packages/{express,fastify,hono,node,server-legacy}/**`, `**/auth/**`, `examples/**` | Ignore                                                            |
 
 The `packages/client/**` row is the subtle one: a limit added to the client's read path applies to
-**Figwright's responses**, since the client is what reads them. `get_screenshot` returns inline
+**Figma Forge's responses**, since the client is what reads them. `get_screenshot` returns inline
 base64 and `get_design_context` returns large JSON, so client-side ceilings are a real exposure even
-though Figwright ships no client.
+though Figma Forge ships no client.
 
 ## Stage 3 — Cross-check against the published dist
 
@@ -159,13 +159,13 @@ second zod copy beside the repo's own.
 
 ## Stage 4 — Classify
 
-1. **Type-level** — a changed export in `dist/**/*.d.mts` that Figwright names. `tsc` covers these;
+1. **Type-level** — a changed export in `dist/**/*.d.mts` that Figma Forge names. `tsc` covers these;
    confirm in Stage 6 rather than reasoning about them.
 2. **★ Wire behavior** — the recurring shapes:
    - the negotiated **protocol version** (`LATEST_PROTOCOL_VERSION`, `SUPPORTED_PROTOCOL_VERSIONS`,
      `FIRST_MODERN_PROTOCOL_VERSION`) — moving it changes what every connecting client sees, and
      dropping an old entry can cut off an older client outright;
-   - the **JSON Schema** generated per tool — one for every tool Figwright registers, they are the LLM's
+   - the **JSON Schema** generated per tool — one for every tool Figma Forge registers, they are the LLM's
      entire spec, and a `$ref`/`allOf`/`additionalProperties` shift has broken third-party clients
      before (see `project_moonshot_ref_immunity`);
    - **era selection in `serveStdio`** — which revision a given opening exchange lands on;
@@ -184,14 +184,14 @@ Two different questions, two tools. Run both.
 **The gate — did anything break?**
 
 ```bash
-pnpm build && pnpm vitest run packages/mcp/test/e2e/mcp-wire.test.ts
+pnpm build && pnpm vitest run packages/server/test/e2e/mcp-wire.test.ts
 ```
 
 It asserts the advertised tool set, each tool's JSON Schema against a derivation that is independent
 of the SDK (but not of Zod — see above), the dialect, annotations, prompts, a live `tools/call`, the
 bad-argument path, and that a 2024-11-05 client is still served. Red here means the release moved
 something that matters. If the bump also moved `zod`, run
-`pnpm vitest run packages/mcp/test/json-schema-generation.test.ts` as a second gate.
+`pnpm vitest run packages/server/test/json-schema-generation.test.ts` as a second gate.
 
 **The probe — what moved?** A gate is a boolean; an audit has to name the change. `probe.mjs` boots
 the same built server, snapshots everything a client can observe, and diffs two snapshots.
@@ -210,7 +210,7 @@ Notes that matter:
 - **`pnpm build` first, every time.** The MCP server runs the built `dist`; probing a stale bundle
   reports the previous SDK. (A stale `dist` left behind by an abandoned upgrade is also
   *unrunnable* — it imports a package the current `node_modules` no longer has.)
-- Both the gate and the probe run the server on a random high port via `FIGWRIGHT_PORT`, so neither
+- Both the gate and the probe run the server on a random high port via `FIGMA_FORGE_PORT`, so neither
   contends for `3055` or steals a connected plugin. Neither needs a plugin — `ping` answers without
   one.
 - A baseline captured *after* upgrading is worthless. If the bump already happened (a Renovate
@@ -221,7 +221,7 @@ Notes that matter:
 ## Stage 6 — Upgrade and run the gates
 
 ```bash
-pnpm -C packages/mcp add @modelcontextprotocol/server@^<target>
+pnpm -C packages/server add @modelcontextprotocol/server@^<target>
 pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm build && pnpm test
 ```
 
@@ -239,7 +239,7 @@ Ordered by consequence:
 3. **要知道但不用動的** — bucket 2/3 items that exist in the release but cannot reach this server
    (a client-side limit, an HTTP transport fix). Say *why* it cannot reach us; that reasoning is the
    deliverable, and it is what makes the next audit cheap.
-4. **新能力** — anything the SDK now exposes that Figwright could use, one line each.
+4. **新能力** — anything the SDK now exposes that Figma Forge could use, one line each.
 
 Report only what the diff and the probe showed. Don't pad with plausible-sounding changes, and never
 claim a verification you didn't run.
@@ -252,7 +252,7 @@ The gate and the probe prove the server speaks correctly to a test harness. They
 clients are happy:
 
 - The MCP server runs the built `dist` → `pnpm build`, then the user reconnects the MCP connection
-  (`.mcp.json` launches `packages/mcp/dist/index.mjs`).
+  (`.mcp.json` launches `packages/server/dist/index.mjs`).
 - Ask the user to run one read tool (`ping`, then something with a real payload like
   `get_design_context`) through the reconnected server with the plugin open.
 - If the release touched protocol-version constants or schema generation, that check should ideally

@@ -1,4 +1,4 @@
-import { DEFAULT_TOOL_BUDGET_MS, ErrorCode, HEAVY_TOOL_BUDGET_MS } from '@figwright/shared';
+import { DEFAULT_TOOL_BUDGET_MS, ErrorCode, HEAVY_TOOL_BUDGET_MS } from '@figma-forge/core';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
@@ -58,11 +58,7 @@ describe('createToolBridge', () => {
     expect(bridge.pendingCount()).toBe(0);
   });
 
-  // The code stays a field instead of being folded into the message. It used to reject with
-  // `${code}: ${message}`, which left the relay client unable to recover the code — it sent a
-  // hardcoded Internal alongside a message that already named the real one, and the server prefixed
-  // it a second time. Asserting the concatenation here is what made that shape look intended.
-  it('rejects when sandbox replies with tool-error, keeping the code addressable', async () => {
+  it('rejects a tool-error as a PluginToolFailure whose code stays a field rather than folded into the message', async () => {
     const { bridge, sent, emit } = setup();
     const promise = bridge.handler('ping', undefined);
     emit(createToolError({ id: sent[0]!.id, code: 'BOOM', message: 'sandbox failed' }));
@@ -77,29 +73,26 @@ describe('createToolBridge', () => {
   });
 
   it.each(['import_variable', 'import_style'])(
-    'reports a %s timeout with a foreground retry path without closing the bridge',
+    'gives a %s import the heavy budget, then times out with a foreground retry hint while a late result never blocks the retry',
     async method => {
       vi.useFakeTimers();
       const { bridge, sent, emit } = setup();
       try {
         const answer = bridge.handler(method, {}).then(
           result => ({ result }),
-          error => ({ error }),
+          (error: unknown) => ({ error }),
         );
-        // Still pending past the default window: a background import gets the heavy one.
         await vi.advanceTimersByTimeAsync(DEFAULT_TOOL_BUDGET_MS + 1);
         expect(bridge.pendingCount()).toBe(1);
         await vi.advanceTimersByTimeAsync(HEAVY_TOOL_BUDGET_MS - DEFAULT_TOOL_BUDGET_MS);
-        await expect(answer).resolves.toMatchObject({
-          error: {
-            code: ErrorCode.Timeout,
-            message: expect.stringMatching(/target Figma file.*foreground.*retry/),
-          },
-        });
+        const outcome = await answer;
+        expect(outcome).toMatchObject({ error: { code: ErrorCode.Timeout } });
+        expect(outcome).toHaveProperty(
+          'error.message',
+          expect.stringMatching(/target Figma file.*foreground.*retry/),
+        );
         expect(bridge.pendingCount()).toBe(0);
 
-        // Timing out abandons the reply, not Figma's pending import. A late result must not
-        // resurrect the call or prevent an independent foreground retry from succeeding.
         emit(createToolResult({ id: sent[0]!.id, result: { ok: true } }));
         const retry = bridge.handler(method, {});
         emit(createToolResult({ id: sent[1]!.id, result: { ok: true } }));
@@ -119,10 +112,9 @@ describe('createToolBridge', () => {
       const { bridge, sent, emit } = setup();
       try {
         const promise = bridge.handler(method, {});
-        // Observe rejections immediately, including when a too-short budget fires mid-advance.
         const answer = promise.then(
           result => ({ result }),
-          error => ({ error }),
+          (error: unknown) => ({ error }),
         );
         await vi.advanceTimersByTimeAsync(DEFAULT_TOOL_BUDGET_MS + 1);
         emit(createToolResult({ id: sent[0]!.id, result: { nodes: [] } }));
@@ -144,7 +136,7 @@ describe('createToolBridge', () => {
         const promise = bridge.handler(method, {});
         const answer = promise.then(
           result => ({ result }),
-          error => ({ error }),
+          (error: unknown) => ({ error }),
         );
         await vi.advanceTimersByTimeAsync(HEAVY_TOOL_BUDGET_MS);
         await expect(answer).resolves.toEqual({
@@ -176,13 +168,16 @@ describe('createToolBridge', () => {
     bridge.dispose();
   });
 
-  it('ignores non-bridge messages (e.g. Figma internals)', () => {
-    const { emit } = setup();
+  it('ignores non-bridge messages such as Figma internals', () => {
+    const { bridge, emit } = setup();
+    void bridge.handler('ping', undefined).catch(() => {});
+
     emit({ pluginMessage: 'something else' });
     emit(undefined);
     emit({ tag: 'wrong', kind: 'tool-result', id: 'x' });
-    // nothing to assert beyond no throw
-    expect(true).toBe(true);
+
+    expect(bridge.pendingCount()).toBe(1);
+    bridge.dispose();
   });
 
   it('dispose rejects pending and unsubscribes', async () => {

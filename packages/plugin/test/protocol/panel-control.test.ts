@@ -29,9 +29,7 @@ describe('clampPanelSize', () => {
     expect(clampPanelSize(10, 1000)).toEqual({ width: PANEL_MIN_SIZE.width, height: 1000 });
   });
 
-  // Both ends of the channel clamp; the second call must be a no-op on the first's output, or the
-  // two would fight over every drag frame.
-  it('is idempotent', () => {
+  it('is idempotent, so the two ends that both clamp never fight over a drag', () => {
     const once = clampPanelSize(400.9, 500.2);
 
     expect(clampPanelSize(once.width, once.height)).toEqual(once);
@@ -55,10 +53,10 @@ describe('parsePanelControl', () => {
     );
   });
 
-  // Tool traffic shares this channel and is by far the more frequent of the two; it has to fall
-  // through untouched so the caller can dispatch it.
   it('passes over anything that is not tagged as panel control', () => {
-    expect(parsePanelControl({ tag: '@figwright/bridge', kind: 'tool-call', id: 'x' })).toBeNull();
+    expect(
+      parsePanelControl({ tag: '@figma-forge/bridge', kind: 'tool-call', id: 'x' }),
+    ).toBeNull();
     expect(parsePanelControl({ kind: 'panel-hide' })).toBeNull();
     expect(parsePanelControl(null)).toBeNull();
     expect(parsePanelControl('panel-hide')).toBeNull();
@@ -70,8 +68,7 @@ describe('parsePanelControl', () => {
   });
 
   describe('resize', () => {
-    // A half-applied resize is a visible defect; dropping the message whole is not.
-    it('rejects a size that is not a pair of finite numbers', () => {
+    it('rejects a size that is not a pair of finite numbers, dropping the message whole rather than half-applying it', () => {
       const resize = (over: Record<string, unknown>): unknown => ({
         ...createPanelResize({ width: 400, height: 500 }, false),
         ...over,
@@ -84,7 +81,6 @@ describe('parsePanelControl', () => {
       expect(parsePanelControl(resize({ persist: 'yes' }))).toBeNull();
     });
 
-    // Clamping is the receiver's job — the message is free to name any size it likes.
     it('accepts a size below the floor without clamping it here', () => {
       expect(parsePanelControl(createPanelResize({ width: 10, height: 10 }, false))).toMatchObject({
         width: 10,
@@ -100,9 +96,7 @@ describe('parsePanelControl', () => {
       expect(parsePanelControl(message)).toEqual(createPanelReveal(['1:1', '2:2']));
     });
 
-    // "Nothing was asked for" and "nothing was found" call for different responses, and only the
-    // latter warrants a notice — so an empty request must never reach the sandbox at all.
-    it('rejects a request that names no usable node', () => {
+    it('rejects a request that names no usable node, so only a reveal that found nothing shows a notice', () => {
       expect(parsePanelControl({ ...createPanelReveal(['1:1']), nodeIds: [] })).toBeNull();
       expect(parsePanelControl({ ...createPanelReveal(['1:1']), nodeIds: [1, 2] })).toBeNull();
       expect(parsePanelControl({ ...createPanelReveal(['1:1']), nodeIds: 'x' })).toBeNull();
