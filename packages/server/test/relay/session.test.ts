@@ -7,11 +7,7 @@ import { SessionManager } from '../../src/relay/session.js';
 const fakeSocket = (): WebSocket => ({ close: () => {} }) as unknown as WebSocket;
 
 describe('SessionManager.clear', () => {
-  // Regression: Relay.stop() clears sessions before terminating sockets, so the socket-close path
-  // (markDisconnected) early-returns and never stops the heartbeat. If clear() doesn't stop it
-  // either, the leaked setInterval pins the event loop open and a shutting-down process lingers
-  // as a zombie.
-  it('stops session heartbeats so no interval outlives the manager', () => {
+  it('stops session heartbeats itself, since Relay.stop clears sessions before their sockets close and a leaked interval keeps the process alive', () => {
     vi.useFakeTimers();
     try {
       const manager = new SessionManager();
