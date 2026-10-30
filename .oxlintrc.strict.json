@@ -61,6 +61,8 @@
     "!packages/server/src/profile/**",
     "!packages/server/src/scan/**",
     "!packages/server/src/optional-file.ts",
+    "!packages/server/src/parse-source.ts",
+    "!packages/server/src/tokens/js-config/**",
     "!packages/server/src/error-message.ts",
     "!packages/server/src/parse-json.ts",
     "!packages/server/test/",
@@ -69,6 +71,7 @@
     "!packages/server/test/relay/**",
     "!packages/server/test/profile/**",
     "!packages/server/test/scan/**",
+    "!packages/server/test/tokens/js-config/**",
     "test/**"
   ]
 }

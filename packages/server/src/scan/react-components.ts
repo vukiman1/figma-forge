@@ -1,8 +1,8 @@
 import type { Directive, ExportNamedDeclaration, ExportSpecifier, Statement } from 'oxc-parser';
 
+import { parseSource } from '../parse-source.js';
 import { identifierName } from './ast-names.js';
 import { isPascalCase, nameFromFile } from './component-name.js';
-import { parseSource } from './parse-program.js';
 import {
   type Candidate,
   candidateOfDeclaration,

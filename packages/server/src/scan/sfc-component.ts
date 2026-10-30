@@ -1,7 +1,7 @@
 import type { Program } from 'oxc-parser';
 
+import { parseSource } from '../parse-source.js';
 import { nameFromFile } from './component-name.js';
-import { parseSource } from './parse-program.js';
 import { mergeProps } from './props-result.js';
 import type { ComponentFramework, ScannedComponent } from './scanned-component.js';
 import { type ScriptLang, scanSfcScripts, type SfcScriptBlock } from './sfc-blocks.js';

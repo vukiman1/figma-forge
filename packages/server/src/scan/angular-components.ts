@@ -1,8 +1,8 @@
 import type { Class, Directive, Expression, Node, Program, Statement } from 'oxc-parser';
 
+import { parseSource } from '../parse-source.js';
 import { ownInputNames } from './angular-input-names.js';
 import { hasDecorator } from './ast-names.js';
-import { parseSource } from './parse-program.js';
 import { mergeProps, NO_PROPS, type PropsResult, UNKNOWN_PROPS } from './props-result.js';
 import type { ScannedComponent } from './scanned-component.js';
 
