@@ -2,8 +2,8 @@ import { join, resolve } from 'node:path';
 
 import { z } from 'zod';
 
+import { readTextIfPresent } from '../optional-file.js';
 import { parseJson } from '../parse-json.js';
-import { readTextIfPresent } from './optional-file.js';
 
 const DependencyMapSchema = z.record(z.string(), z.string().catch('')).optional().catch(undefined);
 

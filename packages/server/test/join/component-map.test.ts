@@ -8,7 +8,7 @@ import {
   joinComponents,
   parseMapFile,
 } from '../../src/join/component-map.js';
-import type { ScannedComponent } from '../../src/scan/scan.js';
+import type { ScannedComponent } from '../../src/scan/scanned-component.js';
 
 const comp = (name: string, propNames: string[] = []): ScannedComponent => ({
   name,

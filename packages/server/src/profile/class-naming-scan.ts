@@ -1,8 +1,8 @@
 import { join } from 'node:path';
 
+import { readTextIfPresent } from '../optional-file.js';
 import { walkRepoFiles } from '../repo-walk.js';
 import { type ClassNamingTally, tallyClassNaming } from './class-naming-tally.js';
-import { readTextIfPresent } from './optional-file.js';
 import { readStylesheetNames, type StylesheetNames } from './stylesheet-names.js';
 
 const NESTING_STYLESHEET_EXTENSIONS = ['.scss', '.sass', '.less', '.styl', '.pcss', '.postcss'];

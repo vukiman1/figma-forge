@@ -1,6 +1,6 @@
 import type { DesignContextNode } from '@figma-forge/core';
 
-import type { ScannedComponent } from '../scan/scan.js';
+import type { ScannedComponent } from '../scan/scanned-component.js';
 import { casefold } from './casefold.js';
 import { CANDIDATE_FLOOR, statusFor } from './status.js';
 

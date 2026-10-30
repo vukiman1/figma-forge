@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-import { fileExists } from './optional-file.js';
+import { fileExists } from '../optional-file.js';
 
 const TAILWIND_CONFIGS: readonly string[] = [
   'tailwind.config.js',

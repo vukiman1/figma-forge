@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
+import { readTextIfPresent } from '../optional-file.js';
 import { walkRepoFiles } from '../repo-walk.js';
-import { readTextIfPresent } from './optional-file.js';
 
 const CSS_TAILWIND_IMPORT = /@import\s+["']tailwindcss["']/;
 const CSS_THEME_BLOCK = /@theme\b/;

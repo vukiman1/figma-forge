@@ -1,10 +1,10 @@
 import { join, resolve } from 'node:path';
 
+import { fileExists, readTextIfPresent } from '../optional-file.js';
 import { declaresVocabularyPreset } from '../tokens/js-config.js';
 import { scanClassNaming } from './class-naming-scan.js';
 import type { ClassNamingTally } from './class-naming-tally.js';
 import { findPresentConfigFiles, findUnoConfig } from './config-files.js';
-import { fileExists, readTextIfPresent } from './optional-file.js';
 import { type PackageJson, readPackageManifest } from './package-manifest.js';
 import { findTailwindCssEntry } from './tailwind-css-entry.js';
 
