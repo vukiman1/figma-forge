@@ -20,10 +20,14 @@ const ALLOWED: ReadonlyMap<string, string> = new Map([
     'declares isUtilityFirst — the predicate every other file should call',
   ],
   [
-    'tokens/load.ts',
+    'tokens/token-source.ts',
     'picks which config vocabulary to parse (Tailwind keys vs UnoCSS keys), which is not the same ' +
       'question as whether the project generates utility classes — a project can be one and read ' +
       'a config written in the other, which is exactly what the tokenSource override allows',
+  ],
+  [
+    'tokens/js-config-token-loader.ts',
+    'decides whether Tailwind v4 compiles pooled @theme declarations; UnoCSS and Tailwind v3 do not',
   ],
 ]);
 

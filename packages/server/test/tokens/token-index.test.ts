@@ -5,12 +5,13 @@ import { join } from 'node:path';
 import type { GetDesignContextResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
+import type { ProjectToken } from '../../src/tokens/project-token.js';
+import { parseCssCustomProperties } from '../../src/tokens/stylesheet/css-custom-properties.js';
 import {
   annotateProjectTokens,
   buildTokenValueIndex,
   loadTokenValueIndex,
 } from '../../src/tokens/token-index.js';
-import { parseCssCustomProperties, type ProjectToken } from '../../src/tokens/tokens.js';
 
 const proj = (name: string, value: string, utility?: string): ProjectToken => ({
   name,

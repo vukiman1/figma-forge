@@ -1,7 +1,7 @@
 import type { ObjectExpression, ObjectPropertyKind, Program } from 'oxc-parser';
 
 import { parseSource } from '../../parse-source.js';
-import type { ProjectToken } from '../tokens.js';
+import type { ProjectToken } from '../project-token.js';
 import { findConfigObject, unwrapObject } from './config-object.js';
 import { keyName, leafValue, propertyNamed } from './literal-values.js';
 import type { Scale } from './scale-tables.js';

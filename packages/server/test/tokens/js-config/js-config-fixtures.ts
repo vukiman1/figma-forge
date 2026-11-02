@@ -1,7 +1,7 @@
 import { parseTailwindConfig } from '../../../src/tokens/js-config/tailwind-config.js';
 import type { JsConfigTokens } from '../../../src/tokens/js-config/theme-tokens.js';
 import { parseUnoConfig } from '../../../src/tokens/js-config/uno-config.js';
-import type { ProjectToken } from '../../../src/tokens/tokens.js';
+import type { ProjectToken } from '../../../src/tokens/project-token.js';
 
 interface IndexedTokens extends JsConfigTokens {
   readonly byName: ReadonlyMap<string, ProjectToken>;

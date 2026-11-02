@@ -4,7 +4,14 @@ import { join } from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { aggregateRepoCssTokens } from '../../src/tokens/repo-css.js';
+import {
+  aggregateRepoCssTokens,
+  aggregateRepoScssTokens,
+} from '../../../src/tokens/stylesheet/repo-stylesheet-tokens.js';
+
+const CSS_CAP = 200;
+const OVER_CAP = 60;
+const SLOW_FILESYSTEM_TIMEOUT_MS = 30_000;
 
 describe('aggregateRepoCssTokens', () => {
   let dir: string;
@@ -17,11 +24,8 @@ describe('aggregateRepoCssTokens', () => {
       join(dir, 'src', 'styles', 'tokens.css'),
       ':root {\n  --primary-500: #6266F0;\n  --spacing-md: 16px;\n}\n',
     );
-    await writeFile(join(dir, 'src', 'reset.css'), '* { margin: 0; }\n'); // no custom props
-    await writeFile(
-      join(dir, 'node_modules', 'pkg', 'vendor.css'),
-      ':root { --vendored: red; }', // must be ignored
-    );
+    await writeFile(join(dir, 'src', 'reset.css'), '* { margin: 0; }\n');
+    await writeFile(join(dir, 'node_modules', 'pkg', 'vendor.css'), ':root { --vendored: red; }');
   });
 
   afterAll(async () => {
@@ -30,34 +34,26 @@ describe('aggregateRepoCssTokens', () => {
 
   it('pools custom properties across hand-authored CSS, skipping vendored dirs and prop-less files', async () => {
     const { tokens, files } = await aggregateRepoCssTokens(dir);
-    const names = tokens.map(t => t.name).toSorted();
-    expect(names).toEqual(['primary-500', 'spacing-md']);
-    expect(files).toEqual(['src/styles/tokens.css']); // reset.css contributed nothing; vendor skipped
+    expect(tokens.map(t => t.name).toSorted()).toEqual(['primary-500', 'spacing-md']);
+    expect(files).toEqual(['src/styles/tokens.css']);
     expect(tokens.find(t => t.name === 'primary-500')?.value).toBe('#6266F0');
   });
 
   it(
     "carries the walk's omitted count so a capped pool cannot read as a complete one",
-    // Staging enough files to breach the cap is the test, so the cost is not removable — and 260
-    // creates, a full walk and a recursive rm run past vitest's 5s default on a Windows runner,
-    // where each of those is a syscall an order of magnitude dearer than on the other two. Same
-    // hazard and same remedy as the fixtures in #220; this one and its sibling in `load.test.ts`
-    // were the pair that release left behind.
-    { timeout: 30_000 },
+    { timeout: SLOW_FILESYSTEM_TIMEOUT_MS },
     async () => {
-      // MAX_CSS_FILES is 200. A pool that silently drops the rest looks exactly like a project that
-      // declares fewer tokens, which is the reading this count exists to prevent.
       const big = await mkdtemp(join(tmpdir(), 'repocss-cap-'));
       try {
         await mkdir(join(big, 'src'), { recursive: true });
         await Promise.all(
-          Array.from({ length: 260 }, (_, i) =>
+          Array.from({ length: CSS_CAP + OVER_CAP }, (_, i) =>
             writeFile(join(big, 'src', `f${String(i).padStart(3, '0')}.css`), `:root{--c${i}:red}`),
           ),
         );
         const { files, omitted } = await aggregateRepoCssTokens(big);
-        expect(files.length).toBe(200);
-        expect(omitted).toBe(60);
+        expect(files.length).toBe(CSS_CAP);
+        expect(omitted).toBe(OVER_CAP);
       } finally {
         await rm(big, { recursive: true, force: true });
       }
@@ -76,6 +72,26 @@ describe('aggregateRepoCssTokens', () => {
       expect(files).toEqual([]);
     } finally {
       await rm(empty, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('aggregateRepoScssTokens', () => {
+  it('pools .scss files with each variable carrying its own file, and never walks indented .sass', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'reposcss-test-'));
+    try {
+      await mkdir(join(dir, 'src'), { recursive: true });
+      await writeFile(join(dir, 'src', '_colors.scss'), '$brand: #6266F0;');
+      await writeFile(join(dir, 'src', '_space.scss'), ':root { --gap: 8px; }');
+      await writeFile(join(dir, 'src', 'legacy.sass'), '$old: red');
+      const { tokens, files } = await aggregateRepoScssTokens(dir);
+      expect(files).toEqual(['src/_colors.scss', 'src/_space.scss']);
+      expect(tokens).toEqual([
+        { name: 'brand', value: '#6266F0', scssVar: '$brand', from: 'src/_colors.scss' },
+        { name: 'gap', value: '8px', cssVar: 'var(--gap)' },
+      ]);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
     }
   });
 });

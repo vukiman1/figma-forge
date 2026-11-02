@@ -1,13 +1,7 @@
 import type { GetPromptResult, Prompt } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
-import type { PromptArgs } from './registry.js';
-
-// The cross-client twin of the figma-build Claude Code skill: a distilled, guided workflow any MCP
-// client (Cursor / Windsurf / Claude Desktop) can surface as a slash command. The deep version lives
-// in skills/figma-build/SKILL.md; this is intentionally the short form — the build order, the
-// reuse/token rules, and the few write-side gotchas a client without the skill needs. Mirror of
-// figma_to_code, reversed (code → design instead of design → code).
+import type { PromptArgs } from './prompt-types.js';
 
 export const CODE_TO_FIGMA_PROMPT_NAME = 'code_to_figma';
 
