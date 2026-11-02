@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 
 import { joinTokens, parseTokenMapFile } from '../../src/join/token-map.js';
 import type { FigmaToken } from '../../src/tokens/figma-tokens.js';
-import { parseCssCustomProperties, type ProjectToken } from '../../src/tokens/tokens.js';
+import type { ProjectToken } from '../../src/tokens/project-token.js';
+import { parseCssCustomProperties } from '../../src/tokens/stylesheet/css-custom-properties.js';
 
 const fig = (
   name: string,

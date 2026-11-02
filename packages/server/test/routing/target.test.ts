@@ -22,11 +22,6 @@ const source =
   async (): Promise<readonly PluginSessionInfo[]> =>
     sessions;
 
-/**
- * ResolveFileTarget takes a free source and a probing one. Here they are the same fixture: these
- * cases are about the resolution ladder, and the split between the two sources is exercised where
- * it matters (dispatch.test.ts asserts the free path costs no dispatch).
- */
 const resolveFileTargetWith = (src: ReturnType<typeof source>): Promise<string | undefined> =>
   resolveFileTarget(src, src);
 
@@ -44,15 +39,11 @@ describe('bindFileTarget', () => {
   });
 
   it('binds by session id even when the file has no name yet', async () => {
-    // A panel opened while its tab was in the background has sent no $activity, so the server has
-    // no name for it — and it is exactly the session a second agent needs to claim.
     const { target } = await bindFileTarget(source(session('s-2', null)), { sessionId: 's-2' });
     expect(target).toEqual({ sessionId: 's-2', fileName: null });
   });
 
   it('refuses a name two open files answer to, and names the sessions instead', async () => {
-    // The case the whole two-handle design exists for: duplicate names are legal in Figma and
-    // "x (Copy)" is how users make them. Guessing here would silently pick the wrong file.
     await expect(
       bindFileTarget(source(session('s-1', 'Brand'), session('s-2', 'Brand')), {
         fileName: 'Brand',
@@ -88,7 +79,6 @@ describe('bindFileTarget', () => {
 
 describe('resolveFileTarget', () => {
   it('is undefined when nothing is bound, so routing stays as it was', async () => {
-    // The single-agent default. Follow-the-foreground must be untouched by this module existing.
     expect(await resolveFileTargetWith(source(session('s-1', 'Brand')))).toBeUndefined();
   });
 
@@ -103,14 +93,12 @@ describe('resolveFileTarget', () => {
 
   it('adopts the new session when the panel was reopened under the same name', async () => {
     await bindFileTarget(source(session('s-1', 'Brand')), { fileName: 'Brand' });
-    // Same file, new panel: the plugin generates a fresh session id, so the id alone would break.
     expect(await resolveFileTargetWith(source(session('s-9', 'Brand')))).toBe('s-9');
     expect(getFileTarget()).toEqual({ sessionId: 's-9', fileName: 'Brand' });
   });
 
   it('throws rather than falling back when the bound file is gone', async () => {
     await bindFileTarget(source(session('s-1', 'Brand')), { fileName: 'Brand' });
-    // The whole point: another file is connected and is NOT an acceptable substitute.
     await expect(resolveFileTargetWith(source(session('s-2', 'Other')))).rejects.toThrow(
       /"Brand" is no longer connected.*Other \[s-2]/s,
     );

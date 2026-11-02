@@ -6,10 +6,7 @@ const vue = (code: string) => scanSfcScripts(code, { templateIsBlock: true });
 const svelte = (code: string) => scanSfcScripts(code, { templateIsBlock: false });
 
 describe('scanSfcScripts — block delimitation', () => {
-  // The regex this replaced used `[^>]*` for the attribute list, so the first `>` inside a quoted
-  // value ended the tag and the body began mid-attribute. Vue 3.3+ generic components are exactly
-  // where that `>` shows up, and they are the components a design system needs variant axes from.
-  it('does not end the open tag at a `>` inside a quoted attribute value', () => {
+  it('does not end the open tag at a `>` inside a quoted attribute value, as in a Vue generic component', () => {
     const { blocks } = vue(
       '<script setup lang="ts" generic="T extends Record<string, unknown>">\nconst a = 1\n</script>',
     );
@@ -32,8 +29,6 @@ describe('scanSfcScripts — block delimitation', () => {
   });
 
   it('ignores a script block that is commented out', () => {
-    // A live regex over the raw text extracted this one and merged its defineProps names into the
-    // result — a prop the component does not declare, reported as a complete list.
     const { blocks } = vue(
       '<!--\n<script setup lang="ts">const dead = 1</script>\n-->\n<script setup lang="ts">const live = 1</script>',
     );
@@ -68,8 +63,7 @@ describe('scanSfcScripts — block delimitation', () => {
     expect(vue('<script lang="ts" data-x="</script>">C</script>').blocks[0]?.body).toBe('C');
   });
 
-  it('applies the raw-text end-tag rule: a delimiter must follow the name', () => {
-    // `</scriptx>` does not close a `<script>`; `</script >` does.
+  it('applies the raw-text end-tag rule: </scriptx> does not close a block and </script > does', () => {
     expect(vue('<script>a</scriptx>b</script>').blocks[0]?.body).toBe('a</scriptx>b');
     expect(vue('<script>a</script >').blocks[0]?.body).toBe('a');
     expect(vue('<script>a</script\n>').blocks[0]?.body).toBe('a');
@@ -101,9 +95,7 @@ describe('scanSfcScripts — dialect', () => {
     expect(vue(`<script${attr}>X</script>`).blocks[0]?.lang).toBe(expected);
   });
 
-  it('reports a dialect it has no parser for as null rather than guessing JS', () => {
-    // Parsing CoffeeScript as JavaScript would report "no props" for a block whose props are
-    // simply unread — the false claim propsExtracted exists to prevent.
+  it('reports a dialect it has no parser for as null rather than guessing JS and reading no props', () => {
     expect(vue('<script lang="coffee">a = 1</script>').blocks[0]?.lang).toBeNull();
   });
 });
@@ -126,9 +118,7 @@ describe('scanSfcScripts — external sources', () => {
   });
 });
 
-describe('scanSfcScripts — delimitation failures', () => {
-  // Each of these leaves content unread. Reporting `unterminated` is what stops the caller from
-  // turning "no blocks found" into a positive "this component declares no props".
+describe('scanSfcScripts — delimitation failures are reported as unterminated', () => {
   it.each([
     ['an unclosed script', '<script setup lang="ts">const a = 1'],
     ['an unclosed comment', '<!-- <script lang="ts">const a = 1</script>'],
@@ -159,18 +149,13 @@ describe('scanSfcScripts — Svelte', () => {
     }
   });
 
-  it('treats <template> as ordinary markup, not as a block to skip', () => {
-    // Vue's markup lives in a <template> block; Svelte's markup *is* the top level, where
-    // <template> carries no special meaning.
+  it('treats <template> as ordinary Svelte markup, not as a block to skip', () => {
     const { blocks } = svelte('<template><b/></template><script lang="ts">A</script>');
     expect(blocks.map(b => b.body)).toEqual(['A']);
   });
 });
 
-describe('scanSfcScripts — totality', () => {
-  // The contract this module inherits from css-scan: it reads *other people's* repositories, so
-  // malformed input must degrade, never throw. Property-checked rather than case-checked, because
-  // the inputs that break a hand-written scanner are the ones nobody thought to write down.
+describe('scanSfcScripts — totality: malformed input degrades, never throws', () => {
   const mulberry = (seed: number) => () => {
     seed = (seed + 0x6d2b79f5) | 0;
     let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
@@ -221,7 +206,6 @@ describe('scanSfcScripts — totality', () => {
   });
 
   it('never throws on any prefix or single-character edit of a realistic SFC', () => {
-    // A truncated file is the realistic failure — a half-written component, a partial read.
     const real =
       '<!-- note -->\n<script lang="ts">\nexport interface P { a: string }\n</script>\n<script setup lang="ts" generic="T extends Record<string, unknown>">\nconst p = defineProps<P>()\n</script>\n<template><div><template #x><b/></template></div></template>\n<style>.a{}</style>\n';
     for (let i = 0; i <= real.length; i++) {

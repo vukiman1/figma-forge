@@ -10,7 +10,8 @@ import {
 } from '@figma-forge/core';
 
 import { joinTokens, parseTokenMapFile, type TokenMapping } from '../join/token-map.js';
-import { analyzeProject, isUtilityFirst, type ProjectProfile } from '../profile/profile.js';
+import { analyzeProject, type ProjectProfile } from '../profile/project-profile.js';
+import { isUtilityFirst } from '../profile/styling-system.js';
 import { resolveFigmaTokens, resolvePaintStyleTokens } from '../tokens/figma-tokens.js';
 import { loadProjectTokens } from '../tokens/load.js';
 

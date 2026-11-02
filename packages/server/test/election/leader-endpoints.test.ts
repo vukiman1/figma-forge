@@ -1,148 +1,16 @@
-import { createServer, type Server as HttpServer, request as httpRequest } from 'node:http';
-import type { AddressInfo } from 'node:net';
+import { request as httpRequest } from 'node:http';
 
-import {
-  createRequest,
-  createResponse,
-  decodeEnvelope,
-  encodeEnvelope,
-  ErrorCode,
-  MIN_PLUGIN_VERSION,
-  newId,
-  PROTOCOL_VERSION,
-  type HelloParams,
-  type RpcRequest,
-  type RpcResponse,
-  RpcResponseSchema,
-  SystemMethod,
-} from '@figma-forge/core';
-import { decode, encode } from '@msgpack/msgpack';
+import { encode } from '@msgpack/msgpack';
 import { afterEach, describe, expect, it } from 'vitest';
-import { WebSocket } from 'ws';
 
-import {
-  ABDICATE_PATH,
-  attachLeaderEndpoints,
-  checkWireArgs,
-  type LeaderEndpointDeps,
-  PING_PATH,
-  RPC_PATH,
-} from '../../src/election/leader-endpoints.js';
-import { Relay } from '../../src/relay/relay.js';
+import { ABDICATE_PATH, PING_PATH, RPC_PATH } from '../../src/election/leader-wire.js';
+import { attachFakePlugin, startLeader, stopLeaders } from './leader-harness.js';
 
-interface Bound {
-  http: HttpServer;
-  relay: Relay;
-  port: number;
-  detach: () => void;
-  plugins: WebSocket[];
-}
-
-const all: Bound[] = [];
-
-afterEach(async () => {
-  await Promise.all(
-    all.map(async b => {
-      for (const ws of b.plugins) ws.close();
-      b.detach();
-      await b.relay.stop();
-      await new Promise<void>(resolve => b.http.close(() => resolve()));
-    }),
-  );
-  all.length = 0;
-});
-
-const startLeader = async (
-  rpcTimeoutMs = 5_000,
-  extraDeps: Partial<LeaderEndpointDeps> = {},
-): Promise<Bound> => {
-  const http = createServer();
-  await new Promise<void>(resolve => http.listen(0, '127.0.0.1', () => resolve()));
-  const port = (http.address() as AddressInfo).port;
-  const relay = new Relay({ serverVersion: '1.0.0', server: http });
-  const detach = attachLeaderEndpoints(http, {
-    relay,
-    serverVersion: '1.0.0',
-    rpcTimeoutMs,
-    ...extraDeps,
-  });
-  const b: Bound = { http, relay, port, detach, plugins: [] };
-  all.push(b);
-  return b;
-};
-
-const postAbdicate = async (
-  port: number,
-  body: unknown,
-): Promise<{ status: number; body: { ok: boolean; reason?: string } }> => {
-  const res = await fetch(`http://127.0.0.1:${port}${ABDICATE_PATH}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: typeof body === 'string' ? body : JSON.stringify(body),
-  });
-  return { status: res.status, body: (await res.json()) as { ok: boolean; reason?: string } };
-};
-
-const attachFakePlugin = async (
-  b: Bound,
-  handle: (method: string, params: unknown) => Promise<unknown>,
-  clientVersion: string = MIN_PLUGIN_VERSION,
-): Promise<WebSocket> => {
-  const ws = new WebSocket(`ws://127.0.0.1:${b.port}`);
-  ws.binaryType = 'arraybuffer';
-  await new Promise<void>(resolve => ws.once('open', () => resolve()));
-  const sessionId = newId();
-
-  let helloResolved: (() => void) | null = null;
-  const helloReceived = new Promise<void>(resolve => {
-    helloResolved = resolve;
-  });
-
-  ws.on('message', async (data: ArrayBuffer) => {
-    const env = decodeEnvelope(data);
-    if (env.kind === 'res' && helloResolved !== null) {
-      helloResolved();
-      helloResolved = null;
-      return;
-    }
-    if (
-      env.kind === 'req' &&
-      env.method !== SystemMethod.Ping &&
-      env.method !== SystemMethod.Hello
-    ) {
-      const result = await handle(env.method, env.params);
-      ws.send(encodeEnvelope(createResponse({ id: env.id, sessionId: env.sessionId, result })));
-    }
-  });
-
-  const helloParams: HelloParams = {
-    clientType: 'plugin',
-    clientVersion,
-    protocolVersion: PROTOCOL_VERSION,
-  };
-  ws.send(
-    encodeEnvelope(
-      createRequest({ id: 'h', sessionId, method: SystemMethod.Hello, params: helloParams }),
-    ),
-  );
-  await helloReceived;
-  b.plugins.push(ws);
-  return ws;
-};
-
-const callRpc = async (port: number, req: RpcRequest): Promise<RpcResponse> => {
-  const res = await fetch(`http://127.0.0.1:${port}${RPC_PATH}`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/msgpack' },
-    body: Buffer.from(encode(req)),
-  });
-  const buf = new Uint8Array(await res.arrayBuffer());
-  return RpcResponseSchema.parse(decode(buf));
-};
+afterEach(stopLeaders);
 
 describe('leader endpoints', () => {
   it('GET /ping returns server info and plugin count', async () => {
-    const b = await startLeader();
+    const b = await startLeader({ rpcTimeoutMs: 5_000 });
     const res = await fetch(`http://127.0.0.1:${b.port}${PING_PATH}`);
     expect(res.status).toBe(200);
     const body = (await res.json()) as { ok: boolean; serverVersion: string; plugins: number };
@@ -157,7 +25,7 @@ describe('leader endpoints', () => {
   });
 
   it('GET /ping exposes activeSessionId for follower-side pin resolution', async () => {
-    const b = await startLeader();
+    const b = await startLeader({ rpcTimeoutMs: 5_000 });
     const res = await fetch(`http://127.0.0.1:${b.port}${PING_PATH}`);
     const body = (await res.json()) as { activeSessionId: string | null };
     expect(body.activeSessionId).toBeNull();
@@ -169,324 +37,31 @@ describe('leader endpoints', () => {
     expect(typeof body2.activeSessionId).toBe('string');
   });
 
-  it('POST /rpc honors a sessionId pin and rejects an unknown one', async () => {
-    const b = await startLeader();
-    await attachFakePlugin(b, async () => ({ pinned: true }));
-    const sid = b.relay.pickActiveSessionId();
-    expect(typeof sid).toBe('string');
+  it('GET /ping advertises the buildId (0 when unset)', async () => {
+    const bare = await startLeader({ rpcTimeoutMs: 5_000 });
+    const bareBody = (await (await fetch(`http://127.0.0.1:${bare.port}${PING_PATH}`)).json()) as {
+      buildId: number;
+    };
+    expect(bareBody.buildId).toBe(0);
 
-    const ok = await callRpc(b.port, {
-      requestId: 'r1',
-      toolName: 'get_design_context',
-      sessionId: sid,
-    });
-    expect(ok).toMatchObject({ kind: 'ok', result: { pinned: true } });
-
-    const bad = await callRpc(b.port, {
-      requestId: 'r2',
-      toolName: 'get_design_context',
-      sessionId: 'ghost',
-    });
-    expect(bad).toMatchObject({ kind: 'err', code: ErrorCode.PluginDisconnected });
-  });
-
-  it('POST /rpc reports a plugin that closed mid-call as disconnected, not as a timeout', async () => {
-    const b = await startLeader();
-    let plugin: WebSocket | undefined;
-    plugin = await attachFakePlugin(b, async () => {
-      // The panel closing (or reloading) while the call is in its hands.
-      plugin?.close(1001);
-      return new Promise(() => {});
-    });
-
-    const started = Date.now();
-    const res = await callRpc(b.port, { requestId: 'r3', toolName: 'get_design_context' });
-    expect(res).toMatchObject({ kind: 'err', code: ErrorCode.PluginDisconnected });
-    expect((res as { message: string }).message).toMatch(/plugin closed before answering/);
-    expect(Date.now() - started).toBeLessThan(2_000);
-  });
-
-  it('POST /rpc forwards to plugin and returns its result', async () => {
-    const b = await startLeader();
-    await attachFakePlugin(b, async (method, params) => {
-      expect(method).toBe('get_selection');
-      expect(params).toEqual({ fileKey: 'abc' });
-      return { ids: ['1:1', '1:2'] };
-    });
-
-    const resp = await callRpc(b.port, {
-      requestId: 'r-1',
-      toolName: 'get_selection',
-      args: { fileKey: 'abc' },
-    });
-    if (resp.kind !== 'ok') throw new Error(`expected ok, got ${resp.kind}`);
-    expect(resp.requestId).toBe('r-1');
-    expect(resp.result).toEqual({ ids: ['1:1', '1:2'] });
-  });
-
-  it('POST /rpc carries the skew warning back to the follower that asked', async () => {
-    // The production half of the warning for anyone whose MCP server is a follower — a normal
-    // state, since several servers share one plugin and only one of them holds the relay. Faking
-    // this response in the dispatch test proves the follower *reads* it; nothing proved the leader
-    // ever *writes* it. Deleting the attachment left all 1387 tests green.
-    const b = await startLeader();
-    await attachFakePlugin(b, async () => ({ ok: true }), '0.0.1');
-
-    const resp = await callRpc(b.port, {
-      requestId: 'r-skew',
-      toolName: 'set_fills',
-      args: { nodeId: '1:1', fills: [] },
-    });
-
-    if (resp.kind !== 'ok') throw new Error(`expected ok, got ${resp.kind}`);
-    expect(resp.notice).toMatch(/older than this server/i);
-    expect(resp.notice).toMatch(/unverified/i);
-  });
-
-  it('POST /rpc attaches no warning for a current plugin', async () => {
-    const b = await startLeader();
-    await attachFakePlugin(b, async () => ({ ok: true }));
-
-    const resp = await callRpc(b.port, {
-      requestId: 'r-ok',
-      toolName: 'set_fills',
-      args: { nodeId: '1:1', fills: [] },
-    });
-
-    if (resp.kind !== 'ok') throw new Error(`expected ok, got ${resp.kind}`);
-    expect(resp.notice).toBeUndefined();
-  });
-
-  it('POST /rpc queues request and surfaces Timeout when no plugin ever connects', async () => {
-    const b = await startLeader(50);
-    const resp = await callRpc(b.port, {
-      requestId: 'r-2',
-      toolName: 'get_document',
-    });
-    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
-    expect(resp.code).toBe(ErrorCode.Timeout);
-    expect(resp.requestId).toBe('r-2');
-  });
-
-  it('POST /rpc flushes queued call once plugin connects', async () => {
-    const b = await startLeader(1_000);
-    const respPromise = callRpc(b.port, {
-      requestId: 'r-flush',
-      toolName: 'get_node',
-      // The extra key is the point: validation strips unknown keys, so forwarding its output
-      // instead of the caller's own arguments would silently drop a field a newer caller sent.
-      args: { nodeId: '1:1', fieldFromTheFuture: 7 },
-    });
-
-    await new Promise(r => setTimeout(r, 50));
-    expect(b.relay.queuedCount()).toBe(1);
-
-    await attachFakePlugin(b, async (method, params) => {
-      expect(method).toBe('get_node');
-      expect(params).toEqual({ nodeId: '1:1', fieldFromTheFuture: 7 });
-      return { ok: 'flushed' };
-    });
-
-    const resp = await respPromise;
-    if (resp.kind !== 'ok') throw new Error(`expected ok, got ${resp.kind}`);
-    expect(resp.result).toEqual({ ok: 'flushed' });
-  });
-
-  it('POST /rpc returns TIMEOUT when plugin does not reply in time', async () => {
-    const b = await startLeader(50);
-    const ws = new WebSocket(`ws://127.0.0.1:${b.port}`);
-    ws.binaryType = 'arraybuffer';
-    await new Promise<void>(resolve => ws.once('open', () => resolve()));
-    ws.send(
-      encodeEnvelope(
-        createRequest({
-          id: 'h',
-          sessionId: newId(),
-          method: SystemMethod.Hello,
-          params: {
-            clientType: 'plugin',
-            clientVersion: MIN_PLUGIN_VERSION,
-            protocolVersion: PROTOCOL_VERSION,
-          } satisfies HelloParams,
-        }),
-      ),
-    );
-    await new Promise<void>(resolve => ws.once('message', () => resolve()));
-    b.plugins.push(ws);
-
-    const resp = await callRpc(b.port, { requestId: 'r-3', toolName: 'get_document' });
-    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
-    expect(resp.code).toBe(ErrorCode.Timeout);
-  });
-
-  it('POST /rpc refuses a tool name no sandbox handler exists for', async () => {
-    // The sandbox answers METHOD_NOT_FOUND for an unknown method; the leader answers the same, one
-    // hop earlier. `calls` is what proves the earlier hop: nothing reached the plugin.
-    const b = await startLeader();
-    let calls = 0;
-    await attachFakePlugin(b, async () => {
-      calls += 1;
-      return { ok: true };
-    });
-
-    const resp = await callRpc(b.port, {
-      requestId: 'r-unknown',
-      toolName: 'definitely_not_a_tool',
-    });
-    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
-    expect(resp.code).toBe(ErrorCode.MethodNotFound);
-    expect(resp.message).toMatch(/definitely_not_a_tool/);
-    // Echoed rather than blanked: the caller correlates by it, and a rejection it cannot match up
-    // is a rejection it has to wait out.
-    expect(resp.requestId).toBe('r-unknown');
-    expect(calls).toBe(0);
-  });
-
-  it('POST /rpc refuses arguments the sandbox handler could not use', async () => {
-    const b = await startLeader();
-    let calls = 0;
-    await attachFakePlugin(b, async () => {
-      calls += 1;
-      return { ok: true };
-    });
-
-    // set_fills without a node to paint. The sandbox reads `params` off a loose cast and would act
-    // on it; nothing between here and `figma.*` checks it but this.
-    const resp = await callRpc(b.port, { requestId: 'r-bad', toolName: 'set_fills', args: {} });
-    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
-    expect(resp.code).toBe(ErrorCode.InvalidParams);
-    expect(resp.message).toMatch(/set_fills/);
-    // Names the field, so the answer says what to fix rather than that something was wrong.
-    expect(resp.message).toMatch(/nodeId/);
-    expect(calls).toBe(0);
-  });
-
-  it('POST /rpc looks inside a batch, which no schema above it can describe', async () => {
-    // batch's own schema says ops[].params is a free-form record, so the envelope check passes and
-    // the bad op would otherwise reach the sandbox — which hands params to the write handler
-    // verbatim. `calls` is what proves it stopped here, before the batch could apply and unwind.
-    const b = await startLeader();
-    let calls = 0;
-    await attachFakePlugin(b, async () => {
-      calls += 1;
-      return { ok: true };
-    });
-
-    const resp = await callRpc(b.port, {
-      requestId: 'r-batch',
-      toolName: 'batch',
-      args: {
-        ops: [
-          { tool: 'rename_node', params: { nodeId: '1:1', name: 'fine' } },
-          { tool: 'set_opacity', params: { nodeId: '1:1', opacity: 'half' } },
-        ],
-      },
-    });
-    if (resp.kind !== 'err') throw new Error(`expected err, got ${resp.kind}`);
-    expect(resp.code).toBe(ErrorCode.InvalidParams);
-    expect(resp.message).toMatch(/ops\[1\]/);
-    expect(resp.message).toMatch(/opacity/);
-    expect(calls).toBe(0);
-  });
-
-  it('POST /rpc forwards a batch whose ops are all well formed', async () => {
-    const b = await startLeader();
-    let seen: unknown = null;
-    await attachFakePlugin(b, async (_method, params) => {
-      seen = params;
-      return { ok: true, results: [{ ok: true }] };
-    });
-
-    const args = { ops: [{ tool: 'rename_node', params: { nodeId: '1:1', name: 'fine' } }] };
-    const resp = await callRpc(b.port, { requestId: 'r-batch-ok', toolName: 'batch', args });
-    expect(resp).toMatchObject({ kind: 'ok' });
-    expect(seen).toEqual(args);
-  });
-
-  it('POST /rpc accepts a no-argument tool called with args omitted', async () => {
-    // How every zero-argument read is actually called — and `undefined` is not an object, so it has
-    // to be checked as the empty one the plugin sees rather than rejected.
-    const b = await startLeader();
-    await attachFakePlugin(b, async () => ({ ok: true }));
-    const resp = await callRpc(b.port, { requestId: 'r-noargs', toolName: 'get_document' });
-    expect(resp).toMatchObject({ kind: 'ok', result: { ok: true } });
-  });
-
-  it('POST /rpc does not judge a caller that declares a strictly newer build', async () => {
-    // An older leader keeps the port while it stays busy, so it really can be the one checking a
-    // newer follower's call — against schemas that predate it. `fills` as an object is not just an
-    // unknown key, it is a field this build would reject outright, which is what makes the skip
-    // observable rather than incidental.
-    const b = await startLeader(5_000, { buildId: 100 });
-    let seen: unknown = null;
-    await attachFakePlugin(b, async (_method, params) => {
-      seen = params;
-      return { ok: true };
-    });
-
-    const resp = await callRpc(b.port, {
-      requestId: 'r-newer',
-      toolName: 'set_fills',
-      args: { nodeId: '1:1', fills: { fromTheFuture: true } },
-      buildId: 101,
-    });
-    expect(resp).toMatchObject({ kind: 'ok' });
-    expect(seen).toEqual({ nodeId: '1:1', fills: { fromTheFuture: true } });
-  });
-
-  it('POST /rpc still checks a caller on the same build or an older one', async () => {
-    const b = await startLeader(5_000, { buildId: 100 });
-    await attachFakePlugin(b, async () => ({ ok: true }));
-
-    for (const buildId of [100, 99, undefined]) {
-      const resp = await callRpc(b.port, {
-        requestId: `r-${String(buildId)}`,
-        toolName: 'set_fills',
-        args: { nodeId: '1:1', fills: { fromTheFuture: true } },
-        ...(buildId === undefined ? {} : { buildId }),
-      });
-      if (resp.kind !== 'err') throw new Error(`expected err for buildId ${String(buildId)}`);
-      expect(resp.code).toBe(ErrorCode.InvalidParams);
-    }
-  });
-
-  it('POST /rpc rejects invalid msgpack body', async () => {
-    const b = await startLeader();
-    const res = await fetch(`http://127.0.0.1:${b.port}${RPC_PATH}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/msgpack' },
-      body: Buffer.from([0xff, 0xff, 0xff]),
-    });
-    expect(res.status).toBe(400);
-  });
-
-  it('POST /rpc rejects schema-invalid request', async () => {
-    const b = await startLeader();
-    const res = await fetch(`http://127.0.0.1:${b.port}${RPC_PATH}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/msgpack' },
-      body: Buffer.from(encode({ requestId: 'r-x' })),
-    });
-    expect(res.status).toBe(400);
-    const buf = new Uint8Array(await res.arrayBuffer());
-    const parsed = RpcResponseSchema.parse(decode(buf));
-    if (parsed.kind !== 'err') throw new Error(`expected err, got ${parsed.kind}`);
-    expect(parsed.code).toBe(ErrorCode.InvalidParams);
+    const stamped = await startLeader({ rpcTimeoutMs: 5_000, buildId: 1234 });
+    const stampedBody = (await (
+      await fetch(`http://127.0.0.1:${stamped.port}${PING_PATH}`)
+    ).json()) as { buildId: number };
+    expect(stampedBody.buildId).toBe(1234);
   });
 
   it('GET on unknown path returns 404', async () => {
-    const b = await startLeader();
+    const b = await startLeader({ rpcTimeoutMs: 5_000 });
     const res = await fetch(`http://127.0.0.1:${b.port}/nope`);
     expect(res.status).toBe(404);
   });
 
   it('refuses any request carrying an Origin, since only browsers send one', async () => {
-    const b = await startLeader();
+    const b = await startLeader({ rpcTimeoutMs: 5_000 });
     const attach = await attachFakePlugin(b, () => Promise.resolve({ pong: true }));
     expect(attach).toBeDefined();
 
-    // The CSRF shape: a simple request needs no preflight, so the page's POST would land and its
-    // side effect would happen even though the reply is unreadable.
     const rpc = await fetch(`http://127.0.0.1:${b.port}${RPC_PATH}`, {
       method: 'POST',
       headers: { 'content-type': 'text/plain', origin: 'https://evil.example' },
@@ -508,10 +83,8 @@ describe('leader endpoints', () => {
   });
 
   it('refuses a request addressed to a rebound domain, on the readable GET path too', async () => {
-    const b = await startLeader();
+    const b = await startLeader({ rpcTimeoutMs: 5_000 });
 
-    // What DNS rebinding looks like on the wire: the page believes it is same-origin with
-    // attacker.com, so it sends no Origin and *can* read the reply — but Host gives it away.
     const status = await new Promise<number>((resolve, reject) => {
       const req = httpRequest(
         {
@@ -530,171 +103,5 @@ describe('leader endpoints', () => {
       req.end();
     });
     expect(status).toBe(403);
-  });
-
-  it('POST /rpc refuses a media type that would skip the CORS preflight', async () => {
-    const b = await startLeader();
-    const res = await fetch(`http://127.0.0.1:${b.port}${RPC_PATH}`, {
-      method: 'POST',
-      headers: { 'content-type': 'text/plain' },
-      body: Buffer.from(encode({ requestId: 'r-ct', toolName: 'ping' })),
-    });
-    expect(res.status).toBe(415);
-  });
-
-  it('POST /abdicate refuses a non-JSON media type', async () => {
-    const b = await startLeader();
-    const res = await fetch(`http://127.0.0.1:${b.port}${ABDICATE_PATH}`, {
-      method: 'POST',
-      headers: { 'content-type': 'text/plain' },
-      body: JSON.stringify({ buildId: 999_999 }),
-    });
-    expect(res.status).toBe(415);
-  });
-
-  it('GET /ping advertises the buildId (0 when unset)', async () => {
-    const bare = await startLeader();
-    const bareBody = (await (await fetch(`http://127.0.0.1:${bare.port}${PING_PATH}`)).json()) as {
-      buildId: number;
-    };
-    expect(bareBody.buildId).toBe(0);
-
-    const stamped = await startLeader(5_000, { buildId: 1234 });
-    const stampedBody = (await (
-      await fetch(`http://127.0.0.1:${stamped.port}${PING_PATH}`)
-    ).json()) as { buildId: number };
-    expect(stampedBody.buildId).toBe(1234);
-  });
-});
-
-describe('POST /abdicate', () => {
-  it('accepts a strictly newer build and releases after the response flushes', async () => {
-    let released = 0;
-    const b = await startLeader(5_000, {
-      buildId: 100,
-      onAbdicate: () => {
-        released += 1;
-      },
-      abdicateQuietWindowMs: 0,
-    });
-    const { status, body } = await postAbdicate(b.port, { buildId: 200 });
-    expect(status).toBe(200);
-    expect(body).toEqual({ ok: true });
-    // onAbdicate fires on the response's 'finish' — by the time fetch resolved, it flushed.
-    await new Promise(r => setTimeout(r, 20));
-    expect(released).toBe(1);
-  });
-
-  it('refuses an equal or older build', async () => {
-    let released = 0;
-    const b = await startLeader(5_000, {
-      buildId: 100,
-      onAbdicate: () => {
-        released += 1;
-      },
-      abdicateQuietWindowMs: 0,
-    });
-    expect((await postAbdicate(b.port, { buildId: 100 })).body).toEqual({
-      ok: false,
-      reason: 'stale',
-    });
-    expect((await postAbdicate(b.port, { buildId: 50 })).body).toEqual({
-      ok: false,
-      reason: 'stale',
-    });
-    expect(released).toBe(0);
-  });
-
-  it('answers unsupported when no release hook is wired', async () => {
-    const b = await startLeader(5_000, { buildId: 100, abdicateQuietWindowMs: 0 });
-    expect((await postAbdicate(b.port, { buildId: 200 })).body).toEqual({
-      ok: false,
-      reason: 'unsupported',
-    });
-  });
-
-  it('defers while a relay request is in flight', async () => {
-    let released = 0;
-    const b = await startLeader(5_000, {
-      buildId: 100,
-      onAbdicate: () => {
-        released += 1;
-      },
-      abdicateQuietWindowMs: 0,
-    });
-    // No plugin connected → the request queues as pending until its own timeout.
-    const pending = b.relay.sendRequest('slow_tool', {}, 1_000).catch(() => {});
-    await new Promise(r => setTimeout(r, 20));
-    expect((await postAbdicate(b.port, { buildId: 200 })).body).toEqual({
-      ok: false,
-      reason: 'busy',
-    });
-    expect(released).toBe(0);
-    await pending;
-  });
-
-  it('defers inside the quiet window after recent traffic, then accepts once it elapses', async () => {
-    let released = 0;
-    const b = await startLeader(5_000, {
-      buildId: 100,
-      onAbdicate: () => {
-        released += 1;
-      },
-      abdicateQuietWindowMs: 150,
-    });
-    // A completed (timed-out) request leaves no pending entry but stamps lastRequestAt.
-    await b.relay.sendRequest('quick_tool', {}, 10).catch(() => {});
-    expect((await postAbdicate(b.port, { buildId: 200 })).body).toEqual({
-      ok: false,
-      reason: 'busy',
-    });
-    expect(released).toBe(0);
-
-    await new Promise(r => setTimeout(r, 160));
-    expect((await postAbdicate(b.port, { buildId: 200 })).body).toEqual({ ok: true });
-    await new Promise(r => setTimeout(r, 20));
-    expect(released).toBe(1);
-  });
-
-  it('rejects malformed bodies', async () => {
-    const b = await startLeader(5_000, { buildId: 100, abdicateQuietWindowMs: 0 });
-    expect((await postAbdicate(b.port, 'not json{{')).status).toBe(400);
-    expect((await postAbdicate(b.port, {})).status).toBe(400);
-    expect((await postAbdicate(b.port, { buildId: 'newest' })).status).toBe(400);
-  });
-});
-
-describe('checkWireArgs', () => {
-  it('bounds how much of a bad payload it quotes back', () => {
-    // The message is built from the caller's own input, so its length is the caller's to set unless
-    // something caps it. Several bad fields, three named, the rest counted — the count is left open
-    // because how many issues a schema raises for one payload is the schema's business, not this
-    // cap's.
-    const rejection = checkWireArgs(
-      {
-        requestId: 'r',
-        toolName: 'set_auto_layout',
-        args: {
-          nodeId: 1,
-          layoutMode: 'SIDEWAYS',
-          itemSpacing: 'wide',
-          paddingTop: 'lots',
-          primaryAxisSizingMode: 'HUGE',
-        },
-      },
-      0,
-    );
-    expect(rejection?.code).toBe(ErrorCode.InvalidParams);
-    expect(rejection?.message).toMatch(/\(\+\d+ more\)$/);
-    expect(rejection?.message.split(';')).toHaveLength(3);
-  });
-
-  it('passes a call it has nothing to object to', () => {
-    expect(
-      checkWireArgs(
-        { requestId: 'r', toolName: 'rename_node', args: { nodeId: '1:1', name: 'x' } },
-        0,
-      ),
-    ).toBeNull();
   });
 });

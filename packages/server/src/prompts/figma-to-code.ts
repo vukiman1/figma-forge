@@ -1,17 +1,10 @@
 import type { GetPromptResult, Prompt } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
-import type { PromptArgs } from './registry.js';
-
-// The cross-client twin of the figma-codegen Claude Code skill: a distilled, guided workflow any MCP
-// client (Cursor / Windsurf / Claude Desktop) can surface as a slash command. The deep version lives
-// in skills/figma-codegen/SKILL.md; this is intentionally the short form — it names the
-// three grounded tools, their order, and the reuse/token rules, which is what a client without the
-// skill needs. Kept short so it tracks the skill's intent without re-deriving its detail.
+import type { PromptArgs } from './prompt-types.js';
 
 export const FIGMA_TO_CODE_PROMPT_NAME = 'figma_to_code';
 
-/** Build the guided-workflow text, pointing the three tools at a node id or the current selection. */
 const promptText = (nodeId: string | undefined): string => {
   const target = nodeId === undefined ? 'the current Figma selection' : `Figma node ${nodeId}`;
   const arg =
@@ -61,8 +54,6 @@ export const figmaToCodePrompt: {
       },
     ],
   },
-  // McpServer.registerPrompt builds the advertised `arguments` list from this shape; prompt args are
-  // always strings, so an optional string mirrors the `nodeId` argument above.
   argsSchema: z.object({
     nodeId: z
       .string()

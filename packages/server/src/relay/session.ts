@@ -1,7 +1,12 @@
 import type { HeartbeatMonitor } from '@figma-forge/core';
 import type { WebSocket } from 'ws';
 
-export type SessionState = 'connected' | 'disconnected';
+import type { PluginSessionInfo } from '../routing/sessions.js';
+
+export enum SessionState {
+  Connected = 'connected',
+  Disconnected = 'disconnected',
+}
 
 export interface Session {
   id: string;
@@ -10,106 +15,97 @@ export interface Session {
   clientVersion: string;
   connectedAt: number;
   reconnectedAt: number | null;
-  /** Updated on every `$activity` event from this session; multi-plugin routing picks the max. */
   lastActivityAt: number;
-  /** Latest file + page reported by this session's `$activity` events — for ping observability. */
   fileName: string | null;
   pageId: string | null;
   pageName: string | null;
   heartbeat: HeartbeatMonitor | null;
   disconnectTimer: ReturnType<typeof setTimeout> | null;
-  /**
-   * Whether this session has already been told, in full, that its plugin predates the server. The
-   * explanation is ~120 tokens and the answer cannot change while the session lives, so every call
-   * after the first carries the one-line form instead — see `Relay.skewNotice`.
-   */
   skewExplained: boolean;
+}
+
+export interface SessionRegistration {
+  readonly id: string;
+  readonly socket: WebSocket;
+  readonly clientVersion: string;
 }
 
 export const DEFAULT_DISCONNECT_GRACE_MS = 30_000;
 
+const REPLACED_CLOSE_CODE = 1001;
+
+const newSession = (input: SessionRegistration, previous: Session | undefined): Session => {
+  const now = Date.now();
+  return {
+    id: input.id,
+    socket: input.socket,
+    state: SessionState.Connected,
+    clientVersion: input.clientVersion,
+    connectedAt: previous?.connectedAt ?? now,
+    reconnectedAt: previous === undefined ? null : now,
+    lastActivityAt: previous?.lastActivityAt ?? now,
+    fileName: previous?.fileName ?? null,
+    pageId: previous?.pageId ?? null,
+    pageName: previous?.pageName ?? null,
+    heartbeat: null,
+    disconnectTimer: null,
+    skewExplained: previous?.skewExplained ?? false,
+  };
+};
+
+const detach = (session: Session): void => {
+  if (session.disconnectTimer !== null) clearTimeout(session.disconnectTimer);
+  session.disconnectTimer = null;
+  session.heartbeat?.stop();
+  session.heartbeat = null;
+};
+
+const retire = (previous: Session): void => {
+  detach(previous);
+  if (previous.state === SessionState.Connected && previous.socket !== null) {
+    previous.socket.close(REPLACED_CLOSE_CODE, 'session replaced');
+  }
+};
+
+const markGone = (session: Session): void => {
+  detach(session);
+  session.state = SessionState.Disconnected;
+  session.socket = null;
+};
+
+const toInfo = (session: Session): PluginSessionInfo => ({
+  id: session.id,
+  fileName: session.fileName,
+  pageName: session.pageName,
+  lastActivityAt: session.lastActivityAt,
+  pluginVersion: session.clientVersion,
+});
+
+export const isLive = (session: Session): boolean =>
+  session.state === SessionState.Connected && session.socket !== null;
+
 export class SessionManager {
   private readonly sessions = new Map<string, Session>();
 
-  register(input: { id: string; socket: WebSocket; clientVersion: string }): {
-    session: Session;
-    resumed: boolean;
-  } {
-    const existing = this.sessions.get(input.id);
-    let resumed = false;
-
-    if (existing !== undefined) {
-      if (existing.disconnectTimer !== null) {
-        clearTimeout(existing.disconnectTimer);
-        existing.disconnectTimer = null;
-      }
-      existing.heartbeat?.stop();
-      if (existing.state === 'connected' && existing.socket !== null) {
-        existing.socket.close(1001, 'session replaced');
-      }
-      resumed = true;
-    }
-
-    const now = Date.now();
-    const session: Session = {
-      id: input.id,
-      socket: input.socket,
-      state: 'connected',
-      clientVersion: input.clientVersion,
-      connectedAt: existing?.connectedAt ?? now,
-      reconnectedAt: existing !== undefined ? now : null,
-      // A *fresh* session (new sessionId = a plugin opened in a newly-focused file) counts as the most
-      // recent activity and should immediately win routing against an idle older session. But a
-      // *resumed* session — the same sessionId reconnecting after a websocket flap, which a backgrounded
-      // plugin iframe triggers when timer throttling makes it miss a heartbeat — must NOT bump: a
-      // reconnect is not user interaction, and re-registering it as "now" silently steals routing from
-      // the file the user is actually in (observed live). Preserve the resumed session's prior value.
-      lastActivityAt: existing === undefined ? now : existing.lastActivityAt,
-      // Filled in by the first `$activity` event; null until then (a plugin that hasn't sent any
-      // context push yet — e.g. mid-handshake — is still routable but won't have a display label).
-      fileName: existing?.fileName ?? null,
-      pageId: existing?.pageId ?? null,
-      pageName: existing?.pageName ?? null,
-      heartbeat: null,
-      disconnectTimer: null,
-      // A reconnect of the same session keeps it: the plugin on the other end has not changed, so
-      // re-explaining would be the repetition this avoids. A genuinely new plugin gets a new id.
-      skewExplained: existing?.skewExplained ?? false,
-    };
-
+  register(input: SessionRegistration): { session: Session; resumed: boolean } {
+    const previous = this.sessions.get(input.id);
+    if (previous !== undefined) retire(previous);
+    const session = newSession(input, previous);
     this.sessions.set(input.id, session);
-    return { session, resumed };
+    return { session, resumed: previous !== undefined };
   }
 
   markDisconnected(session: Session, graceMs: number): void {
-    const current = this.sessions.get(session.id);
-    if (current !== session) return;
-    if (session.disconnectTimer !== null) clearTimeout(session.disconnectTimer);
-    session.state = 'disconnected';
-    session.socket = null;
-    session.heartbeat?.stop();
-    session.heartbeat = null;
+    if (this.sessions.get(session.id) !== session) return;
+    markGone(session);
     session.disconnectTimer = setTimeout(() => {
-      if (this.sessions.get(session.id) === session) {
-        this.sessions.delete(session.id);
-      }
+      if (this.sessions.get(session.id) === session) this.sessions.delete(session.id);
     }, graceMs);
   }
 
-  /**
-   * Drop a session whose plugin run is over, with no grace window. Returns false — and leaves the
-   * map alone — when this session object has already been replaced under its id, the same guard
-   * markDisconnected applies: the socket closing is then the old half of a resume, and the session
-   * now registered is the one that resumed.
-   */
   end(session: Session): boolean {
     if (this.sessions.get(session.id) !== session) return false;
-    if (session.disconnectTimer !== null) clearTimeout(session.disconnectTimer);
-    session.disconnectTimer = null;
-    session.state = 'disconnected';
-    session.socket = null;
-    session.heartbeat?.stop();
-    session.heartbeat = null;
+    markGone(session);
     this.sessions.delete(session.id);
     return true;
   }
@@ -118,32 +114,28 @@ export class SessionManager {
     return this.sessions.get(id);
   }
 
-  remove(id: string): void {
-    const s = this.sessions.get(id);
-    if (s !== undefined && s.disconnectTimer !== null) {
-      clearTimeout(s.disconnectTimer);
-    }
-    this.sessions.delete(id);
-  }
-
   list(): readonly Session[] {
     return [...this.sessions.values()];
   }
 
   connected(): readonly Session[] {
-    return this.list().filter(s => s.state === 'connected' && s.socket !== null);
+    return this.list().filter(isLive);
+  }
+
+  mostActive(): Session | undefined {
+    return this.byActivity()[0];
+  }
+
+  infoByActivity(): readonly PluginSessionInfo[] {
+    return this.byActivity().map(toInfo);
   }
 
   clear(): void {
-    for (const s of this.sessions.values()) {
-      if (s.disconnectTimer !== null) clearTimeout(s.disconnectTimer);
-      // Stop heartbeats here, not via the socket-close path: Relay.stop() clears sessions before
-      // terminating sockets, so markDisconnected (which normally stops the heartbeat) early-returns
-      // for a session that's no longer in the map — leaking a live setInterval that pins the event
-      // loop open and keeps a shutting-down process alive as a zombie.
-      s.heartbeat?.stop();
-      s.heartbeat = null;
-    }
+    for (const session of this.sessions.values()) detach(session);
     this.sessions.clear();
+  }
+
+  private byActivity(): readonly Session[] {
+    return this.connected().toSorted((a, b) => b.lastActivityAt - a.lastActivityAt);
   }
 }

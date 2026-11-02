@@ -1,13 +1,24 @@
-/**
- * Normalize a hex color for comparison: expand shorthand, drop a fully-opaque alpha, uppercase.
- * Returns null for anything that isn't a plain hex literal. Shared by the token join's value-match
- * and the value-reverse index so both sides agree on what "the same color" means.
- */
+const HEX_LITERAL = /^#([0-9a-fA-F]{3,8})$/;
+const SHORTHAND_LENGTH = 3;
+const WITH_ALPHA_LENGTH = 8;
+const RGB_LENGTH = 6;
+const OPAQUE_ALPHA = 'FF';
+
+const expandShorthand = (digits: string): string =>
+  digits.length === SHORTHAND_LENGTH
+    ? digits
+        .split('')
+        .map(c => c + c)
+        .join('')
+    : digits;
+
+const dropOpaqueAlpha = (digits: string): string =>
+  digits.length === WITH_ALPHA_LENGTH && digits.slice(RGB_LENGTH).toUpperCase() === OPAQUE_ALPHA
+    ? digits.slice(0, RGB_LENGTH)
+    : digits;
+
 export const normHex = (raw: string): string | null => {
-  const m = /^#([0-9a-fA-F]{3,8})$/.exec(raw.trim());
-  if (m === null) return null;
-  let h = m[1] ?? '';
-  if (h.length === 3) h = [...h].map(c => c + c).join('');
-  if (h.length === 8 && h.slice(6).toUpperCase() === 'FF') h = h.slice(0, 6);
-  return `#${h.toUpperCase()}`;
+  const match = HEX_LITERAL.exec(raw.trim());
+  if (match === null) return null;
+  return `#${dropOpaqueAlpha(expandShorthand(match[1] ?? '')).toUpperCase()}`;
 };

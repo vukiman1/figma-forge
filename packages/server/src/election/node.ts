@@ -1,24 +1,15 @@
 import { createServer, type Server as HttpServer } from 'node:http';
-import type { AddressInfo } from 'node:net';
 
 import { DEFAULT_PORT } from '@figma-forge/core';
 
+import { errorMessage } from '../error-message.js';
 import { Relay } from '../relay/relay.js';
-import { type PortHolder, portConflictMessage } from './leader-lock.js';
+import { bindPort, closeAllConnections } from './bind-port.js';
+import { NodeRole } from './node-role.js';
+import { portConflictMessage } from './port-conflict-message.js';
+import type { PortHolder } from './port-holder.js';
 
-export const NodeRole = {
-  Unknown: 'unknown',
-  Leader: 'leader',
-  Follower: 'follower',
-  // The port is held by something that isn't answering as a Figma Forge leader, so this node can
-  // neither lead nor safely follow it. It keeps contending for the port instead of attaching as a
-  // follower of a process that would silently fail every forwarded RPC. Two ways in, one state: a
-  // foreign process squatting the port (found at startup), and a Figma Forge leader that is still
-  // alive and still holding the port but has stopped answering (found by the tick). See
-  // Election.determineRole / tick, and leader-lock.ts for how the two are told apart.
-  Conflicted: 'conflicted',
-} as const;
-export type NodeRole = (typeof NodeRole)[keyof typeof NodeRole];
+const DEFAULT_HOST = '127.0.0.1';
 
 export interface NodeOptions {
   serverVersion: string;
@@ -33,25 +24,21 @@ export interface LeaderResources {
   port: number;
 }
 
-export const isAddressInUse = (err: unknown): boolean =>
-  err !== null &&
-  typeof err === 'object' &&
-  'code' in err &&
-  (err as { code?: string }).code === 'EADDRINUSE';
+type RoleListener = (role: NodeRole) => void;
 
 export class Node {
-  private currentRole: NodeRole = NodeRole.Unknown;
+  private currentRole = NodeRole.Unknown;
   private leader: LeaderResources | null = null;
   private conflict: string | null = null;
   private readonly opts: Required<NodeOptions>;
-  private readonly listeners = new Set<(role: NodeRole) => void>();
+  private readonly listeners = new Set<RoleListener>();
 
   constructor(opts: NodeOptions) {
     this.opts = {
       serverVersion: opts.serverVersion,
       port: opts.port ?? DEFAULT_PORT,
-      host: opts.host ?? '127.0.0.1',
-      log: opts.log ?? (() => {}),
+      host: opts.host ?? DEFAULT_HOST,
+      log: opts.log ?? ((): void => {}),
     };
   }
 
@@ -79,35 +66,25 @@ export class Node {
     return `http://${this.opts.host}:${this.opts.port}`;
   }
 
+  get conflictMessage(): string {
+    return this.conflict ?? portConflictMessage(this.opts.port);
+  }
+
   async becomeLeader(): Promise<LeaderResources> {
     if (this.currentRole === NodeRole.Leader && this.leader !== null) return this.leader;
-
     const http = createServer();
+    let port: number;
     try {
-      await new Promise<void>((resolve, reject) => {
-        const onError = (err: NodeJS.ErrnoException): void => {
-          http.removeListener('listening', onListening);
-          reject(err);
-        };
-        const onListening = (): void => {
-          http.removeListener('error', onError);
-          resolve();
-        };
-        http.once('error', onError);
-        http.once('listening', onListening);
-        http.listen(this.opts.port, this.opts.host);
-      });
-    } catch (err) {
+      port = await bindPort(http, this.opts.port, this.opts.host);
+    } catch (error) {
       http.close();
-      throw err;
+      throw error;
     }
-
     const relay = new Relay({
       serverVersion: this.opts.serverVersion,
       server: http,
       log: this.opts.log,
     });
-    const port = (http.address() as AddressInfo).port;
     this.leader = { http, relay, port };
     this.setRole(NodeRole.Leader);
     this.opts.log(`[node] became LEADER on :${port}`);
@@ -121,29 +98,6 @@ export class Node {
     this.opts.log(`[node] became FOLLOWER (leader @ ${this.leaderUrl})`);
   }
 
-  /**
-   * The one explanation of an unusable port, rendered once at the transition and read by both
-   * `dispatch` (which fails the tool call with it) and `ping` (which reports it). Rendered at the
-   * transition rather than on demand because the diagnosis behind it costs an OS probe and can
-   * change the holder's state (a suspended holder is sent SIGCONT), neither of which belongs on a
-   * per-tool-call path. Falls back to the anonymous form for a node that was never told who holds
-   * the port.
-   */
-  get conflictMessage(): string {
-    return this.conflict ?? portConflictMessage(this.opts.port);
-  }
-
-  /**
-   * Enter the port-conflict state: :port is held by something that isn't answering as a Figma Forge
-   * leader. Unlike becomeFollower this never points RPC at the holder — dispatch fails fast with
-   * `conflictMessage` while the election keeps contending for the port (see Election.tick), so the
-   * moment the port frees we take over.
-   *
-   * `holder` names the process when it could be proved (see leader-lock.ts); passing it again for a
-   * node that is already conflicted refreshes the message, which is why the message is assigned
-   * before the idempotent early return — a first, anonymous transition must not pin a worse
-   * explanation in place than a later, identified one.
-   */
   becomeConflicted(holder?: PortHolder): void {
     this.conflict = portConflictMessage(this.opts.port, holder);
     if (this.currentRole === NodeRole.Conflicted) return;
@@ -156,7 +110,7 @@ export class Node {
     return this.leader;
   }
 
-  onRoleChange(listener: (role: NodeRole) => void): () => void {
+  onRoleChange(listener: RoleListener): () => void {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
@@ -164,48 +118,30 @@ export class Node {
   }
 
   async stop(): Promise<void> {
-    if (this.leader !== null) {
-      const { http, relay } = this.leader;
-      this.leader = null;
-      await relay.stop();
-      await new Promise<void>(resolve => {
-        http.close(() => resolve());
-        // close() waits for in-flight requests to finish before its callback fires (idle keep-alive
-        // connections it closes itself on Node ≥19). A follower /rpc landing in this shutdown window
-        // sits on the now-stopped relay until its tool budget (up to minutes) expires — during which
-        // this stop() hasn't resolved, process.exit is never reached, and the process lingers as a
-        // zombie leader still answering /ping on live connections (so no follower takes over).
-        // Sever everything so stop completes and takeover is immediate.
-        http.closeAllConnections();
-      });
+    const leader = this.leader;
+    this.leader = null;
+    if (leader !== null) {
+      await leader.relay.stop();
+      await closeAllConnections(leader.http);
     }
     this.currentRole = NodeRole.Unknown;
     this.listeners.clear();
   }
 
-  /**
-   * Tear down leader resources on demotion (follower/conflicted). Fire-and-forget by design — the
-   * demoted role must not wait on the old relay draining. closeAllConnections severs in-flight
-   * connections for the same reason as stop(): close() alone would keep serving them off a server
-   * that no longer leads until their (possibly minutes-long) tool budgets expire.
-   */
   private releaseLeader(): void {
     if (this.leader === null) return;
     const { http, relay } = this.leader;
     this.leader = null;
-    void relay.stop().catch(() => {
-      /* ignore */
+    void relay.stop().catch((error: unknown) => {
+      this.opts.log(`[node] relay stop after demotion failed: ${errorMessage(error)}`);
     });
-    http.close();
-    http.closeAllConnections();
+    void closeAllConnections(http);
   }
 
   private setRole(role: NodeRole): void {
     if (this.currentRole === role) return;
-    // Leaving the conflict behind: the diagnosis named a process and a remedy that no longer apply,
-    // and a re-entry re-derives its own.
     if (role !== NodeRole.Conflicted) this.conflict = null;
     this.currentRole = role;
-    for (const l of this.listeners) l(role);
+    for (const listener of this.listeners) listener(role);
   }
 }

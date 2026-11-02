@@ -3,16 +3,14 @@ import { type AddressInfo, connect as netConnect, type Socket } from 'node:net';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { isAddressInUse, Node, NodeRole } from '../../src/election/node.js';
+import { isAddressInUse } from '../../src/election/bind-port.js';
+import { NodeRole } from '../../src/election/node-role.js';
+import { Node } from '../../src/election/node.js';
 
 const blockers: HttpServer[] = [];
 const nodes: Node[] = [];
 const sockets: Socket[] = [];
 
-// Open a connection to the leader with an HTTP request in flight that nothing will ever answer
-// (the bare leader http server has no request listener in these tests). Node ≥19's server.close()
-// closes *idle* connections itself, so only an in-flight request reproduces the hang these
-// regression tests pin down.
 const connectWithInflightRequest = async (port: number): Promise<Socket> => {
   const sock = netConnect(port, '127.0.0.1');
   sockets.push(sock);
@@ -21,7 +19,6 @@ const connectWithInflightRequest = async (port: number): Promise<Socket> => {
     sock.once('error', reject);
   });
   sock.write('GET /never-answered HTTP/1.1\r\nHost: 127.0.0.1\r\n\r\n');
-  // Give the server a beat to parse the request so the connection counts as in-flight.
   await new Promise<void>(resolve => setTimeout(resolve, 30));
   return sock;
 };
@@ -127,12 +124,7 @@ describe('Node role state machine', () => {
     expect(seen).toEqual([NodeRole.Leader, NodeRole.Follower]);
   });
 
-  // Regression: http.close() waits for in-flight requests to finish before its callback fires. A
-  // follower /rpc that lands in the shutdown window sits on a stopped relay until its tool budget
-  // (up to minutes) expires, so a shutting-down leader lingers that whole time as a zombie — still
-  // answering /ping on live connections, so no follower takes over. stop must sever connections,
-  // not wait them out.
-  it('stop resolves even while a connection has a request in flight', async () => {
+  it('stop resolves even while a connection has a request in flight, so a stopping leader cannot linger answering /ping', async () => {
     const port = await freePort();
     const n = makeNode(port);
     await n.becomeLeader();
