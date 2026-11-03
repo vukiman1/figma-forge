@@ -1,6 +1,6 @@
 {
   "name": "figma-forge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Free, two-way Figma MCP server. Turn designs into framework-aware code, and push code back to the canvas. Works with Claude Code, Cursor, Codex, and any MCP client.",
   "homepage": "https://github.com/vukiman1/figma-forge",
