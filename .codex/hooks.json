@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .codex/hooks/format-on-edit.mjs",
+            "statusMessage": "oxfmt + oxlint on edited file"
+          }
+        ]
+      }
+    ]
+  }
+}

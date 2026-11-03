@@ -13,8 +13,6 @@ A two-way Figma MCP server. A coding agent reads a Figma file as structured desi
   <img alt="Plugin relay" src=".github/assets/illustration-sync.png" width="260">
 </p>
 
-Figma Forge is a hard fork of [Figwright](https://github.com/awdr74100/figwright) (MIT, © Roya).
-
 ## Setup
 
 You need Node.js 24.11+ and the Figma desktop app.
