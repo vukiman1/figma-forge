@@ -7,7 +7,6 @@ import { serializeFlatSync } from '../packages/plugin/src/serialize/serialize-no
 import { ALL_TOOL_SPECS } from '../packages/server/src/tools/registry/registry.js';
 import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire/wire-schema.js';
 
-// Figma is the external boundary. Schemas, dispatch, writes, reads and batch rollback stay real.
 const setup = () => {
   const base = { name: 'Test', visible: true, locked: false, x: 0, y: 0, parent: null };
   const frame = {
@@ -41,8 +40,6 @@ const setup = () => {
       [1, 0, 0],
       [0, 1, 0],
     ],
-    // Figma stores whatever height a line is resized to (measured: 250 × 10 was kept, and drew the
-    // same hairline). Modelled the same, so a test can only see height 0 if 0 is what was written.
     resize(w: number, h: number) {
       if (w < 0.01) throw new Error('Invalid line size');
       this.width = w;
@@ -91,7 +88,6 @@ describe('basic node property round-trips', () => {
     const target = setup();
     await target.call('set_corner_radius', { nodeId: '1:1', cornerSmoothing: value });
     expect(target.frame).toMatchObject({ cornerRadius: 12, cornerSmoothing: value });
-    // 0 is Figma's default (a circular corner): neither read writes it out.
     expect(target.read().flat.cornerSmoothing).toBe(value === 0 ? undefined : value);
     expect(target.read().full.cornerSmoothing).toBe(value === 0 ? undefined : value);
   });
