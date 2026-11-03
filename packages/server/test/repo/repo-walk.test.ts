@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { walkRepoFiles } from '../src/repo-walk.js';
+import { walkRepoFiles } from '../../src/repo/repo-walk.js';
 
 const dirs: string[] = [];
 const make = async (files: Record<string, string>): Promise<string> => {

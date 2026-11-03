@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
-import { readTextIfPresent } from '../../optional-file.js';
-import { walkRepoFiles } from '../../repo-walk.js';
+import { readTextIfPresent } from '../../repo/optional-file.js';
+import { walkRepoFiles } from '../../repo/repo-walk.js';
 import type { ProjectToken } from '../project-token.js';
 import { parseCssCustomProperties } from './css-custom-properties.js';
 import { parseScssFile } from './scss-file.js';

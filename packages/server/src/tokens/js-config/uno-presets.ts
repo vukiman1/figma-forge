@@ -1,6 +1,6 @@
 import type { ArrayExpressionElement, ObjectExpression, Program } from 'oxc-parser';
 
-import { parseSource } from '../../parse-source.js';
+import { parseSource } from '../../repo/parse-source.js';
 import { findConfigObject } from './config-object.js';
 import { propertyNamed } from './literal-values.js';
 

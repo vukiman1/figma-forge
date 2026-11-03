@@ -1,3 +1,5 @@
+import { log } from '../process/server-config.js';
+import type { ServerRuntime } from '../process/server-runtime.js';
 import {
   dispatchTargeted,
   dispatchTool,
@@ -5,8 +7,6 @@ import {
   resolveRoutingSession,
   type DispatchContext,
 } from './dispatch.js';
-import { log } from './server-config.js';
-import type { ServerRuntime } from './server-runtime.js';
 
 export type ToolDispatch = (toolName: string, args: unknown) => Promise<unknown>;
 

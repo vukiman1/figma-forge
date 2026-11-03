@@ -2,18 +2,18 @@ import type { ToolSpec } from '@figma-forge/core';
 import { normalizeIdArgs } from '@figma-forge/core';
 import { McpServer } from '@modelcontextprotocol/server';
 
+import { createToolDispatchers } from '../dispatch/tool-dispatchers.js';
+import { SERVER_NAME, SERVER_VERSION } from '../process/server-config.js';
+import type { ServerRuntime } from '../process/server-runtime.js';
+import { ALL_TOOL_SPECS } from '../tools/registry/registry.js';
+import { annotationsFor } from '../tools/result/annotations.js';
+import { captureNotices, withRoutingNotice, withSkewNotice } from '../tools/result/notices.js';
+import { assertWithinLimit } from '../tools/result/result-budget.js';
 import { createGenericToolHandler } from './generic-tool-handler.js';
 import { SERVER_INSTRUCTIONS } from './instructions.js';
 import { PROMPTS } from './prompts/registry.js';
-import { SERVER_NAME, SERVER_VERSION } from './server-config.js';
-import type { ServerRuntime } from './server-runtime.js';
 import { createSpecialToolHandlers } from './special-tool-handlers.js';
-import { createToolDispatchers } from './tool-dispatchers.js';
 import type { ToolHandler } from './tool-handler.js';
-import { ALL_TOOL_SPECS } from './tools/registry/registry.js';
-import { annotationsFor } from './tools/result/annotations.js';
-import { captureNotices, withRoutingNotice, withSkewNotice } from './tools/result/notices.js';
-import { assertWithinLimit } from './tools/result/result-budget.js';
 
 const wrapToolHandler =
   (spec: ToolSpec, run: ToolHandler): ToolHandler =>

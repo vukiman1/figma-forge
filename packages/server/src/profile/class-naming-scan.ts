@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
-import { readTextIfPresent } from '../optional-file.js';
-import { walkRepoFiles } from '../repo-walk.js';
+import { readTextIfPresent } from '../repo/optional-file.js';
+import { walkRepoFiles } from '../repo/repo-walk.js';
 import { type ClassNamingTally, tallyClassNaming } from './class-naming-tally.js';
 import { readStylesheetNames, type StylesheetNames } from './stylesheet-names.js';
 

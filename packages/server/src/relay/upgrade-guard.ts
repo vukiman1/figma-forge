@@ -1,6 +1,6 @@
 import type { IncomingMessage } from 'node:http';
 
-import { isAllowedHost, isAllowedWsOrigin } from '../local-access.js';
+import { isAllowedHost, isAllowedWsOrigin } from '../http/local-access.js';
 
 type Logger = (msg: string) => void;
 

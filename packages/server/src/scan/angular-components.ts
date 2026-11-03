@@ -1,6 +1,6 @@
 import type { Class, Directive, Expression, Node, Program, Statement } from 'oxc-parser';
 
-import { parseSource } from '../parse-source.js';
+import { parseSource } from '../repo/parse-source.js';
 import { ownInputNames } from './angular-input-names.js';
 import { hasDecorator } from './ast-names.js';
 import { mergeProps, NO_PROPS, type PropsResult, UNKNOWN_PROPS } from './props-result.js';

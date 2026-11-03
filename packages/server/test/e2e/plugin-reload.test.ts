@@ -2,7 +2,7 @@ import type { ListFilesResult } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
-import { dispatchTargeted } from '../../src/dispatch.js';
+import { dispatchTargeted } from '../../src/dispatch/dispatch.js';
 import { getFileTarget, setFileTarget } from '../../src/routing/target.js';
 import {
   closeSocket,

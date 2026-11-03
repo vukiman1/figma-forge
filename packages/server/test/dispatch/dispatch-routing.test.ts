@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { dispatchTargeted, resolveRoutingSession } from '../src/dispatch.js';
-import type { Follower } from '../src/election/follower.js';
-import type { Node } from '../src/election/node.js';
-import { portConflictMessage } from '../src/election/port-conflict-message.js';
-import type { PluginSessionInfo } from '../src/routing/sessions.js';
-import { clearFileTarget, setFileTarget } from '../src/routing/target.js';
+import { dispatchTargeted, resolveRoutingSession } from '../../src/dispatch/dispatch.js';
+import type { Follower } from '../../src/election/follower.js';
+import type { Node } from '../../src/election/node.js';
+import { portConflictMessage } from '../../src/election/port-conflict-message.js';
+import type { PluginSessionInfo } from '../../src/routing/sessions.js';
+import { clearFileTarget, setFileTarget } from '../../src/routing/target.js';
 
 const makeNode = (overrides: Partial<Node>): Node =>
   ({

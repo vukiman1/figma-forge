@@ -2,7 +2,7 @@ import { EventEmitter } from 'node:events';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { DEFAULT_HARD_EXIT_DELAY_MS, wireShutdown } from '../src/lifecycle.js';
+import { DEFAULT_HARD_EXIT_DELAY_MS, wireShutdown } from '../../src/process/lifecycle.js';
 
 describe('wireShutdown', () => {
   it.each([

@@ -1,6 +1,6 @@
 import type { IncomingMessage, Server as HttpServer, ServerResponse } from 'node:http';
 
-import { isAllowedHost, isAllowedHttpOrigin } from '../local-access.js';
+import { isAllowedHost, isAllowedHttpOrigin } from '../http/local-access.js';
 import type { Relay } from '../relay/relay.js';
 import { ABDICATE_QUIET_WINDOW_MS, answerAbdicate } from './abdicate-endpoint.js';
 import { writeJson } from './http-replies.js';

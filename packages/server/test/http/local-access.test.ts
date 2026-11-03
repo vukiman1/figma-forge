@@ -5,7 +5,7 @@ import {
   isAllowedHost,
   isAllowedHttpOrigin,
   isAllowedWsOrigin,
-} from '../src/local-access.js';
+} from '../../src/http/local-access.js';
 
 afterEach(() => {
   delete process.env.FIGMA_FORGE_ALLOW_ANY_ORIGIN;

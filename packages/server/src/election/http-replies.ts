@@ -3,7 +3,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { RpcResponse } from '@figma-forge/core';
 import { encode } from '@msgpack/msgpack';
 
-import { parseJson } from '../parse-json.js';
+import { parseJson } from '../common/parse-json.js';
 import { type HttpStatus, JSON_CONTENT_TYPE, MSGPACK_CONTENT_TYPE } from './leader-wire.js';
 
 export const readBody = (req: IncomingMessage): Promise<Buffer> =>

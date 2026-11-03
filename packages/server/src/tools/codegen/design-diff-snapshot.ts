@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { GetDesignContextResultSchema, type GetDesignContextResult } from '@figma-forge/core';
 import { z } from 'zod';
 
-import { parseJson } from '../../parse-json.js';
+import { parseJson } from '../../common/parse-json.js';
 
 export const SNAPSHOT_FORMAT_VERSION = 9;
 

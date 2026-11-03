@@ -1,20 +1,20 @@
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
-import { BUILD_ID } from './build-id.js';
-import { Election } from './election/election.js';
-import { Follower } from './election/follower.js';
-import { attachLeaderEndpoints } from './election/leader-endpoints.js';
-import { writeLeaderLock } from './election/leader-lock.js';
-import { NodeRole } from './election/node-role.js';
-import { Node } from './election/node.js';
+import { Election } from '../election/election.js';
+import { Follower } from '../election/follower.js';
+import { attachLeaderEndpoints } from '../election/leader-endpoints.js';
+import { writeLeaderLock } from '../election/leader-lock.js';
+import { NodeRole } from '../election/node-role.js';
+import { Node } from '../election/node.js';
 import {
   installPlugin,
   PLUGIN_DIR_ENV,
   resolvePluginInstallDir,
   type PluginInstallResult,
-} from './plugin-install/install-plugin.js';
-import { describePluginInstall } from './plugin-install/setup-hint.js';
+} from '../plugin-install/install-plugin.js';
+import { describePluginInstall } from '../plugin-install/setup-hint.js';
+import { BUILD_ID } from './build-id.js';
 import { log, SERVER_PORT, SERVER_VERSION } from './server-config.js';
 
 export interface ServerRuntime {

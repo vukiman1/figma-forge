@@ -1,4 +1,4 @@
-import { dispatchTargeted } from '../../dispatch.js';
+import { dispatchTargeted } from '../../dispatch/dispatch.js';
 import { pluginSetupHint } from '../../plugin-install/setup-hint.js';
 import type { Session } from '../../relay/session.js';
 import type { FileTarget } from '../../routing/target.js';

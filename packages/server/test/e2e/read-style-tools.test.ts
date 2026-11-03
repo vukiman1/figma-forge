@@ -9,7 +9,7 @@ import {
 import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
-import { dispatchTool } from '../../src/dispatch.js';
+import { dispatchTool } from '../../src/dispatch/dispatch.js';
 import {
   closeSocket,
   connectFakePlugin,

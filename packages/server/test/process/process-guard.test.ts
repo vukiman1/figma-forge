@@ -4,7 +4,11 @@ import { PassThrough } from 'node:stream';
 
 import { describe, expect, it } from 'vitest';
 
-import { consoleToStderr, guardProcess, muteStreamErrors } from '../src/process-guard.js';
+import {
+  consoleToStderr,
+  guardProcess,
+  muteStreamErrors,
+} from '../../src/process/process-guard.js';
 
 const fakeProcess = (): EventEmitter => new EventEmitter();
 

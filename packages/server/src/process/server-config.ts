@@ -1,6 +1,6 @@
 import { DEFAULT_PORT } from '@figma-forge/core';
 
-import pkg from '../package.json' with { type: 'json' };
+import pkg from '../../package.json' with { type: 'json' };
 
 export const SERVER_NAME = 'figma-forge';
 export const SERVER_VERSION = pkg.version;

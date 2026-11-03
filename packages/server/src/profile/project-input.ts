@@ -1,6 +1,6 @@
 import { join, resolve } from 'node:path';
 
-import { fileExists, readTextIfPresent } from '../optional-file.js';
+import { fileExists, readTextIfPresent } from '../repo/optional-file.js';
 import { declaresVocabularyPreset } from '../tokens/js-config/uno-presets.js';
 import { scanClassNaming } from './class-naming-scan.js';
 import type { ClassNamingTally } from './class-naming-tally.js';

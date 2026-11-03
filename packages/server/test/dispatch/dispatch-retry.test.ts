@@ -1,10 +1,10 @@
 import { ErrorCode, type RpcResponse } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { DispatchError, dispatchTool } from '../src/dispatch.js';
-import type { Follower } from '../src/election/follower.js';
-import type { Node } from '../src/election/node.js';
-import { portConflictMessage } from '../src/election/port-conflict-message.js';
+import { DispatchError, dispatchTool } from '../../src/dispatch/dispatch.js';
+import type { Follower } from '../../src/election/follower.js';
+import type { Node } from '../../src/election/node.js';
+import { portConflictMessage } from '../../src/election/port-conflict-message.js';
 
 const makeNode = (overrides: Partial<Node>): Node =>
   ({

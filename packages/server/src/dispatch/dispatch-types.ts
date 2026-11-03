@@ -1,5 +1,5 @@
-import type { Follower } from './election/follower.js';
-import type { Node } from './election/node.js';
+import type { Follower } from '../election/follower.js';
+import type { Node } from '../election/node.js';
 
 export interface DispatchOptions {
   maxAttempts?: number;

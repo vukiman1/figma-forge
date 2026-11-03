@@ -1,4 +1,4 @@
-import { truncationNote } from '../repo-walk.js';
+import { truncationNote } from '../repo/repo-walk.js';
 import type { ProjectToken } from './project-token.js';
 
 const NAMED_FILES_LIMIT = 6;

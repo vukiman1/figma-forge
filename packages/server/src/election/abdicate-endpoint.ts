@@ -2,7 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 
 import { z } from 'zod';
 
-import { hasContentType } from '../local-access.js';
+import { hasContentType } from '../http/local-access.js';
 import type { Relay } from '../relay/relay.js';
 import { readJsonBody, writeJson } from './http-replies.js';
 import { AbdicateReason, HttpStatus, JSON_CONTENT_TYPE } from './leader-wire.js';

@@ -9,8 +9,8 @@ import {
 } from '@figma-forge/core';
 import { decode } from '@msgpack/msgpack';
 
-import { errorMessage } from '../error-message.js';
-import { hasContentType } from '../local-access.js';
+import { errorMessage } from '../common/error-message.js';
+import { hasContentType } from '../http/local-access.js';
 import type { Relay } from '../relay/relay.js';
 import { checkWireCall, type WireRejection } from '../tools/wire/wire-schema.js';
 import { readBody, writeJson, writeMsgpack } from './http-replies.js';

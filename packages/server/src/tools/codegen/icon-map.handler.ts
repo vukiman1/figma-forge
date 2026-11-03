@@ -9,7 +9,7 @@ import { collectFigmaIcons, type IconMapping, joinIcons } from '../../join/icon-
 import { readProjectDeps } from '../../profile/package-manifest.js';
 import { analyzeProject, type ProjectProfile } from '../../profile/project-profile.js';
 import { isUtilityFirst } from '../../profile/styling-system.js';
-import { truncationNote } from '../../repo-walk.js';
+import { truncationNote } from '../../repo/repo-walk.js';
 
 const DEFAULT_THRESHOLD = 0.7;
 

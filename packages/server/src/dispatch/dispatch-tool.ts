@@ -1,8 +1,8 @@
 import { ErrorCode, getFollowerBudget, getRelayBudget } from '@figma-forge/core';
 
+import { NodeRole } from '../election/node-role.js';
+import { reportSkew } from '../tools/result/notices.js';
 import type { DispatchContext, DispatchOptions } from './dispatch-types.js';
-import { NodeRole } from './election/node-role.js';
-import { reportSkew } from './tools/result/notices.js';
 
 const DEFAULT_DISPATCH_MAX_ATTEMPTS = 3;
 const DEFAULT_DISPATCH_RETRY_DELAY_MS = 1_500;

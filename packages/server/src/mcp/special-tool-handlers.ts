@@ -21,27 +21,27 @@ import {
 } from '@figma-forge/core';
 import { z } from 'zod';
 
-import { BUILD_ID } from './build-id.js';
-import { log, SERVER_VERSION } from './server-config.js';
-import type { ServerRuntime } from './server-runtime.js';
-import type { ToolDispatch, ToolDispatchers } from './tool-dispatchers.js';
+import type { ToolDispatch, ToolDispatchers } from '../dispatch/tool-dispatchers.js';
+import { BUILD_ID } from '../process/build-id.js';
+import { log, SERVER_VERSION } from '../process/server-config.js';
+import type { ServerRuntime } from '../process/server-runtime.js';
+import { handleAnalyzeProject } from '../tools/codegen/analyze-project.handler.js';
+import { handleComponentMap } from '../tools/codegen/component-map.handler.js';
+import { handleDesignDiff } from '../tools/codegen/design-diff.handler.js';
+import { handleIconMap } from '../tools/codegen/icon-map.handler.js';
+import { handleScanComponents } from '../tools/codegen/scan-components.handler.js';
+import { handleTokenMap } from '../tools/codegen/token-map.handler.js';
+import { handleExportPdf } from '../tools/export/export-pdf.handler.js';
+import { handleExportVideo } from '../tools/export/export-video.handler.js';
+import { screenshotContent } from '../tools/export/get-screenshot.handler.js';
+import { handleSaveImageFills } from '../tools/export/save-image-fills.handler.js';
+import { handleSaveScreenshots } from '../tools/export/save-screenshots.handler.js';
+import { handleListFiles } from '../tools/files/list-files.handler.js';
+import { formatPingResult, handlePing } from '../tools/files/ping.handler.js';
+import { handleUseFile } from '../tools/files/use-file.handler.js';
+import { handleDesignContext } from '../tools/read/design-context-guard.js';
+import { fitNodeList } from '../tools/result/result-budget.js';
 import { textResult, type ToolHandler } from './tool-handler.js';
-import { handleAnalyzeProject } from './tools/codegen/analyze-project.handler.js';
-import { handleComponentMap } from './tools/codegen/component-map.handler.js';
-import { handleDesignDiff } from './tools/codegen/design-diff.handler.js';
-import { handleIconMap } from './tools/codegen/icon-map.handler.js';
-import { handleScanComponents } from './tools/codegen/scan-components.handler.js';
-import { handleTokenMap } from './tools/codegen/token-map.handler.js';
-import { handleExportPdf } from './tools/export/export-pdf.handler.js';
-import { handleExportVideo } from './tools/export/export-video.handler.js';
-import { screenshotContent } from './tools/export/get-screenshot.handler.js';
-import { handleSaveImageFills } from './tools/export/save-image-fills.handler.js';
-import { handleSaveScreenshots } from './tools/export/save-screenshots.handler.js';
-import { handleListFiles } from './tools/files/list-files.handler.js';
-import { formatPingResult, handlePing } from './tools/files/ping.handler.js';
-import { handleUseFile } from './tools/files/use-file.handler.js';
-import { handleDesignContext } from './tools/read/design-context-guard.js';
-import { fitNodeList } from './tools/result/result-budget.js';
 
 const NodeListWireResultSchema = z.object({
   note: z.string().optional(),

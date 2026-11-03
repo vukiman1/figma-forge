@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { CODE_TO_FIGMA_PROMPT_NAME } from '../../src/prompts/code-to-figma.js';
-import { FIGMA_TO_CODE_PROMPT_NAME } from '../../src/prompts/figma-to-code.js';
-import { buildPrompt, PROMPT_DEFINITIONS } from '../../src/prompts/registry.js';
+import { CODE_TO_FIGMA_PROMPT_NAME } from '../../../src/mcp/prompts/code-to-figma.js';
+import { FIGMA_TO_CODE_PROMPT_NAME } from '../../../src/mcp/prompts/figma-to-code.js';
+import { buildPrompt, PROMPT_DEFINITIONS } from '../../../src/mcp/prompts/registry.js';
 
 const textOf = (name: string, args: Record<string, string> = {}): string => {
   const result = buildPrompt(name, args);

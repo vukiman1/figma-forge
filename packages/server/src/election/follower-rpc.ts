@@ -1,7 +1,7 @@
 import { ErrorCode, type RpcRequest, type RpcResponse, RpcResponseSchema } from '@figma-forge/core';
 import { decode, encode } from '@msgpack/msgpack';
 
-import { errorMessage } from '../error-message.js';
+import { errorMessage } from '../common/error-message.js';
 import { MSGPACK_CONTENT_TYPE } from './leader-wire.js';
 
 export type FetchFn = typeof globalThis.fetch;

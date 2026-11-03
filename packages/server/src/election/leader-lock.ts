@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 import { z } from 'zod';
 
-import { parseJson } from '../parse-json.js';
+import { parseJson } from '../common/parse-json.js';
 import { osProcessProbe, type ProcessProbe } from './process-probe.js';
 
 const LOCK_DIR_NAME = 'figma-forge';

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { PROMPTS } from '../../src/prompts/registry.js';
-import { ALL_TOOL_SPECS } from '../../src/tools/registry/registry.js';
+import { PROMPTS } from '../../../src/mcp/prompts/registry.js';
+import { ALL_TOOL_SPECS } from '../../../src/tools/registry/registry.js';
 
 const TOOL_NAMES = new Set(ALL_TOOL_SPECS.map(spec => spec.name));
 
