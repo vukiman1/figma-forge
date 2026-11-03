@@ -1,7 +1,6 @@
 import {
   CLIENT_MESSAGE_LIMIT_BYTES,
   NODE_LIST_BUDGET_BYTES,
-  type SearchNodesResult,
   TOOL_RESULT_LIMIT_BYTES,
 } from '@figma-forge/core';
 import type { CallToolResult } from '@modelcontextprotocol/server';
@@ -10,11 +9,17 @@ const megabytes = (bytes: number): string => (bytes / 1024 / 1024).toFixed(1);
 
 const wireBytes = (text: string): number => Buffer.byteLength(JSON.stringify(text), 'utf8') - 2;
 
-export const fitNodeList = (
-  result: SearchNodesResult,
+interface NodeListResult<Node> {
+  note?: string | undefined;
+  matchCount?: number | undefined;
+  nodes: Node[];
+}
+
+export const fitNodeList = <Node>(
+  result: NodeListResult<Node>,
   narrowWith: string,
   budgetBytes = NODE_LIST_BUDGET_BYTES,
-): SearchNodesResult => {
+): NodeListResult<Node> => {
   const total = result.matchCount ?? result.nodes.length;
   const sizes = result.nodes.map(node => wireBytes(JSON.stringify(node)));
   const noteFor = (kept: number): string =>

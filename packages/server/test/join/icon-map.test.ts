@@ -43,7 +43,7 @@ describe('collectFigmaIcons', () => {
         id: 'root',
         children: [
           node({ id: 'v1', type: 'VECTOR', name: 'search' }),
-          node({ id: 'v2', type: 'VECTOR', name: 'Vector 3' }), // decoration → skipped
+          node({ id: 'v2', type: 'VECTOR', name: 'Vector 3' }),
         ],
       }),
     ]);
@@ -59,7 +59,7 @@ describe('collectFigmaIcons', () => {
             id: 'inst',
             type: 'INSTANCE',
             name: 'ic_arrow-right',
-            children: [node({ id: 'inner', type: 'VECTOR', name: 'Union' })], // not double-counted
+            children: [node({ id: 'inner', type: 'VECTOR', name: 'Union' })],
           }),
         ],
       }),
@@ -95,8 +95,6 @@ describe('collectFigmaIcons', () => {
   });
 
   it('keeps non-Latin icon names distinct', () => {
-    // The grouping key is the casefolded label. An [a-z0-9] fold turns every CJK label into the
-    // empty string, collapsing a whole icon set into one usage with all of their node ids merged.
     const icons = collectFigmaIcons([
       node({ id: '1:1', type: 'VECTOR', name: '搜尋' }),
       node({ id: '1:2', type: 'VECTOR', name: '刪除' }),
@@ -104,7 +102,7 @@ describe('collectFigmaIcons', () => {
       node({ id: '1:4', type: 'VECTOR', name: '搜尋' }),
     ]);
     expect(icons.map(i => i.name).toSorted()).toEqual(['刪除', '搜尋', '編輯']);
-    // The repeated one groups; the distinct ones don't merge into it.
+
     expect(icons.find(i => i.name === '搜尋')?.nodeIds).toEqual(['1:1', '1:4']);
     expect(icons.find(i => i.name === '刪除')?.nodeIds).toEqual(['1:2']);
   });
@@ -179,9 +177,6 @@ describe('joinIcons', () => {
   });
 
   it('does NOT fuzzy-match a near-neighbor to the wrong icon (precision over recall)', () => {
-    // A/B regression: arr-u must not reuse arr-d (opposite arrows), checkbox must not reuse
-    // check, cash must not reuse trash. A wrong icon is a silent visual bug, so these fall through
-    // to a fresh export instead of a confident mis-map.
     const files = [svg('arr-d'), svg('check'), svg('trash')];
     const statuses = ['arr-u', 'checkbox', 'cash'].map(name => {
       const [m] = joinIcons([{ name, figmaName: `icon/${name}`, nodeIds: ['n'] }], files, opts());

@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { EXPORT_PDF_TOOL_NAME, exportPdfTool } from '@figma-forge/core';
-import type { ExportPdfResult, PdfExport } from '@figma-forge/core';
+import type { PdfExport } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -75,7 +75,7 @@ describe('handleExportPdf', () => {
       return { nodeId: '0:1', base64: 'AAAA' } satisfies PdfExport;
     };
 
-    const result = (await handleExportPdf(dispatch, { outPath: path })) as ExportPdfResult;
+    const result = await handleExportPdf(dispatch, { outPath: path });
 
     expect(dispatched).toEqual({ tool: 'export_pdf', args: { binary: true } });
     expect(result).toEqual({ nodeId: '0:1', path });
@@ -89,7 +89,7 @@ describe('handleExportPdf', () => {
     const dispatch: ToolDispatcher = async () =>
       ({ nodeId: '0:1', base64: null, bytes }) satisfies PdfExport;
 
-    const result = (await handleExportPdf(dispatch, { outPath: path })) as ExportPdfResult;
+    const result = await handleExportPdf(dispatch, { outPath: path });
 
     expect(result).toEqual({ nodeId: '0:1', path });
     expect(new Uint8Array(await readFile(path))).toEqual(bytes);

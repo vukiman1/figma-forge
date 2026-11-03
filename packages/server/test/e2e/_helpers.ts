@@ -8,7 +8,6 @@ import {
   createResponse,
   decodeEnvelope,
   encodeEnvelope,
-  type Envelope,
   ErrorCode,
   MIN_PLUGIN_VERSION,
   newId,
@@ -57,7 +56,7 @@ export interface FakePluginOptions {
   port: number;
   sessionId?: string;
   handlers: Record<string, (params: unknown) => unknown>;
-  /** Defaults to a version the server is happy with; override to exercise the skew warning. */
+
   clientVersion?: string;
 }
 
@@ -72,7 +71,7 @@ export const connectFakePlugin = async (opts: FakePluginOptions): Promise<WebSoc
       ws.off('error', onError);
       const helloId = 'fake-hello-1';
       const onMessage = (raw: WebSocket.RawData): void => {
-        const env = decodeEnvelope(raw as Uint8Array) as Envelope;
+        const env = decodeEnvelope(raw as Uint8Array);
         if (env.kind === 'res' && env.id === helloId) {
           ws.off('message', onMessage);
           resolve();
@@ -87,8 +86,7 @@ export const connectFakePlugin = async (opts: FakePluginOptions): Promise<WebSoc
             method: SystemMethod.Hello,
             params: {
               clientType: 'plugin',
-              // MIN_PLUGIN_VERSION is always accepted without a warning: the threshold actually
-              // applied is capped at the server's own version, so this is never below it.
+
               clientVersion: opts.clientVersion ?? MIN_PLUGIN_VERSION,
               protocolVersion: PROTOCOL_VERSION,
             },
@@ -99,7 +97,7 @@ export const connectFakePlugin = async (opts: FakePluginOptions): Promise<WebSoc
   });
 
   ws.on('message', raw => {
-    const env = decodeEnvelope(raw as Uint8Array) as Envelope;
+    const env = decodeEnvelope(raw as Uint8Array);
     if (env.kind !== 'req') return;
     if (env.method === SystemMethod.Ping) {
       ws.send(
@@ -111,9 +109,6 @@ export const connectFakePlugin = async (opts: FakePluginOptions): Promise<WebSoc
     }
     const handler = opts.handlers[env.method];
     if (handler === undefined) {
-      // What the real sandbox does for a method it has no handler for (see plugin dispatcher) —
-      // the defining behaviour of a plugin older than the server's tool set. Staying silent here
-      // would turn that case into a 15s timeout and hide whatever it was meant to prove.
       ws.send(
         encodeEnvelope(
           createError({
@@ -139,20 +134,6 @@ export const closeSocket = (ws: WebSocket): void => {
   }
 };
 
-/**
- * Read a child process's pipe as UTF-8 text. A pipe delivers bytes in chunks whose boundaries fall
- * wherever the OS and the reading Node put them, so decoding each chunk on its own
- * (`chunk.toString('utf8')`) turns any multi-byte character that straddles a boundary into U+FFFD
- * replacement characters. `setEncoding` gives the stream a decoder that holds a partial character
- * back until the rest of it arrives. This is not hypothetical: the tool descriptions carry `’` and
- * `—`, and on macOS Node 20 and 22 read a pipe 8 KB at a time where Node 24 reads 64 KB — on 20 and
- * 22 one boundary in `tools/list` lands inside a `’`, and the wire gate failed on a description
- * that differed from the spec only there. Node 24 passed because no boundary happened to land on
- * one, which any change to a description's length can undo.
- *
- * The encoding is set in the same call that attaches the listener, so no chunk can reach it
- * undecoded.
- */
 export const onText = (stream: Readable, listener: (text: string) => void): void => {
   stream.setEncoding('utf8');
   stream.on('data', listener);

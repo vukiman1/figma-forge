@@ -37,8 +37,7 @@ const fakeContext: GetDesignContextResult = {
 
 describe('handleComponentMap', () => {
   let dir: string;
-  // Only get_design_context is dispatched now — the set name rides on its mainComponent. Any other
-  // dispatch (notably the dropped doc-wide get_local_components) is a regression and throws.
+
   const dispatch: ToolDispatcher = async tool => {
     if (tool === GET_DESIGN_CONTEXT_TOOL_NAME) return fakeContext;
     throw new Error(`unexpected dispatch: ${tool}`);
@@ -77,8 +76,7 @@ describe('handleComponentMap', () => {
 
   it('honors a docs/figma-component-map.md override for the otherwise-unmapped component', async () => {
     await mkdir(join(dir, 'docs'), { recursive: true });
-    // The override wins — but only because its target is a real file. The tool confirms it on disk
-    // (or via the scan) so it isn't treated as stale.
+
     await mkdir(join(dir, 'src', 'ui'), { recursive: true });
     await writeFile(join(dir, 'src', 'ui', 'Tip.tsx'), 'export function Tip() { return <div/>; }');
     await writeFile(join(dir, 'docs', 'figma-component-map.md'), 'Tooltip -> src/ui/Tip.tsx\n');
@@ -92,14 +90,11 @@ describe('handleComponentMap', () => {
   });
 
   it('reports a stale override (target gone from disk) and degrades instead of a phantom import', async () => {
-    // Row points at a file that neither the scan parsed nor exists on disk — a recorded mapping whose
-    // file was deleted/renamed. Honouring it would import a dead module, so it degrades (here to
-    // unmapped) and surfaces the dead row for cleanup.
     await mkdir(join(dir, 'docs'), { recursive: true });
     await writeFile(join(dir, 'docs', 'figma-component-map.md'), 'Tooltip -> src/ui/Gone.tsx\n');
     const result = await handleComponentMap(dispatch, { rootDir: dir });
     const tooltip = result.mappings.find(m => m.figmaComponentName === 'Tooltip');
-    // Degraded to the fuzzy scan, never the dead target — and the row is reported for cleanup.
+
     expect(tooltip?.source).toBe('scan');
     expect(tooltip?.candidate?.filePath).not.toBe('src/ui/Gone.tsx');
     expect(tooltip?.staleOverride).toEqual({ name: 'Gone', filePath: 'src/ui/Gone.tsx' });
@@ -109,10 +104,6 @@ describe('handleComponentMap', () => {
   });
 
   it('groups variant instances by their component set, not the variant name', async () => {
-    // Figma resolves a variant instance's mainComponent to the variant ("Size=Large, State=Hover"),
-    // whose name fuzzy-matches nothing. get_design_context now carries the owning set on the
-    // mainComponent (componentSetName), so the usage is named "btn/Default" — which is also what the
-    // override file keys on — with no doc-wide get_local_components scan.
     const variantContext: GetDesignContextResult = {
       nodes: [
         {
@@ -163,16 +154,15 @@ describe('handleComponentMap', () => {
     );
     const result = await handleComponentMap(variantDispatch, { rootDir: dir });
 
-    // Two variant instances collapse into ONE usage named after the set, not two variant rows.
     const btn = result.mappings.filter(m => m.figmaComponentName === 'btn/Default');
     expect(btn).toHaveLength(1);
     expect(btn[0]?.instanceCount).toBe(2);
-    // Each instance carries its own resolved component-property values for codegen to wire.
+
     expect(btn[0]?.instances).toEqual([
       { nodeId: '1:1', props: { Size: 'Large' } },
       { nodeId: '1:2', props: { Size: 'Small' } },
     ]);
-    // The override keyed on the set name now fires.
+
     expect(btn[0]?.source).toBe('map-file');
     expect(btn[0]?.candidate?.name).toBe('Button');
   });

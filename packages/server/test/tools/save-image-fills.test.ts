@@ -16,7 +16,6 @@ import { toToolDefinition } from '../tool-schema.js';
 
 const saveImageFillsToolDefinition = toToolDefinition(saveImageFillsTool);
 
-// Minimal magic-byte payloads, base64-encoded the way the plugin ships them over the wire.
 const b64 = (bytes: number[]): string => Buffer.from(bytes).toString('base64');
 const PNG_B64 = b64([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 const JPG_B64 = b64([0xff, 0xd8, 0xff, 0xe0, 0x00]);
@@ -177,10 +176,10 @@ describe('handleSaveImageFills', () => {
       } satisfies ImageFillsResult;
     };
 
-    const result = (await handleSaveImageFills(dispatch, {
+    const result = await handleSaveImageFills(dispatch, {
       nodeIds: ['1:1'],
       outDir: dir,
-    })) as SaveImageFillsResult;
+    });
 
     expect(dispatched).toEqual({
       tool: 'save_image_fills',
@@ -203,12 +202,11 @@ describe('handleSaveImageFills', () => {
         nodes: [{ nodeId: '1:1', images: [{ index: 0, imageHash: 'h', base64: null, bytes }] }],
       }) satisfies ImageFillsResult;
 
-    const result = (await handleSaveImageFills(dispatch, {
+    const result = await handleSaveImageFills(dispatch, {
       nodeIds: ['1:1'],
       outDir: dir,
-    })) as SaveImageFillsResult;
+    });
 
-    // Format detection reads magic bytes, so it has to work off the binary payload too.
     expect(result.nodes[0]?.images[0]).toEqual({
       index: 0,
       imageHash: 'h',

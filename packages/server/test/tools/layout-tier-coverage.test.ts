@@ -1,19 +1,6 @@
 import { DesignContextNodeSchema, LAYOUT_TIER_FIELDS } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-// The drift ratchet for the LAYOUT downgrade tier.
-//
-// `LAYOUT_TIER_FIELDS` is a hand-copied field list, and this repo's most recurring bug class is
-// exactly that: a new dimension lands in the serializer, and a hand-copied projection silently stops
-// carrying it. For the layout tier the failure is invisible in the worst way — the payload still
-// looks complete, it just quietly loses the flex/grid/padding/gap of one dimension, and the caller
-// goes back to reconstructing spacing from coordinates (issue #161).
-//
-// So: every field DesignContextNodeSchema defines must be classified exactly once — carried by the
-// tier, part of the compact base it builds on, or explicitly listed below as appearance. A new
-// schema field fails this test until someone decides which side it is on.
-
-/** Identity/geometry/structural flags the compact base already emits (see projectToCompact). */
 const COMPACT_BASE = [
   'id',
   'name',
@@ -29,10 +16,6 @@ const COMPACT_BASE = [
   'children',
 ] as const;
 
-/**
- * Fields the tier deliberately drops: appearance, typography and token bindings — the expensive
- * half a caller re-grounds per section. Each carries the reason it is not structure.
- */
 const APPEARANCE: Record<string, string> = {
   rotation: 'transform, not flow',
   opacity: 'appearance',
@@ -104,8 +87,6 @@ describe('LAYOUT tier coverage', () => {
     }
     expect(dupes).toEqual([]);
 
-    // Guidance rides inside the compared value so it shows up in the CI failure output — oxlint's
-    // valid-expect forbids expect()'s second message argument.
     const problems: string[] = [];
     const unclassified = schemaFields.filter(f => !classified.has(f));
     if (unclassified.length > 0) {
@@ -116,7 +97,7 @@ describe('LAYOUT tier coverage', () => {
           'if it is colour / typography / effects / tokens.',
       );
     }
-    // A stale entry hides a rename: the tier would silently stop carrying the renamed field.
+
     const stale = [...classified.keys()].filter(f => !schemaFields.includes(f));
     if (stale.length > 0) {
       problems.push(
@@ -128,8 +109,6 @@ describe('LAYOUT tier coverage', () => {
   });
 
   it('carries the fields the reported bug is about', () => {
-    // Named explicitly so a future refactor cannot quietly drop the ones that decide whether a
-    // caller emits a container with gap/padding or per-child margins.
     for (const f of ['layout', 'layoutSizingHorizontal', 'layoutSizingVertical', 'constraints']) {
       expect(LAYOUT_TIER_FIELDS as readonly string[]).toContain(f);
     }

@@ -1,9 +1,12 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 
-import { SAVE_IMAGE_FILLS_TOOL_NAME, saveImageFillsParams } from '@figma-forge/core';
 import {
-  type ImageFillsResult,
+  ImageFillsResultSchema,
+  SAVE_IMAGE_FILLS_TOOL_NAME,
+  saveImageFillsParams,
+} from '@figma-forge/core';
+import {
   type NodeImageFills,
   type SaveImageFillsResult,
   type SavedImageFill,
@@ -12,11 +15,6 @@ import {
 
 import { binaryPayload } from './binary-payload.js';
 
-/**
- * Sniff the container from the leading magic bytes so the file lands with the right extension. Only
- * the formats Figma stores as image fills are recognized; anything else is written verbatim as
- * `.bin` (lossless — the bytes are preserved, only the label is generic).
- */
 export const detectImageFormat = (bytes: Buffer): { format: string; ext: string } => {
   if (
     bytes.length >= 4 &&
@@ -45,10 +43,8 @@ export const detectImageFormat = (bytes: Buffer): { format: string; ext: string 
   return { format: 'BIN', ext: 'bin' };
 };
 
-/** Map a Figma image hash to a filesystem-safe basename, blocking path traversal. */
 const sanitize = (hash: string): string => hash.replace(/[^\w.-]/g, '-');
 
-/** Carry the identifying/display fields through from the plugin result to the write result. */
 const carry = (img: NodeImageFills['images'][number]): Omit<SavedImageFill, 'format' | 'path'> => ({
   index: img.index,
   imageHash: img.imageHash,
@@ -57,12 +53,6 @@ const carry = (img: NodeImageFills['images'][number]): Omit<SavedImageFill, 'for
   ...(img.scaleMode !== undefined ? { scaleMode: img.scaleMode } : {}),
 });
 
-/**
- * Land the original image-fill bytes as files under outDir (created if missing). Files are named by
- * imageHash so an asset reused across many nodes is written exactly once; every usage still gets
- * its own result entry pointing at the shared path. Pure-fs and dispatch-free so it can be
- * unit-tested against a temp directory.
- */
 export const writeImageFills = async (
   outDir: string,
   nodes: readonly NodeImageFills[],
@@ -70,8 +60,6 @@ export const writeImageFills = async (
   const dir = resolve(outDir);
   await mkdir(dir, { recursive: true });
 
-  // Dedup writes by path: a hash reused across nodes maps to one file written once. Build the whole
-  // result (and the unique write set) first, then flush the files in parallel — no await in a loop.
   const toWrite = new Map<string, Buffer>();
   const outNodes: SavedNodeImageFills[] = nodes.map(node => {
     const images: SavedImageFill[] = node.images.map(img => {
@@ -91,19 +79,16 @@ export const writeImageFills = async (
 
 export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknown>;
 
-/**
- * Reuses the plugin-side save_image_fills handler to fetch the original fill bytes, then lands them
- * on the server filesystem.
- */
 export const handleSaveImageFills = async (
   dispatch: ToolDispatcher,
   rawArgs: unknown,
 ): Promise<SaveImageFillsResult> => {
   const args = saveImageFillsParams.parse(rawArgs);
-  const { nodes } = (await dispatch(SAVE_IMAGE_FILLS_TOOL_NAME, {
-    // These bytes go to disk, never to a model, so they ride the wire as a msgpack `bin`.
-    binary: true,
-    nodeIds: args.nodeIds,
-  })) as ImageFillsResult;
+  const { nodes } = ImageFillsResultSchema.parse(
+    await dispatch(SAVE_IMAGE_FILLS_TOOL_NAME, {
+      binary: true,
+      nodeIds: args.nodeIds,
+    }),
+  );
   return writeImageFills(args.outDir, nodes);
 };

@@ -24,7 +24,6 @@ describe('normalizeNodeId', () => {
   });
 
   it('round-trips an instance id (I-prefix, ; segments) from its dash URL form', () => {
-    // URL replaces ':' with '-' but keeps ';' and the 'I' prefix → blanket dash→colon reverses it
     expect(normalizeNodeId('I17248-32218;19656-154511')).toBe('I17248:32218;19656:154511');
   });
 
@@ -62,8 +61,6 @@ describe('normalizeIdArgs', () => {
   });
 
   it('normalizes every canvas-id field a tool exposes, not just nodeId/parentId', () => {
-    // Each of these is a real tool arg (swap_component.instanceId, create_instance.componentId,
-    // search_nodes.root, navigate_to_page.pageId, …) where a pasted URL / dash id must also work.
     expect(
       normalizeIdArgs({
         instanceId: '1-2',
@@ -90,7 +87,7 @@ describe('normalizeIdArgs', () => {
       componentKey: 'a1b2c3d4',
       propertyId: 'Show Icon#12:5',
     };
-    expect(normalizeIdArgs(args)).toBe(args); // untouched, same reference
+    expect(normalizeIdArgs(args)).toBe(args);
   });
 
   it('returns the same reference when nothing changes (no needless clone)', () => {
@@ -104,20 +101,15 @@ describe('normalizeIdArgs', () => {
   });
 
   it('covers every top-level canvas-id arg any advertised tool exposes', () => {
-    // normalizeIdArgs rewrites pasted Figma URLs / dash ids only for the fields in
-    // STRING_ID_FIELDS (+ the nodeIds array). A new tool introducing e.g. `targetId` without
-    // listing it would silently skip normalization — so every *Id-shaped top-level field must be
-    // classified: either a canvas node id (listed in STRING_ID_FIELDS) or a non-canvas id
-    // namespace (allowlisted below, never URL-pasteable). Nested ids stay out of scope by design.
     const NON_CANVAS_ID_FIELDS = new Set([
-      'styleId', // shared-style ids (S:…)
-      'variableId', // variable ids (VariableID:…)
-      'collectionId', // variable-collection ids
-      'propertyId', // component-property handles (name#id)
-      'modeId', // variable-mode ids
-      'animationStyleId', // Motion applied-style instance ids
-      'timelineId', // Motion timeline ids
-      'sessionId', // relay plugin-session ids (id-…), a server-side handle, never on the canvas
+      'styleId',
+      'variableId',
+      'collectionId',
+      'propertyId',
+      'modeId',
+      'animationStyleId',
+      'timelineId',
+      'sessionId',
     ]);
     const covered = new Set<string>([...STRING_ID_FIELDS, 'nodeIds']);
     const offenders: string[] = [];

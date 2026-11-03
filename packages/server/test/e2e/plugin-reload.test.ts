@@ -12,12 +12,6 @@ import {
   stopLeader,
 } from './_helpers.js';
 
-// A plugin reload — the user closing and reopening the panel, or Figma reloading a development build
-// — ends one plugin run and starts another under a new session id, in the same file. An agent that
-// has claimed that file must reach the new run on its very next call. Measured before the fix: the
-// call was held for the old session's reconnect grace window, which no reload ever ends, and failed
-// after 35s while the reloaded plugin had been connected for 15.
-
 const harnesses: LeaderHarness[] = [];
 const sockets: WebSocket[] = [];
 
@@ -55,7 +49,6 @@ describe('e2e: a claimed file across a plugin reload', () => {
     sockets.push(before);
     setFileTarget({ sessionId: 'run-1', fileName: 'Demo' });
 
-    // What Figma's unloading page sends, measured on every reload observed.
     await closed(before, 1001);
     sockets.push(await plugin(h.port, 'run-2', 'Demo'));
 
@@ -74,7 +67,7 @@ describe('e2e: a claimed file across a plugin reload', () => {
     sockets.push(before);
     setFileTarget({ sessionId: 'run-1', fileName: 'Demo' });
     await closed(before, 1001);
-    // Two other files that share the claimed name: the name alone cannot pick one.
+
     sockets.push(await plugin(h.port, 'other-a', 'Demo'));
     sockets.push(await plugin(h.port, 'other-b', 'Demo'));
 

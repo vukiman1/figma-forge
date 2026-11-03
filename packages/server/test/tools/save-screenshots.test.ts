@@ -3,11 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { SAVE_SCREENSHOTS_TOOL_NAME, saveScreenshotsTool } from '@figma-forge/core';
-import type {
-  GetScreenshotResult,
-  SaveScreenshotsResult,
-  ScreenshotImage,
-} from '@figma-forge/core';
+import type { GetScreenshotResult, ScreenshotImage } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -43,7 +39,7 @@ describe('save_screenshots — definition', () => {
         nodeIds: { type: 'array', items: { type: 'string' } },
         outDir: { type: 'string' },
         format: { type: 'string', enum: ['PNG', 'JPG', 'SVG'] },
-        // .positive() — the plugin rejects scale <= 0, so the advertised schema must too
+
         scale: { type: 'number', exclusiveMinimum: 0 },
       },
     });
@@ -97,13 +93,11 @@ describe('handleSaveScreenshots', () => {
       } satisfies GetScreenshotResult;
     };
 
-    const result = (await handleSaveScreenshots(dispatch, {
+    const result = await handleSaveScreenshots(dispatch, {
       nodeIds: ['1:1'],
       outDir: dir,
-    })) as SaveScreenshotsResult;
+    });
 
-    // scale:1 is always forwarded explicitly — an omitted scale would make get_screenshot auto-fit
-    // the raster for model consumption, but files on disk are user artifacts and stay full-res.
     expect(dispatched).toEqual({
       tool: 'get_screenshot',
       args: { binary: true, nodeIds: ['1:1'], scale: 1 },
@@ -120,10 +114,10 @@ describe('handleSaveScreenshots', () => {
         images: [{ nodeId: '1:1', format: 'PNG', base64: null, bytes }],
       }) satisfies GetScreenshotResult;
 
-    const result = (await handleSaveScreenshots(dispatch, {
+    const result = await handleSaveScreenshots(dispatch, {
       nodeIds: ['1:1'],
       outDir: dir,
-    })) as SaveScreenshotsResult;
+    });
 
     expect(result.saved[0]).toEqual({ nodeId: '1:1', format: 'PNG', path: join(dir, '1-1.png') });
     expect(new Uint8Array(await readFile(join(dir, '1-1.png')))).toEqual(bytes);
