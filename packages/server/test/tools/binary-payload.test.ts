@@ -23,7 +23,6 @@ describe('binaryPayload', () => {
   });
 
   it('keeps zero-length bytes distinct from nothing exported', () => {
-    // A blank-but-real export (an empty frame) must still land a file rather than a null path.
     const empty = binaryPayload({ base64: null, bytes: new Uint8Array(0) });
     expect(empty).not.toBeNull();
     expect(empty?.byteLength).toBe(0);

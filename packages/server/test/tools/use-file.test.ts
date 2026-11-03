@@ -32,12 +32,6 @@ afterEach(() => {
 
 describe('handleUseFile', () => {
   it('claims a file the relay has no name for yet', async () => {
-    // The bug this exists for, caught live. `$activity` is gated on tab visibility, so a session
-    // reports its file only after its own tab has been in front and the user has touched something.
-    // A session that just connected has reported nothing — and every leader handover and server
-    // restart reconnects every plugin, so this is the state right after a restart, not a rarity.
-    // Matching against the relay's cache there answers "no connected file named X" for a file that
-    // is plainly open. Only the plugins themselves know.
     const sessions = [session('s-1', null), session('s-2', null)];
     const result = await handleUseFile(
       { fileName: 'Marketing' },
@@ -49,8 +43,6 @@ describe('handleUseFile', () => {
   });
 
   it('records the real file name when claiming by session id', async () => {
-    // The name is the recovery handle, so a claim that stored null would not survive a panel
-    // reopen — the id changes and nothing is left to match on.
     const result = await handleUseFile(
       { sessionId: 's-2' },
       async () => [session('s-1', null), session('s-2', null)],
@@ -79,7 +71,6 @@ describe('handleUseFile', () => {
   });
 
   it('leaves the previous claim in place when a new one is refused', async () => {
-    // A failed re-claim must not silently drop the working one and fall back to the foreground.
     const sessions = [session('s-1', 'Brand'), session('s-2', 'Marketing')];
     const dispatch = plugins({ 's-1': 'Brand', 's-2': 'Marketing' });
     await handleUseFile({ fileName: 'Marketing' }, async () => sessions, dispatch);

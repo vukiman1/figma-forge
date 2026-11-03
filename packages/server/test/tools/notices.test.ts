@@ -6,7 +6,6 @@ import { captureNotices, reportSkew, withSkewNotice } from '../../src/tools/noti
 const result = (text: string): CallToolResult => ({ content: [{ type: 'text', text }] });
 const NOTICE = 'Figma Forge plugin v0.3.0 is older than this server (v0.4.0).';
 
-/** A content block's text, or '' — the union also covers image/audio/resource blocks. */
 const textOf = (from: CallToolResult, index: number): string => {
   const block = from.content[index];
   return block !== undefined && block.type === 'text' ? block.text : '';
@@ -26,9 +25,6 @@ describe('captureNotices', () => {
   });
 
   it('carries the warning on the very first call, not from the call before', async () => {
-    // The predecessor to this was a module-level "last notice seen", which had nothing recorded
-    // when the first call ran — so the first tool call after the server started shipped unwarned.
-    // That is the call most likely to be a write, and the one an agent is most likely to trust.
     let first: string | null = 'unset';
     await captureNotices(
       async () => {
@@ -53,7 +49,6 @@ describe('captureNotices', () => {
       r => r,
     );
 
-    // The plugin was updated between calls; this one must come back clean.
     let second: string | null = 'unset';
     await captureNotices(
       async () => result('{}'),
@@ -67,8 +62,6 @@ describe('captureNotices', () => {
   });
 
   it('keeps the warning when a call reaches several plugins and any one is old', async () => {
-    // ping and the map tools dispatch more than once; if any plugin involved is out of date the
-    // result as a whole is unverified, so a later clean report must not clear an earlier warning.
     let notice: string | null = 'unset';
     await captureNotices(
       async () => {
@@ -86,10 +79,6 @@ describe('captureNotices', () => {
   });
 
   it('attaches the warning to a failure, where it explains the failure', async () => {
-    // The loudest thing an out-of-date plugin does is answer METHOD_NOT_FOUND for a tool it
-    // predates — nine of them for the last shipped build. Unattributed, an agent reads that as
-    // "this tool is broken" and looks for another way round, which is the same misdirection as a
-    // silent wrong write.
     await expect(
       captureNotices(
         async () => {
@@ -112,7 +101,6 @@ describe('captureNotices', () => {
   });
 
   it('ignores a report made outside any call', () => {
-    // Election probes and the leader's own RPC endpoint dispatch with no tool call to attribute to.
     expect(() => reportSkew(NOTICE)).not.toThrow();
   });
 });
@@ -127,9 +115,6 @@ describe('withSkewNotice', () => {
   });
 
   it('separates the warning from the payload it warns about', () => {
-    // Clients concatenate content blocks. Appended bare, the sentence runs straight on from the
-    // result's closing brace and reads as part of the payload — seen against a real client, which
-    // is why the separation is asserted rather than left to look right.
     const out = withSkewNotice(result('{"ok":true}'), NOTICE);
     const appended = textOf(out, 1);
 
@@ -138,17 +123,11 @@ describe('withSkewNotice', () => {
   });
 
   it('warns regardless of how the tool is labelled, since a notice means it dispatched', () => {
-    // The spec's `kind` used to gate this, which was wrong: `local` marks a tool whose handler runs
-    // on the server, not one that never talks to Figma, and eight of the ten dispatch —
-    // component_map, token_map, icon_map, design_diff, the exports. Those are the grounding tools,
-    // so the label was hiding the warning on the results most likely to be built on.
     expect(withSkewNotice(result('{"ok":true}'), NOTICE).content).toHaveLength(2);
     expect(withSkewNotice(result('{"components":[]}'), NOTICE).content).toHaveLength(2);
   });
 
   it('leaves a result alone when nothing dispatched', () => {
-    // A filesystem-only tool never sets a notice, so it stays silent for the reason that holds —
-    // nothing was asked of the plugin — rather than because of what it is called.
     const untouched = result('{"framework":"vue"}');
     expect(withSkewNotice(untouched, null)).toBe(untouched);
   });

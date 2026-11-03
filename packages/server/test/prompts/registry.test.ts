@@ -23,14 +23,12 @@ describe('prompts registry', () => {
   it('builds the workflow against the current selection when no nodeId is given', () => {
     const text = textOf(FIGMA_TO_CODE_PROMPT_NAME);
     expect(text).toContain('current Figma selection');
-    // names the three grounded tools and the core reuse rule
+
     expect(text).toContain('get_design_context');
     expect(text).toContain('component_map');
     expect(text).toContain('token_map');
     expect(text).toContain('unmatchedProps');
-    // The static tree's motion summary is not evidence of no animation (dedupe drops instance
-    // children), so the inventory has to be taught, not merely allowed — with the measured rule a
-    // CSS port gets wrong by default.
+
     expect(text).toContain('get_motion_context');
     expect(text).toContain('easing shapes the segment arriving at it');
   });
@@ -48,7 +46,7 @@ describe('prompts registry', () => {
     expect(def?.arguments).toEqual([]);
 
     const text = textOf(CODE_TO_FIGMA_PROMPT_NAME);
-    // names the discovery + write tools and the colour-binding gotcha (paint, not node)
+
     expect(text).toContain('get_variable_defs');
     expect(text).toContain('create_instance');
     expect(text).toContain('bind_variable_to_paint');

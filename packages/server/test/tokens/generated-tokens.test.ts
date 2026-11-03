@@ -12,7 +12,7 @@ import {
 describe('detectTokenBuildTool', () => {
   it('recognises the pipelines that generate design tokens into a file', () => {
     expect(detectTokenBuildTool({ 'style-dictionary': '^5.5.1' })).toBe('Style Dictionary');
-    // The Figma Tokens Studio → Style Dictionary bridge, squarely this server's audience.
+
     expect(detectTokenBuildTool({ '@tokens-studio/sd-transforms': '^1' })).toBe(
       'Tokens Studio + Style Dictionary',
     );
@@ -34,9 +34,6 @@ describe('findGeneratedStylesheets', () => {
   });
 
   it('never reaches a root-level node_modules', async () => {
-    // The load-bearing property: this crawls `<root>/build|dist|out`, never `<root>` itself, so the
-    // dependency tree is not on any path it can take. A change that walked the root instead would
-    // put a five-figure file count on a request path.
     const dir = await mkdtemp(join(tmpdir(), 'gen-nm-'));
     try {
       await mkdir(join(dir, 'node_modules', 'pkg'), { recursive: true });
@@ -62,8 +59,6 @@ describe('findGeneratedStylesheets', () => {
   });
 
   it('caps how many it names, shortest path first', async () => {
-    // The caller picks one, so an exhaustive list helps nobody — and the shallowest paths are the
-    // likeliest entry points rather than a chunk of a bundle.
     const dir = await mkdtemp(join(tmpdir(), 'gen-cap-'));
     try {
       await mkdir(join(dir, 'build', 'nested', 'deeper'), { recursive: true });
@@ -84,15 +79,8 @@ describe('findGeneratedStylesheets', () => {
     'names the same stylesheets on every run over a dist/ above the crawl cap',
     { timeout: 30_000 },
     async () => {
-      // CRAWL_CAP is 400. Locks the property the doc claims, rather than reproducing a failure: the
-      // old truncation was a race by construction, but it never actually returned two answers here
-      // (see the note on findGeneratedStylesheets for why), so this is a guard against a future
-      // regression, not a red test that went green.
       const dir = await mkdtemp(join(tmpdir(), 'gen-race-'));
       try {
-        // One short-named winner per directory, buried under long-named chunks: the eight names this
-        // returns therefore have to come from eight *different* directories, which an arbitrary
-        // truncation across forty of them will not reliably reach.
         await Promise.all(
           Array.from({ length: 40 }, async (_unused, d) => {
             const sub = join(dir, 'dist', `g${String(d).padStart(2, '0')}`);

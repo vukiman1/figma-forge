@@ -16,7 +16,7 @@ const makeNode = (overrides: Partial<Node> & { role?: NodeRole }): Node =>
     isConflicted: () => false,
     port: 3055,
     conflictMessage: portConflictMessage(3055),
-    // dispatch subscribes to role changes so a conflict declared mid-call can cut it short.
+
     onRoleChange: () => () => {},
     ...overrides,
   }) as unknown as Node;
@@ -99,8 +99,7 @@ describe('ping tool', () => {
     expect(result.hop).toBe('server-only');
     expect(result.plugin).toBeNull();
     expect(result.server.role).toBe(NodeRole.Conflicted);
-    // Reports the election's diagnosis verbatim, pid included — `ping` is where a user looks when
-    // nothing works, so it must name the process to kill rather than restate the symptom.
+
     expect(result.server.portConflict).toMatch(/pid 4242/);
     expect(result.server.portConflict).toMatch(/kill 4242/);
   });
@@ -145,7 +144,7 @@ describe('ping tool', () => {
     expect(result.sessions?.routedSessionId).toBe('sess-b');
     expect(result.sessions?.routedFileName).toBe('Design B');
     expect(result.sessions?.routedPageName).toBe('Cover');
-    // All sessions sorted newest-active first.
+
     expect(result.sessions?.all.map(s => s.id)).toEqual(['sess-b', 'sess-a']);
   });
 
@@ -184,7 +183,6 @@ describe('ping tool', () => {
       getLeader: () => null,
     });
     const follower = makeFollower({
-      // stale older leader still owns the plugin
       leaderInfo: async () => ({ serverVersion: '0.1.0', buildId: 100 }),
       sendRpc: async () => ({
         kind: 'ok' as const,
@@ -203,8 +201,7 @@ describe('ping tool', () => {
     expect(result.server.version).toBe('0.2.0');
     expect(result.server.leaderVersion).toBe('0.1.0');
     expect(result.server.versionSkew).toMatch(/leader is v0\.1\.0.*v0\.2\.0/);
-    // An older version implies an older build, so both warnings fire; buildSkew explains the
-    // auto-heal (abdication) and the manual fallback.
+
     expect(result.server.leaderBuildId).toBe(100);
     expect(result.server.buildSkew).toMatch(/older build/);
   });
@@ -216,7 +213,6 @@ describe('ping tool', () => {
       getLeader: () => null,
     });
     const follower = makeFollower({
-      // Same released version, older local build — the dev-iteration zombie ping must expose.
       leaderInfo: async () => ({ serverVersion: '0.2.0', buildId: 100 }),
       sendRpc: async () => ({
         kind: 'ok' as const,

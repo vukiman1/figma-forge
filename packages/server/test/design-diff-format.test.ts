@@ -8,14 +8,6 @@ import { z } from 'zod';
 
 import { SNAPSHOT_FORMAT_VERSION } from '../src/tools/design-diff.handler.js';
 
-// design_diff compares a saved get_design_context against a fresh one field by field, so a field
-// the baseline predates reads as "changed" on every node that has it — a design edit nobody made,
-// and an agent told to update the code for it. The format version is what prevents that: a baseline
-// of another version is re-captured instead of diffed. Nothing tied it to the shape it versions, and
-// eight fields went in after v2 without a bump. This records the shape next to the version, so a
-// change to either is a visible decision: bump the version (a field a baseline could lack), or —
-// only when the change can never show up as a diff — re-record as is.
-
 const RECORD_PATH = join(dirname(fileURLToPath(import.meta.url)), 'design-diff-format.json');
 const RERECORD = 'UPDATE_DESIGN_DIFF_FORMAT=1 pnpm test design-diff-format && pnpm format';
 
@@ -30,13 +22,6 @@ interface JsonNode {
   allOf?: JsonNode[];
 }
 
-/**
- * Every property path of a result schema, each shared definition walked once. A definition is
- * labelled by the path it is first reached at (`nodes[]`), never by its key in `$defs`: that key is
- * Zod's internal name (`__schema0`), and a Zod release that renamed it would otherwise report every
- * node field as changed — and the report would advise a version bump that throws away every user's
- * baseline for a shape that did not move.
- */
 const fieldsOf = (json: JsonNode): string[] => {
   const defs = json.$defs ?? {};
   const fields = new Set<string>();
@@ -89,14 +74,12 @@ if (!existsSync(RECORD_PATH)) {
 const recorded = JSON.parse(readFileSync(RECORD_PATH, 'utf8')) as Recorded;
 
 it('walks the real result shape', () => {
-  // A walk that silently found nothing would pass forever; these are long-standing fields.
   expect(current.fields).toEqual(
     expect.arrayContaining(['nodes', 'globalVars', 'nodes[].id', 'nodes[].children']),
   );
 });
 
 it("does not depend on Zod's names for its definitions", () => {
-  // Rename every definition the way a Zod release might, and point every $ref at the new name.
   const json = resultSchema();
   const renamed = JSON.parse(
     JSON.stringify(json).replaceAll(

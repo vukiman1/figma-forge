@@ -8,10 +8,6 @@ import type { ScannedComponent } from '../scan/scanned-component.js';
 export interface ScanComponentsResult {
   components: ScannedComponent[];
   profile: ProjectProfile;
-  /**
-   * Present only when the walk's file cap was reached: says the result covers a subset of the repo,
-   * so an absent match reads as "not in the part that was read" rather than "not in the project".
-   */
   truncationNote?: string;
 }
 

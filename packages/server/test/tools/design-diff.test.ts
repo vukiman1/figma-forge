@@ -37,12 +37,9 @@ describe('handleDesignDiff', () => {
   let dir: string;
   let currentCtx: GetDesignContextResult;
 
-  // dispatch stub: design_diff's only round-trip is get_design_context; return the mutable currentCtx.
   const dispatch: ToolDispatcher = async (tool, args) => {
     if (tool !== GET_DESIGN_CONTEXT_TOOL_NAME) throw new Error(`unexpected dispatch: ${tool}`);
-    // The tool must always ask for full detail + dedupe (the codegen-equivalent baseline view) and
-    // must NOT arm the public-path budget guard: a snapshot needs the raw tree, never a section
-    // plan, no matter how large the node is.
+
     expect(args).toMatchObject({ detail: 'full', dedupeComponents: true });
     expect(args).not.toHaveProperty('budget');
     return currentCtx;
@@ -63,11 +60,12 @@ describe('handleDesignDiff', () => {
     expect(r.snapshotPath).toBe(SNAP_REL);
     expect(r.summary).toBeUndefined();
 
-    // The file exists, is format-tagged, and stores the raw context.
-    const saved = JSON.parse(await readFile(join(dir, SNAP_REL), 'utf8'));
-    expect(saved.figmaForgeSnapshot).toBe(SNAPSHOT_FORMAT_VERSION);
-    expect(saved.nodeId).toBe('1:1');
-    expect(saved.context.nodes[0].id).toBe('1:1');
+    const saved: unknown = JSON.parse(await readFile(join(dir, SNAP_REL), 'utf8'));
+    expect(saved).toMatchObject({
+      figmaForgeSnapshot: SNAPSHOT_FORMAT_VERSION,
+      nodeId: '1:1',
+      context: { nodes: [{ id: '1:1' }] },
+    });
   });
 
   it('reports no-changes when the design is unchanged since the baseline', async () => {
@@ -80,7 +78,7 @@ describe('handleDesignDiff', () => {
 
   it('reports a real per-property change against the baseline', async () => {
     await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
-    // The title text changes.
+
     currentCtx = ctx();
     (currentCtx.nodes[0]!.children![0] as { characters: string }).characters = 'Updated';
     const r = await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
@@ -96,19 +94,17 @@ describe('handleDesignDiff', () => {
     currentCtx = ctx();
     (currentCtx.nodes[0]!.children![0] as { characters: string }).characters = 'Updated';
 
-    // Plain diff: baseline untouched, so a second plain diff still reports the same change.
     const plain = await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
     expect(plain.baselineUpdated).toBeUndefined();
     expect(plain.summary!.changed).toBe(1);
 
-    // update:true accepts the current design as the new baseline...
     const accepted = await handleDesignDiff(dispatch, {
       nodeId: '1:1',
       rootDir: dir,
       update: true,
     });
     expect(accepted.baselineUpdated).toBe(true);
-    // ...so the next diff (still the "Updated" design) is clean.
+
     const after = await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
     expect(after.status).toBe('no-changes');
   });
@@ -121,13 +117,13 @@ describe('handleDesignDiff', () => {
     );
     const r = await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
     expect(r.status).toBe('baseline-created');
-    const saved = JSON.parse(await readFile(join(dir, SNAP_REL), 'utf8'));
-    expect(saved.figmaForgeSnapshot).toBe(SNAPSHOT_FORMAT_VERSION); // rewritten to the current format
+    const saved: unknown = JSON.parse(await readFile(join(dir, SNAP_REL), 'utf8'));
+    expect(saved).toMatchObject({ figmaForgeSnapshot: SNAPSHOT_FORMAT_VERSION });
   });
 
   it('warns (but still diffs) when the baseline root looks like a different node', async () => {
     await handleDesignDiff(dispatch, { nodeId: '1:1', rootDir: dir });
-    // Same id, but the root was renamed/replaced (different name + type).
+
     currentCtx = ctx({
       nodes: [{ id: '1:1', name: 'Sidebar', type: 'COMPONENT', children: [] }],
     });

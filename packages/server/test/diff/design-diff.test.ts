@@ -3,8 +3,6 @@ import { describe, expect, it } from 'vitest';
 
 import { deepEqual, diffDesignContext } from '../../src/diff/design-diff.js';
 
-// A minimal but realistic get_design_context result: one root frame with two children, styles
-// deduped into globalVars, one bound variable. Overrides let each test mutate a slice.
 const ctx = (over: Partial<GetDesignContextResult> = {}): GetDesignContextResult => ({
   nodes: [
     {
@@ -44,7 +42,7 @@ describe('diffDesignContext', () => {
 
   it('resolves a globalVars fill ref so a fill change reads as the paint value, not the hash', () => {
     const after = ctx();
-    // Title now points at fill_B (red) instead of fill_A.
+
     (after.nodes[0]!.children![0] as { fill?: string }).fill = 'fill_B';
     const d = diffDesignContext(ctx(), after);
     expect(d.changed).toHaveLength(1);
@@ -52,7 +50,7 @@ describe('diffDesignContext', () => {
     expect(change.id).toBe('1:2');
     expect(change.path).toBe('Card / Title');
     const fill = change.fields!.find(f => f.field === 'fill')!;
-    // Resolved: before = the #111111 bundle, after = the #EE0000 bundle (not "fill_A" → "fill_B").
+
     expect(fill.before).toEqual([{ type: 'SOLID', color: '#111111' }]);
     expect(fill.after).toEqual([{ type: 'SOLID', color: '#EE0000' }]);
   });
@@ -111,7 +109,7 @@ describe('diffDesignContext', () => {
 
   it('classifies a removed node', () => {
     const after = ctx();
-    after.nodes[0]!.children = [after.nodes[0]!.children![0]!]; // drop Body
+    after.nodes[0]!.children = [after.nodes[0]!.children![0]!];
     const d = diffDesignContext(ctx(), after);
     expect(d.removed).toHaveLength(1);
     expect(d.removed[0]).toMatchObject({ id: '1:3', name: 'Body', kind: 'removed' });
@@ -119,7 +117,7 @@ describe('diffDesignContext', () => {
 
   it('reports a reparent as a `parent` field change (not add+remove)', () => {
     const before = ctx();
-    // Move Body (1:3) out to the root as a sibling of Card.
+
     const after = ctx();
     after.nodes[0]!.children = [after.nodes[0]!.children![0]!];
     after.nodes = [
@@ -142,13 +140,13 @@ describe('diffDesignContext', () => {
 
   it('reports a pure sibling reorder as an `order` change', () => {
     const after = ctx();
-    after.nodes[0]!.children = [after.nodes[0]!.children![1]!, after.nodes[0]!.children![0]!]; // swap
+    after.nodes[0]!.children = [after.nodes[0]!.children![1]!, after.nodes[0]!.children![0]!];
     const d = diffDesignContext(ctx(), after);
     const title = d.changed.find(c => c.id === '1:2')!;
     const order = title.fields!.find(f => f.field === 'order')!;
     expect(order.before).toBe(0);
     expect(order.after).toBe(1);
-    // A reorder must not also emit a `parent` change (same parent).
+
     expect(title.fields!.some(f => f.field === 'parent')).toBe(false);
   });
 });

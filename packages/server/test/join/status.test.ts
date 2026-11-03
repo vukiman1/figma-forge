@@ -12,13 +12,10 @@ describe('statusFor', () => {
   });
 
   it('lets a raised bar demote a match the absolute mark would call high', () => {
-    // The bug this encodes: `high`/`medium` mean "reuse this component" to codegen, so threshold is
-    // the reuse bar. A hardcoded top cut ignored a caller asking for something stricter than 0.85 —
-    // exactly the caller who has already been burned by a wrong reuse.
     expect(statusFor(0.889, 0.7)).toBe('high');
-    expect(statusFor(0.889, 0.9)).toBe('low'); // below the caller's bar → not reuse-grade
-    expect(statusFor(0.95, 0.9)).toBe('high'); // clears both → still reuse-grade
-    expect(statusFor(1, 1)).toBe('high'); // a bar of 1 still admits a perfect match
+    expect(statusFor(0.889, 0.9)).toBe('low');
+    expect(statusFor(0.95, 0.9)).toBe('high');
+    expect(statusFor(1, 1)).toBe('high');
   });
 
   it('is monotonic: raising the bar never promotes a mapping', () => {
@@ -34,9 +31,7 @@ describe('statusFor', () => {
   });
 
   it('does not let a lowered bar drag candidates below the reporting floor', () => {
-    // The floor is what's worth showing, not what counts as reliable: flooding codegen with
-    // sub-0.5 name guesses trades a silent wrong reuse for a noisy one.
     expect(statusFor(CANDIDATE_FLOOR - 0.01, 0)).toBe('unmapped');
-    expect(statusFor(CANDIDATE_FLOOR, 0)).toBe('medium'); // clears the bar, not the absolute mark
+    expect(statusFor(CANDIDATE_FLOOR, 0)).toBe('medium');
   });
 });

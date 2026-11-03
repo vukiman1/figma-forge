@@ -16,7 +16,6 @@ const node = (id: string, name: string): SerializedNode =>
     height: 1,
   }) as SerializedNode;
 
-/** Bytes the result occupies as the text block of a JSON-RPC line — what the client buffers. */
 const onWire = (result: unknown): number =>
   Buffer.byteLength(JSON.stringify(JSON.stringify(result)), 'utf8') - 2;
 
@@ -37,15 +36,13 @@ describe('fitNodeList', () => {
     expect(fitted.nodes).toEqual(nodes.slice(0, fitted.nodes.length));
     expect(fitted.note).toContain(`first ${fitted.nodes.length} of 50 matching nodes`);
     expect(fitted.note).toContain(HINT);
-    // As full as the budget allows: within it, and one more node would not be.
+
     expect(onWire(fitted)).toBeLessThanOrEqual(budget);
     const oneMore = { ...fitted, nodes: nodes.slice(0, fitted.nodes.length + 1) };
     expect(onWire(oneMore)).toBeGreaterThan(budget);
   });
 
   it('counts escaped and multi-byte text as the wire carries it', () => {
-    // Quotes and backslashes double when escaped into the text block; CJK is three bytes in UTF-8.
-    // Measuring characters instead would overshoot the budget on exactly these names.
     const nodes = Array.from({ length: 40 }, (_, i) => node(`1:${i}`, `按鈕 "主要" \\ ${i}`));
     const budget = Math.floor(onWire({ nodes }) * 0.6);
     const fitted = fitNodeList({ nodes }, HINT, budget);
@@ -84,7 +81,6 @@ describe('assertWithinLimit', () => {
   });
 
   it('counts the escaped size, not the character count', () => {
-    // 4,000 quotes are 4,000 characters but 8,000 bytes once escaped into the JSON-RPC line.
     const result = { content: [{ type: 'text' as const, text: '"'.repeat(4_000) }] };
     expect(() => assertWithinLimit('search_nodes', result, 6_000)).toThrow(/search_nodes/);
   });

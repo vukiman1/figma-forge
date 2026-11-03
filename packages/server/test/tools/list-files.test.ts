@@ -11,7 +11,6 @@ const session = (
   pageName: string | null = 'Page 1',
 ): PluginSessionInfo => ({ id, fileName, pageName, lastActivityAt: 1, pluginVersion: '0.5.0' });
 
-/** Answers each session with the file name it is keyed by; anything not listed throws. */
 const replying =
   (byId: Record<string, string>): SessionDispatch =>
   async (sessionId): Promise<ListFilesResult> => {
@@ -26,7 +25,6 @@ afterEach(() => {
 
 describe('handleListFiles', () => {
   it('asks every connected session, marking the routed one', async () => {
-    // Sessions arrive newest-activity-first, so the head is where an unbound call would land.
     const { files } = await handleListFiles(
       [session('s-1', 'Brand'), session('s-2', 'Marketing')],
       replying({ 's-1': 'Brand', 's-2': 'Marketing' }),
@@ -43,7 +41,7 @@ describe('handleListFiles', () => {
       [session('s-1', 'Brand'), session('s-2', 'Marketing')],
       replying({ 's-1': 'Brand', 's-2': 'Marketing' }),
     );
-    // Claimed and routed are different facts, and the whole feature is the case where they differ.
+
     expect(files.map(f => [f.sessionId, f.routed, f.bound])).toEqual([
       ['s-1', true, false],
       ['s-2', false, true],
@@ -51,8 +49,6 @@ describe('handleListFiles', () => {
   });
 
   it('fills in a name the server never learned by asking the plugin', async () => {
-    // A panel opened in a background tab has emitted no $activity, so the relay's cached name is
-    // null — and that is precisely the session a second agent is looking for.
     const { files } = await handleListFiles(
       [session('s-2', null, null)],
       replying({ 's-2': 'Hidden' }),
@@ -70,13 +66,12 @@ describe('handleListFiles', () => {
   });
 
   it('keeps listing the other files when one plugin does not answer', async () => {
-    // One wedged panel must not hide the file the agent is trying to find.
     const { files } = await handleListFiles(
       [session('s-1', 'Brand'), session('s-2', 'Marketing')],
       replying({ 's-1': 'Brand' }),
     );
     expect(files[0]).toMatchObject({ fileName: 'Brand' });
-    // Falls back to what the relay last heard, and says why it is second-hand.
+
     expect(files[1]).toMatchObject({ fileName: 'Marketing' });
     expect(files[1]?.error).toMatch(/timeout/);
   });

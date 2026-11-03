@@ -109,7 +109,7 @@ describe('M2 write tool definitions', () => {
         height: { type: 'number' },
       },
     });
-    // All inputs optional → Zod omits `required` entirely (vs an empty array).
+
     expect(createFrameToolDefinition.inputSchema.required).toBeUndefined();
   });
 
@@ -175,9 +175,7 @@ describe('M2 write tool definitions', () => {
       required: ['nodeId', 'layoutMode'],
       properties: {
         layoutMode: { enum: ['NONE', 'HORIZONTAL', 'VERTICAL', 'GRID'] },
-        // Pinned for the same reason as set_text_properties below: plugin-typings widened this
-        // union in 1.137.0 (SPACE_EVENLY / SPACE_AROUND), and nothing else in the suite would
-        // notice the list drifting from what Figma accepts.
+
         primaryAxisAlignItems: {
           enum: ['MIN', 'CENTER', 'MAX', 'SPACE_BETWEEN', 'SPACE_EVENLY', 'SPACE_AROUND'],
         },
@@ -223,9 +221,6 @@ describe('M2 write tool definitions', () => {
   });
 
   it('set_text_properties requires nodeId; truncation/maxLines/autoResize/paragraph/wrap optional', () => {
-    // The enums are pinned here on purpose: widening one to a bare string is invisible to the other
-    // gates — plugin-contract.json records argument *names*, and the wire test derives the advertised
-    // schema from this same spec, so both stay green while the model loses the value list.
     expect(setTextPropertiesToolDefinition.name).toBe(SET_TEXT_PROPERTIES_TOOL_NAME);
     expect(setTextPropertiesToolDefinition.inputSchema).toMatchObject({
       required: ['nodeId'],
@@ -249,7 +244,6 @@ describe('M2 write tool definitions', () => {
         codeSyntax: {
           type: 'object',
           properties: {
-            // string sets (non-empty), null removes — the set_text_properties partial idiom
             WEB: { anyOf: [{ type: 'string', minLength: 1 }, { type: 'null' }] },
             ANDROID: { anyOf: [{ type: 'string', minLength: 1 }, { type: 'null' }] },
             iOS: { anyOf: [{ type: 'string', minLength: 1 }, { type: 'null' }] },

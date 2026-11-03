@@ -61,8 +61,7 @@ describe('annotateProjectTokens', () => {
       globalVars: { styles: { abc: [{ type: 'SOLID', color: '#6266f0' }] } },
     });
     const r = annotateProjectTokens(payload, index, false);
-    // Keyed exactly as it appears in the payload (lowercase here), value ref is the CSS var
-    // off-Tailwind.
+
     expect(r.projectTokens).toEqual({
       '#6266f0': {
         ref: 'var(--color-primary-500)',
@@ -73,9 +72,6 @@ describe('annotateProjectTokens', () => {
   });
 
   it('carries the declaring file for a SCSS token, without which the ref cannot resolve', () => {
-    // This annotation is the surface a caller reads when the document has no bound variables to
-    // join — the commoner case — so leaving `from` off it hands codegen a ref it cannot make
-    // compile, which is exactly the failure the forward join already guards against.
     const index = buildTokenValueIndex([
       {
         name: 'color-primary-500',
@@ -178,11 +174,9 @@ describe('loadTokenValueIndex', () => {
     expect(first.utilityFirst).toBe(false);
     expect(first.index.get('#6266F0')?.[0]?.name).toBe('primary');
 
-    // Cached: same map instance while the file is untouched.
     const second = await loadTokenValueIndex(dir);
     expect(second.index).toBe(first.index);
 
-    // An edit (mtime bump) invalidates the cache and the new value shows up.
     await writeFile(css, ':root { --primary: #FF0000; }');
     await utimes(css, new Date(), new Date(Date.now() + 5000));
     const third = await loadTokenValueIndex(dir);
@@ -198,8 +192,6 @@ describe('loadTokenValueIndex', () => {
 });
 
 describe('annotateProjectTokens — themed stylesheets', () => {
-  // A light/dark stylesheet parsed for real. Every declared value now reaches the index, where the
-  // previous parser kept only whichever block came last — so a light-mode color had no entry at all.
   const themed = parseCssCustomProperties(`
     :root { --background: #FFFFFF; --foreground: #0A0A0A; --card: #FFFFFF; }
     .dark { --background: #0A0A0A; --foreground: #FAFAFA; --card: #171717; }
@@ -212,7 +204,7 @@ describe('annotateProjectTokens — themed stylesheets', () => {
       index,
       false,
     );
-    // #FFFFFF is --background and --card in light mode; both are surfaced, unranked, as candidates.
+
     expect(r.projectTokens).toEqual({
       '#FFFFFF': {
         matchedBy: ['value'],
@@ -225,11 +217,6 @@ describe('annotateProjectTokens — themed stylesheets', () => {
   });
 
   it('withholds an annotation the old parser answered confidently but wrongly', () => {
-    // #0A0A0A is --foreground in light mode AND --background in dark mode. Collapsing the repeated
-    // names hid the light declarations, leaving exactly one candidate — so the payload used to be
-    // annotated "#0A0A0A is --background", which inverts the color in light mode. Seeing all of them
-    // makes it correctly ambiguous, and an ambiguous color is left to the raw hex rather than bound
-    // to an arbitrary sibling.
     const index = buildTokenValueIndex(themed);
     expect(index.get('#0A0A0A')?.map(t => t.name)).toEqual(['foreground', 'background']);
     const r = annotateProjectTokens(

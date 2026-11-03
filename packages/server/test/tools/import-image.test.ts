@@ -14,7 +14,6 @@ import {
 import { WIRE_TOOL_SCHEMAS } from '../../src/tools/wire-schema.js';
 import { toToolDefinition } from '../tool-schema.js';
 
-// Smallest valid headers the signature check looks at, plus a few trailing bytes.
 const PNG = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x01]);
 const JPEG = Uint8Array.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);
 const GIF = Uint8Array.from([0x47, 0x49, 0x46, 0x38, 0x39, 0x61]);
@@ -28,7 +27,6 @@ const fileWith = async (name: string, bytes: Uint8Array | string): Promise<strin
   return path;
 };
 
-/** A sparse file: the header is real, `truncate` makes stat report `size` without writing it. */
 const sparseFileWith = async (name: string, header: Uint8Array, size: number): Promise<string> => {
   const dir = await mkdtemp(join(tmpdir(), 'import-image-'));
   dirs.push(dir);
@@ -179,20 +177,12 @@ describe('resolveBatchImagePaths', () => {
 
 describe('import_image — guards before the read', () => {
   it('refuses a file too large for one relay message, naming both sizes', async () => {
-    // 80MB of declared size: past the cap, and base64 of it past what the relay's WebSocket takes.
     const path = await sparseFileWith('huge.png', PNG, 80 * 1024 * 1024);
     await expect(resolveImagePath({ path })).rejects.toThrow(/80\.0MB, over the 72\.0MB/);
-    // The message has to name the file, the way the wrong-format one does.
+
     await expect(resolveImagePath({ path })).rejects.toThrow(path);
   });
 
-  // No "just under the cap" case on purpose: it would have to be read for real (a 71MB sparse file
-  // becomes 71MB of buffer and 95MB of base64), and the accepting path is already covered by the
-  // small-file cases above — the same code, without the memory.
-
-  // `path: ''` resolves to the working directory, and open()/stat() both succeed on a directory —
-  // only the read would object, with a bare EISDIR naming neither the path nor the problem. A batch
-  // op's params never pass the tool's own schema, so `min(1)` alone would not cover this.
   it('refuses a directory by name rather than failing as EISDIR', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'import-image-'));
     dirs.push(dir);
@@ -210,16 +200,14 @@ describe('import_image — guards before the read', () => {
 
 describe('importImageError', () => {
   const tooLarge = new Error('in createImage: Image is too large');
-  // Built from tmpdir rather than written as a POSIX literal: the message carries resolve(path), so
-  // on Windows a literal '/tmp/shot.png' comes back as 'D:\tmp\shot.png' and the assertion would be
-  // looking for the wrong separator — a difference no local run on macOS or Linux can show.
+
   const file = join(tmpdir(), 'shot.png');
 
   it("adds the file and Figma's ceiling to a size rejection", () => {
     const wrapped = importImageError(tooLarge, file) as Error;
     expect(wrapped.message).toContain(file);
     expect(wrapped.message).toMatch(/4096px/);
-    // Figma's own words stay in, so the cause is never replaced by our paraphrase.
+
     expect(wrapped.message).toMatch(/Image is too large/);
     expect(wrapped.cause).toBe(tooLarge);
   });

@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { EXPORT_VIDEO_TOOL_NAME, exportVideoTool } from '@figma-forge/core';
-import type { ExportVideoResult, VideoExport } from '@figma-forge/core';
+import type { VideoExport } from '@figma-forge/core';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -102,11 +102,11 @@ describe('handleExportVideo', () => {
       return { nodeId: '5:5', format: 'MP4', base64: 'AAAA' } satisfies VideoExport;
     };
 
-    const result = (await handleExportVideo(dispatch, {
+    const result = await handleExportVideo(dispatch, {
       nodeId: '5:5',
       format: 'MP4',
       outPath: path,
-    })) as ExportVideoResult;
+    });
 
     expect(dispatched).toEqual({
       tool: 'export_video',
@@ -123,11 +123,11 @@ describe('handleExportVideo', () => {
     const dispatch: ToolDispatcher = async () =>
       ({ nodeId: '5:5', format: 'MP4', base64: null, bytes }) satisfies VideoExport;
 
-    const result = (await handleExportVideo(dispatch, {
+    const result = await handleExportVideo(dispatch, {
       nodeId: '5:5',
       format: 'MP4',
       outPath: path,
-    })) as ExportVideoResult;
+    });
 
     expect(result).toEqual({ nodeId: '5:5', format: 'MP4', path });
     expect(new Uint8Array(await readFile(path))).toEqual(bytes);

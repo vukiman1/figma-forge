@@ -75,11 +75,11 @@ describe('e2e get_document', () => {
       }),
     );
 
-    const result = (await dispatchTool(
+    const result = await dispatchTool(
       { node: h.node, follower: h.follower },
       GET_DOCUMENT_TOOL_NAME,
       {},
-    )) as unknown;
+    );
 
     expect(GetDocumentResultSchema.parse(result)).toEqual(tree);
   });

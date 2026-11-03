@@ -1,6 +1,6 @@
 import {
   GET_DESIGN_CONTEXT_TOOL_NAME,
-  type GetDesignContextResult,
+  GetDesignContextResultSchema,
   iconMapParams,
 } from '@figma-forge/core';
 
@@ -15,33 +15,26 @@ const DEFAULT_THRESHOLD = 0.7;
 
 export interface IconMapResult {
   mappings: IconMapping[];
-  /**
-   * Figma icon names with no `.svg` match — export fresh (get_screenshot SVG) or use an icon
-   * library.
-   */
   unmapped: string[];
-  /**
-   * Icon component libraries detected in the project (lucide / heroicons / iconify …). The
-   * alternative route for unmapped icons: import from one of these instead of exporting. Empty when
-   * none installed, in which case unmapped icons fall back to a fresh get_screenshot SVG export.
-   */
   iconLibraries: string[];
   profile: ProjectProfile;
   svgFileCount: number;
-  /**
-   * Present only when the walk's file cap was reached: says the result covers a subset of the repo,
-   * so an absent match reads as "not in the part that was read" rather than "not in the project".
-   */
   truncationNote?: string;
 }
 
 export type ToolDispatcher = (toolName: string, args: unknown) => Promise<unknown>;
 
-/**
- * Orchestrate the icon join: pull the grounded Figma tree (reusing get_design_context — no
- * dedicated plugin handler), scan the repo's `.svg` files + detect icon libraries, and join.
- * Filesystem + dispatch live here; the matching itself is pure (join/icon-map.ts).
- */
+const loadDesignContext = async (
+  dispatch: ToolDispatcher,
+  nodeId: string | undefined,
+): Promise<ReturnType<typeof GetDesignContextResultSchema.parse>> => {
+  const contextArgs: Record<string, unknown> = { detail: 'full', dedupeComponents: true };
+  if (nodeId !== undefined) contextArgs.nodeId = nodeId;
+  return GetDesignContextResultSchema.parse(
+    await dispatch(GET_DESIGN_CONTEXT_TOOL_NAME, contextArgs),
+  );
+};
+
 export const handleIconMap = async (
   dispatch: ToolDispatcher,
   rawArgs: unknown,
@@ -50,11 +43,8 @@ export const handleIconMap = async (
   const rootDir = args.rootDir ?? process.cwd();
   const threshold = args.threshold ?? DEFAULT_THRESHOLD;
 
-  const contextArgs: Record<string, unknown> = { detail: 'full', dedupeComponents: true };
-  if (args.nodeId !== undefined) contextArgs.nodeId = args.nodeId;
-
   const [context, profile, svgs, deps] = await Promise.all([
-    dispatch(GET_DESIGN_CONTEXT_TOOL_NAME, contextArgs) as Promise<GetDesignContextResult>,
+    loadDesignContext(dispatch, args.nodeId),
     analyzeProject(rootDir),
     scanRepoSvgs(rootDir),
     readProjectDeps(rootDir),

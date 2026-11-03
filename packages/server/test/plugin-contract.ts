@@ -2,27 +2,6 @@ import { z } from 'zod';
 
 import { WIRE_TOOL_SCHEMAS } from '../src/tools/wire-schema.js';
 
-/**
- * Derive the argument surface every plugin-dispatched tool sends over the relay.
- *
- * This is the contract a sandbox handler has to keep up with, and the one place skew hides: the
- * server validates arguments with Zod and the handler re-reads them positionally (`const p = params
- * as { nodeId?: unknown; … }`), so an argument an older handler predates is not rejected — it is
- * dropped, and the write still answers `{ ok: true }`. Recording the surface is what turns "someone
- * added a field" from an invisible event into a diff.
- *
- * Paths are dotted and descend through arrays and unions (`track.keyframes[].easing.type`), because
- * a nested addition drops just as silently as a top-level one.
- *
- * A read/write tool dispatches its own schema verbatim, so the schema is the contract. A `local`
- * tool's handler builds the plugin payload by hand, so its schema is not: `serverOnlyArgs` names
- * the fields that stay on the server (an output path), and `null` there means the tool has no
- * sandbox handler of its own — its arguments belong to the tool it reuses, which records them.
- *
- * `batch.ops[].params` stops at `unknown` on purpose — it is the union of every other tool's
- * arguments, and each of those tools records its own entry here, so the arguments a batched op
- * carries are covered under the tool it batches rather than duplicated under `batch`.
- */
 export const collect = (schema: z.ZodType, prefix: string, out: Set<string>): void => {
   const def = schema.def as { type: string; [key: string]: unknown };
 
@@ -47,7 +26,7 @@ export const collect = (schema: z.ZodType, prefix: string, out: Set<string>): vo
       collect(def.valueType as z.ZodType, `${prefix}[key]`, out);
       return;
     }
-    // Wrappers carry the same argument under a modifier; descend without consuming a path segment.
+
     case 'optional':
     case 'nullable':
     case 'default':
@@ -63,11 +42,9 @@ export const collect = (schema: z.ZodType, prefix: string, out: Set<string>): vo
       return;
     }
     case 'lazy': {
-      // Recursive schemas would not terminate; the tools that use one describe it inline elsewhere.
       return;
     }
     default:
-      // A leaf (string / number / enum / literal / unknown …) — already recorded by its parent.
       return;
   }
 };
@@ -76,10 +53,7 @@ export type PluginToolContract = Record<string, readonly string[]>;
 
 export const derivePluginContract = (): PluginToolContract => {
   const contract: Record<string, readonly string[]> = {};
-  // WIRE_TOOL_SCHEMAS already is `inputSchema − serverOnlyArgs + injectedArgs (+ requestId)`: the
-  // projection this file used to compute for itself, and the one the leader now validates incoming
-  // arguments against. Reading it here is what keeps "what the plugin is sent" and "what the leader
-  // will accept" from being two descriptions that can disagree.
+
   for (const [name, schema] of WIRE_TOOL_SCHEMAS) {
     const paths = new Set<string>();
     collect(schema, '', paths);
@@ -88,26 +62,9 @@ export const derivePluginContract = (): PluginToolContract => {
   return contract;
 };
 
-/**
- * Every key the server puts into a payload bound for the plugin, read from the call sites.
- *
- * Three shapes reach a sandbox handler, and all three had to be covered before this proved
- * anything. Mutation found the first two while it was being written:
- *
- * - `{ ...args, extra: … }` — walked brace to brace, not matched to the first key after the spread. A
- *   second key added beside an existing one is the likeliest careless change, and a first-key-only
- *   regex reports the old key and calls the file clean.
- * - Object literals handed straight to `dispatch(TOOL, { … })` — several tools build the payload for
- *   another tool by hand, so a field added there never passes through `...args` at all.
- * - `someArgs.field = …` on a `Record` built up before dispatch (`contextArgs`, `pluginArgs`).
- *
- * Only top-level keys count in each case: a key nested inside a value belongs to that value's
- * shape, not to the argument list the plugin receives.
- */
 const KEY_AT = /^([A-Za-z_$][\w$]*)\s*:/;
 const IDENT = /^[\w$]*/;
 
-/** Collect the top-level keys of the object literal that starts at `open`. */
 const literalKeys = (source: string, open: number, out: Set<string>): void => {
   let depth = 0;
   let close = -1;
@@ -135,7 +92,6 @@ const literalKeys = (source: string, open: number, out: Set<string>): void => {
         out.add(key[1]);
         i += key[0].length - 1;
       } else {
-        // Not a key — skip the rest of this identifier so its letters are not re-tested.
         i += (IDENT.exec(body.slice(i))?.[0].length ?? 1) - 1;
       }
     }
@@ -145,18 +101,15 @@ const literalKeys = (source: string, open: number, out: Set<string>): void => {
 export const scanInjectedArgs = (source: string): Set<string> => {
   const found = new Set<string>();
 
-  // Spread form: find the literal enclosing the spread.
   for (const spread of source.matchAll(/\.\.\.args\s*,/g)) {
     const open = source.lastIndexOf('{', spread.index);
     if (open !== -1) literalKeys(source, open, found);
   }
 
-  // Literal handed directly to a dispatch call.
   for (const call of source.matchAll(/\bdispatch\w*\s*\(\s*[^,()]+,\s*\{/g)) {
     literalKeys(source, call.index + call[0].length - 1, found);
   }
 
-  // Fields assigned onto a payload object before it is dispatched.
   for (const assign of source.matchAll(/\b\w*[Aa]rgs\.([A-Za-z_$][\w$]*)\s*=[^=]/g)) {
     if (assign[1] !== undefined) found.add(assign[1]);
   }
@@ -167,7 +120,7 @@ export const scanInjectedArgs = (source: string): Set<string> => {
 export interface ContractDrift {
   addedTools: string[];
   removedTools: string[];
-  /** The dangerous class: an existing tool gained an argument older handlers cannot see. */
+
   addedArgs: string[];
   removedArgs: string[];
 }

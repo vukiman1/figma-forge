@@ -9,7 +9,7 @@ import { classifySvgColor, detectIconLibraries, scanRepoSvgs } from '../../src/i
 describe('classifySvgColor', () => {
   it('currentColor wins outright (single-color, designer-prepped)', () => {
     expect(classifySvgColor('<svg><path fill="currentColor" d="M0"/></svg>')).toBe('currentColor');
-    // even alongside a hard color elsewhere, any currentColor means "meant to be recolored"
+
     expect(classifySvgColor('<svg><path fill="currentColor"/><path stroke="#000"/></svg>')).toBe(
       'currentColor',
     );
@@ -31,7 +31,7 @@ describe('classifySvgColor', () => {
 
   it('no explicit fill and no currentColor → unknown', () => {
     expect(classifySvgColor('<svg><path d="M0 0"/></svg>')).toBe('unknown');
-    // none/transparent are not committed colors
+
     expect(classifySvgColor('<svg><path fill="none"/></svg>')).toBe('unknown');
   });
 });
