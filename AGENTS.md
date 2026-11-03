@@ -12,7 +12,7 @@ Hexagonal. Dependencies point inward only.
 
 `server` and `plugin` never import each other. Plugin handlers receive `figma` as a parameter (`createXHandler(figmaCtx)`), so the Plugin API stays the port.
 
-All packages (`core`, `server`, `plugin`) are under the strict rules. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover all packages without exception.
+All packages (`core`, `server`, `plugin`) and root tests are under the strict rules. The strict checks (`.oxlintrc.json`, `pnpm comments:check`) cover the entire repository without exception.
 
 ## Rules
 
@@ -36,3 +36,8 @@ pnpm typecheck && pnpm lint && pnpm format:check && pnpm knip && pnpm deps:check
 ## Commits
 
 `type(scope): subject` in lowercase. Scopes: `codegen`, `design`, `grounding`, `tools`, `relay`, `plugin`, `deps`, `repo`. Work lands on `dev`; `main` holds stable releases.
+
+## Versioning
+
+- The plugin package version follows the server release version.
+- `MIN_PLUGIN_VERSION` in `core` defines the wire protocol floor and increments only when wire compatibility breaks.
