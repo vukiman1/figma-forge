@@ -1,7 +1,7 @@
 import { GET_DOCUMENT_TOOL_NAME, getDocumentTool } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from '../registry/tool-schema.js';
 
 const getDocumentToolDefinition = toToolDefinition(getDocumentTool);
 

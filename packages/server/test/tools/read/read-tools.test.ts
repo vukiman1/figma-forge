@@ -36,7 +36,7 @@ import {
 } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from '../registry/tool-schema.js';
 
 const getAnnotationsToolDefinition = toToolDefinition(getAnnotationsTool);
 const getDesignContextToolDefinition = toToolDefinition(getDesignContextTool);

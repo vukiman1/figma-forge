@@ -12,7 +12,7 @@ import {
   type ToolDispatcher,
   writeImageFills,
 } from '../../../src/tools/export/save-image-fills.handler.js';
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from '../registry/tool-schema.js';
 
 const saveImageFillsToolDefinition = toToolDefinition(saveImageFillsTool);
 

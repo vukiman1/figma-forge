@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { WIRE_TOOL_SCHEMAS } from '../src/tools/wire/wire-schema.js';
+import { WIRE_TOOL_SCHEMAS } from '../../../src/tools/wire/wire-schema.js';
 
 export const collect = (schema: z.ZodType, prefix: string, out: Set<string>): void => {
   const def = schema.def as { type: string; [key: string]: unknown };

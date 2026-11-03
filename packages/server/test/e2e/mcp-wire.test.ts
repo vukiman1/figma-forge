@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PROMPT_DEFINITIONS } from '../../src/mcp/prompts/registry.js';
 import { ALL_TOOL_SPECS } from '../../src/tools/registry/registry.js';
 import { annotationsFor } from '../../src/tools/result/annotations.js';
-import { toToolDefinition } from '../tool-schema.js';
+import { toToolDefinition } from '../tools/registry/tool-schema.js';
 import {
   type AdvertisedTool,
   canonical,

@@ -12,7 +12,7 @@ import {
   resolveImagePath,
 } from '../../../src/tools/nodes/import-image.handler.js';
 import { WIRE_TOOL_SCHEMAS } from '../../../src/tools/wire/wire-schema.js';
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from '../registry/tool-schema.js';
 
 const PNG = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x01]);
 const JPEG = Uint8Array.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);

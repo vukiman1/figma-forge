@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { MIN_PLUGIN_VERSION } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../src/tools/registry/registry.js';
+import { ALL_TOOL_SPECS } from '../../../src/tools/registry/registry.js';
 import {
   collect,
   derivePluginContract,
@@ -140,7 +140,7 @@ describe('plugin argument contract', () => {
   });
 
   it('records every argument a handler-owning local tool is seen to dispatch', () => {
-    const toolsRoot = join(dirname(fileURLToPath(import.meta.url)), '../src/tools');
+    const toolsRoot = join(dirname(fileURLToPath(import.meta.url)), '../../../src/tools');
     const allFiles = readdirSync(toolsRoot, { recursive: true, encoding: 'utf8' });
     for (const spec of ALL_TOOL_SPECS) {
       if (
@@ -170,7 +170,7 @@ describe('plugin argument contract', () => {
   });
 
   it('has a declaration for every argument the server injects into a dispatch', () => {
-    const srcRoot = join(dirname(fileURLToPath(import.meta.url)), '../src');
+    const srcRoot = join(dirname(fileURLToPath(import.meta.url)), '../../../src');
     const injected = new Set<string>();
     for (const entry of readdirSync(srcRoot, { recursive: true, encoding: 'utf8' })) {
       if (!entry.endsWith('.ts')) continue;

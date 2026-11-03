@@ -11,7 +11,7 @@ import {
   type ToolDispatcher,
   writeExportedVideo,
 } from '../../../src/tools/export/export-video.handler.js';
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from '../registry/tool-schema.js';
 
 const exportVideoToolDefinition = toToolDefinition(exportVideoTool);
 

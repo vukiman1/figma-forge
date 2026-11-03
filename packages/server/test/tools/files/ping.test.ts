@@ -7,7 +7,7 @@ import type { Node } from '../../../src/election/node.js';
 import { portConflictMessage } from '../../../src/election/port-conflict-message.js';
 import { PluginInstallStatus } from '../../../src/plugin-install/install-plugin.js';
 import { handlePing } from '../../../src/tools/files/ping.handler.js';
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from '../registry/tool-schema.js';
 
 const pingToolDefinition = toToolDefinition(pingTool);
 

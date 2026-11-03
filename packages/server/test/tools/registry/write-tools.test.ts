@@ -52,7 +52,7 @@ import {
 } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { toToolDefinition } from '../../tool-schema.js';
+import { toToolDefinition } from './tool-schema.js';
 
 const batchToolDefinition = toToolDefinition(batchTool);
 const cloneNodeToolDefinition = toToolDefinition(cloneNodeTool);

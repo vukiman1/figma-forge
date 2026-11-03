@@ -8,7 +8,7 @@ import {
   WRITE_TOOL_NAMES,
 } from '../packages/server/src/tools/registry/registry.js';
 import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire/wire-schema.js';
-import { toToolDefinition } from '../packages/server/test/tool-schema.js';
+import { toToolDefinition } from '../packages/server/test/tools/registry/tool-schema.js';
 
 // Cross-package guard: a tool is wired across ~6 places (server def + ListTools + WRITE set, plugin
 // handler + idempotent wrap + batch inverse). Forgetting one fails silently at runtime. These tests
