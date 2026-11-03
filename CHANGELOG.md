@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/vukiman1/figma-forge/compare/@figma-forge/mcp@0.2.0...@figma-forge/mcp@0.2.1) (2026-11-03)
+
+
+### Bug Fixes
+
+* **tools:** normalize path separator in plugin-contract test for windows compatibility ([0b6436c](https://github.com/vukiman1/figma-forge/commit/0b6436c7646e30ade02a53d37a519624289ddf8a))
+
 ## [0.2.0](https://github.com/vukiman1/figma-forge/compare/@figma-forge/mcp@0.1.0...@figma-forge/mcp@0.2.0) (2026-11-03)
 
 ### Features
