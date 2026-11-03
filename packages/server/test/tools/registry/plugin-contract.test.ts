@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { MIN_PLUGIN_VERSION } from '@figma-forge/core';
@@ -150,7 +150,7 @@ describe('plugin argument contract', () => {
       )
         continue;
       const targetName = `${spec.name.replaceAll('_', '-')}.handler.ts`;
-      const match = allFiles.find(f => f.endsWith(`/${targetName}`) || f === targetName);
+      const match = allFiles.find(f => basename(f.replaceAll('\\', '/')) === targetName);
       if (!match) throw new Error(`Handler not found for ${spec.name}`);
       const file = join(toolsRoot, match);
       const seen = [...scanInjectedArgs(readFileSync(file, 'utf8'))].toSorted();
