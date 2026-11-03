@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { ALL_TOOL_SPECS } from '../src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../src/tools/registry/registry.js';
 import { toToolDefinition } from './tool-schema.js';
 
 const OPTIONS = { io: 'input', target: 'draft-2020-12' } as const;

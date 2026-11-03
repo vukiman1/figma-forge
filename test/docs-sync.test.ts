@@ -3,7 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../packages/server/src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../packages/server/src/tools/registry/registry.js';
 
 // Docs-sync guard: the tool count is prose in the two user-facing READMEs (the GitHub front page and
 // the npm package page) while the authority is ALL_TOOL_SPECS.length — and the npm one has already

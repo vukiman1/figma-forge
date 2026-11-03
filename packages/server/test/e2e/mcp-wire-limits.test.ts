@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import { CLIENT_MESSAGE_LIMIT_BYTES, NODE_LIST_BUDGET_BYTES } from '@figma-forge/core';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../../src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../../src/tools/registry/registry.js';
 import { closeSocket, connectFakePlugin } from './_helpers.js';
 import {
   DIST_ENTRY,

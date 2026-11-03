@@ -1,7 +1,7 @@
 import { STRING_ID_FIELDS } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../src/tools/registry/registry.js';
 
 describe('tool canvas id coverage', () => {
   it('covers every top-level canvas-id arg any advertised tool exposes', () => {

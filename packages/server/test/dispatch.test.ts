@@ -6,7 +6,7 @@ import type { Follower } from '../src/election/follower.js';
 import { NodeRole } from '../src/election/node-role.js';
 import type { Node } from '../src/election/node.js';
 import { portConflictMessage } from '../src/election/port-conflict-message.js';
-import { captureNotices } from '../src/tools/notices.js';
+import { captureNotices } from '../src/tools/result/notices.js';
 
 const makeNode = (overrides: Partial<Node>): Node =>
   ({

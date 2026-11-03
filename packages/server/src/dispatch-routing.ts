@@ -3,8 +3,8 @@ import type { DispatchContext, DispatchOptions } from './dispatch-types.js';
 import { errorMessage } from './error-message.js';
 import type { PluginSessionInfo } from './routing/sessions.js';
 import { getFileTarget, resolveFileTarget } from './routing/target.js';
-import { namedSessions, type SessionDispatch } from './tools/list-files.handler.js';
-import { reportRouting } from './tools/notices.js';
+import { namedSessions, type SessionDispatch } from './tools/files/list-files.handler.js';
+import { reportRouting } from './tools/result/notices.js';
 
 const ROUTING_NOTICE_TTL_MS = 10_000;
 

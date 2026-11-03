@@ -3,8 +3,11 @@ import { describe, expect, it } from 'vitest';
 import { BATCHABLE_TOOLS } from '../packages/plugin/src/features/batch/inverses.js';
 import { NON_BATCHABLE } from '../packages/plugin/src/features/batch/non-batchable.js';
 import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
-import { ALL_TOOL_SPECS, WRITE_TOOL_NAMES } from '../packages/server/src/tools/registry.js';
-import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire-schema.js';
+import {
+  ALL_TOOL_SPECS,
+  WRITE_TOOL_NAMES,
+} from '../packages/server/src/tools/registry/registry.js';
+import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire/wire-schema.js';
 import { toToolDefinition } from '../packages/server/test/tool-schema.js';
 
 // Cross-package guard: a tool is wired across ~6 places (server def + ListTools + WRITE set, plugin

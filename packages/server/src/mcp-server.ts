@@ -10,10 +10,10 @@ import type { ServerRuntime } from './server-runtime.js';
 import { createSpecialToolHandlers } from './special-tool-handlers.js';
 import { createToolDispatchers } from './tool-dispatchers.js';
 import type { ToolHandler } from './tool-handler.js';
-import { annotationsFor } from './tools/annotations.js';
-import { captureNotices, withRoutingNotice, withSkewNotice } from './tools/notices.js';
-import { ALL_TOOL_SPECS } from './tools/registry.js';
-import { assertWithinLimit } from './tools/result-budget.js';
+import { ALL_TOOL_SPECS } from './tools/registry/registry.js';
+import { annotationsFor } from './tools/result/annotations.js';
+import { captureNotices, withRoutingNotice, withSkewNotice } from './tools/result/notices.js';
+import { assertWithinLimit } from './tools/result/result-budget.js';
 
 const wrapToolHandler =
   (spec: ToolSpec, run: ToolHandler): ToolHandler =>

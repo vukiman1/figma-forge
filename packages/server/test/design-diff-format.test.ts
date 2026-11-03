@@ -6,7 +6,7 @@ import { GetDesignContextResultSchema } from '@figma-forge/core';
 import { expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { SNAPSHOT_FORMAT_VERSION } from '../src/tools/design-diff.handler.js';
+import { SNAPSHOT_FORMAT_VERSION } from '../src/tools/codegen/design-diff.handler.js';
 
 const RECORD_PATH = join(dirname(fileURLToPath(import.meta.url)), 'design-diff-format.json');
 const RERECORD = 'UPDATE_DESIGN_DIFF_FORMAT=1 pnpm test design-diff-format && pnpm format';

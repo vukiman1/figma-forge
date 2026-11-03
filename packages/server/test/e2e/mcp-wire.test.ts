@@ -3,8 +3,8 @@ import { existsSync } from 'node:fs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { PROMPT_DEFINITIONS } from '../../src/prompts/registry.js';
-import { annotationsFor } from '../../src/tools/annotations.js';
-import { ALL_TOOL_SPECS } from '../../src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../../src/tools/registry/registry.js';
+import { annotationsFor } from '../../src/tools/result/annotations.js';
 import { toToolDefinition } from '../tool-schema.js';
 import {
   type AdvertisedTool,

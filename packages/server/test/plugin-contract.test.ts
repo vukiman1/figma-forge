@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { MIN_PLUGIN_VERSION } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
-import { ALL_TOOL_SPECS } from '../src/tools/registry.js';
+import { ALL_TOOL_SPECS } from '../src/tools/registry/registry.js';
 import {
   collect,
   derivePluginContract,
@@ -141,6 +141,7 @@ describe('plugin argument contract', () => {
 
   it('records every argument a handler-owning local tool is seen to dispatch', () => {
     const toolsRoot = join(dirname(fileURLToPath(import.meta.url)), '../src/tools');
+    const allFiles = readdirSync(toolsRoot, { recursive: true, encoding: 'utf8' });
     for (const spec of ALL_TOOL_SPECS) {
       if (
         spec.kind !== 'local' ||
@@ -148,7 +149,10 @@ describe('plugin argument contract', () => {
         spec.serverOnlyArgs === null
       )
         continue;
-      const file = join(toolsRoot, `${spec.name.replaceAll('_', '-')}.handler.ts`);
+      const targetName = `${spec.name.replaceAll('_', '-')}.handler.ts`;
+      const match = allFiles.find(f => f.endsWith(`/${targetName}`) || f === targetName);
+      if (!match) throw new Error(`Handler not found for ${spec.name}`);
+      const file = join(toolsRoot, match);
       const seen = [...scanInjectedArgs(readFileSync(file, 'utf8'))].toSorted();
       const recordedArgs = new Set(derived[spec.name] ?? []);
       expect({ tool: spec.name, missing: seen.filter(arg => !recordedArgs.has(arg)) }).toEqual({

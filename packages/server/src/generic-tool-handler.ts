@@ -7,8 +7,8 @@ import {
   importImageError,
   resolveBatchImagePaths,
   resolveImagePath,
-} from './tools/import-image.handler.js';
-import { checkBatchOps } from './tools/wire-schema.js';
+} from './tools/nodes/import-image.handler.js';
+import { checkBatchOps } from './tools/wire/wire-schema.js';
 
 const validateBatch = (spec: ToolSpec, args: Record<string, unknown>): void => {
   if (spec.name !== BATCH_TOOL_NAME) return;

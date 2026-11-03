@@ -21,7 +21,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import type { WebSocket } from 'ws';
 
 import { dispatchTool } from '../../src/dispatch.js';
-import { handleSaveScreenshots } from '../../src/tools/save-screenshots.handler.js';
+import { handleSaveScreenshots } from '../../src/tools/export/save-screenshots.handler.js';
 import {
   closeSocket,
   connectFakePlugin,

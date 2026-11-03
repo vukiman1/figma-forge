@@ -12,7 +12,7 @@ import { decode } from '@msgpack/msgpack';
 import { errorMessage } from '../error-message.js';
 import { hasContentType } from '../local-access.js';
 import type { Relay } from '../relay/relay.js';
-import { checkWireCall, type WireRejection } from '../tools/wire-schema.js';
+import { checkWireCall, type WireRejection } from '../tools/wire/wire-schema.js';
 import { readBody, writeJson, writeMsgpack } from './http-replies.js';
 import { HttpStatus, MSGPACK_CONTENT_TYPE } from './leader-wire.js';
 
