@@ -4,8 +4,8 @@ import {
   GetDesignContextResultSchema,
   type GetDesignContextResult,
 } from '@figma-forge/core';
+import { type DesignDiffChanges, diffDesignContext } from '@figma-forge/core';
 
-import { type DesignDiffChanges, diffDesignContext } from '../diff/design-diff.js';
 import {
   createSnapshotPaths,
   readDesignSnapshot,

@@ -1,5 +1,4 @@
-import type { GetDesignContextResult } from '@figma-forge/core';
-
+import type { GetDesignContextResult } from '../design-context/result.js';
 import { flattenDesignContext } from './design-context-resolver.js';
 import type {
   DesignDiffChanges,

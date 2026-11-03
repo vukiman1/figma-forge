@@ -43,4 +43,7 @@ export * from './design-context/text-style.js';
 export * from './color/hex.js';
 export * from './object/omit-keys.js';
 export * from './object/pick-defined.js';
+export * from './model/node-id.js';
+export * from './diff/design-diff.js';
+export * from './diff/design-diff-types.js';
 export * from './tools/index.js';

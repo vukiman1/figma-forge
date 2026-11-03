@@ -1,6 +1,6 @@
-import type { GetDesignContextResult } from '@figma-forge/core';
 import { describe, expect, it } from 'vitest';
 
+import type { GetDesignContextResult } from '../../src/design-context/result.js';
 import { deepEqual, diffDesignContext } from '../../src/diff/design-diff.js';
 
 const ctx = (over: Partial<GetDesignContextResult> = {}): GetDesignContextResult => ({

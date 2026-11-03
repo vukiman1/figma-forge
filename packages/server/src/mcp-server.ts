@@ -1,9 +1,9 @@
 import type { ToolSpec } from '@figma-forge/core';
+import { normalizeIdArgs } from '@figma-forge/core';
 import { McpServer } from '@modelcontextprotocol/server';
 
 import { createGenericToolHandler } from './generic-tool-handler.js';
 import { SERVER_INSTRUCTIONS } from './instructions.js';
-import { normalizeIdArgs } from './node-id.js';
 import { PROMPTS } from './prompts/registry.js';
 import { SERVER_NAME, SERVER_VERSION } from './server-config.js';
 import type { ServerRuntime } from './server-runtime.js';

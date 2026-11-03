@@ -1,5 +1,5 @@
-import type { DesignContextNode, GetDesignContextResult } from '@figma-forge/core';
-
+import type { DesignContextNode } from '../design-context/node.js';
+import type { GetDesignContextResult } from '../design-context/result.js';
 import { isPlainObject } from './deep-equal.js';
 import type { FlatDesignNode } from './design-diff-types.js';
 
