@@ -12,7 +12,7 @@ Hexagonal. Dependencies point inward only.
 
 `server` and `plugin` never import each other. Plugin handlers receive `figma` as a parameter (`createXHandler(figmaCtx)`), so the Plugin API stays the port.
 
-The migration is in progress: `packages/server` (published as `@figma-forge/mcp`) is being brought under the strict rules. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover migrated paths only; legacy paths are listed there and drop off as they move.
+All packages (`core`, `server`, `plugin`) are under the strict rules. The strict checks (`.oxlintrc.strict.json`, `pnpm comments:check`) cover all packages without exception.
 
 ## Rules
 
