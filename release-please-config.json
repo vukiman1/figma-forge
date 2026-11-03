@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "1889c8cf0c6a77c5f4ef12e761efeea28f1646b6",
+  "pull-request-title-pattern": "chore(repo): release${component} ${version}",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "@figma-forge/mcp",
+      "component": "@figma-forge/mcp",
+      "include-component-in-tag": true,
+      "tag-separator": "@",
+      "include-v-in-tag": false,
+      "bump-minor-pre-major": true,
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "type": "json",
+          "path": "packages/server/package.json",
+          "jsonpath": "$.version"
+        }
+      ]
+    }
+  }
+}
