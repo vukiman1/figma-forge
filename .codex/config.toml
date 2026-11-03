@@ -1,0 +1,3 @@
+[mcp_servers.figma-forge]
+command = "node"
+args = ["packages/server/dist/index.mjs"]
