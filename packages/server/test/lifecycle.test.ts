@@ -45,9 +45,6 @@ describe('wireShutdown', () => {
   });
 
   it('returns a trigger for losses that stdin never reports', () => {
-    // A transport that dies on its own detaches from stdin without ending it, so none of the wired
-    // events fire. The caller needs a way in — otherwise the process survives deaf, still holding
-    // the relay port, which is the exact zombie this module exists to prevent.
     const proc = new EventEmitter();
     const stdin = new EventEmitter();
     let calls = 0;
@@ -58,8 +55,6 @@ describe('wireShutdown', () => {
   });
 
   it('shares one guard between the returned trigger and the wired events', () => {
-    // Shutdown closes the transport, which reports its close, which calls the trigger. That must
-    // not start a second shutdown on top of the one already running.
     const proc = new EventEmitter();
     const stdin = new EventEmitter();
     let calls = 0;
@@ -101,7 +96,7 @@ describe('wireShutdown hardExit backstop', () => {
     const proc = new EventEmitter();
     const stdin = new EventEmitter();
     const hardExit = vi.fn<() => void>();
-    // A shutdown that stalls forever (e.g. a close waiting on connections that never drain).
+
     wireShutdown({ proc, stdin, shutdown: () => new Promise<void>(() => {}), hardExit });
 
     stdin.emit('end');

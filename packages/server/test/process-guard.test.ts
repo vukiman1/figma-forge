@@ -35,11 +35,23 @@ describe('guardProcess', () => {
     let writes = 0;
     guardProcess(proc, () => {
       writes += 1;
-      // A write that synchronously ends up raising again must not loop back into a new report.
+
       proc.emit('uncaughtException', new Error('raised while reporting'));
     });
     proc.emit('uncaughtException', new Error('first'));
     expect(writes).toBe(1);
+  });
+
+  it('continues reporting after an unformattable rejection reason', () => {
+    const proc = fakeProcess();
+    const written: string[] = [];
+    guardProcess(proc, text => written.push(text));
+
+    expect(() => proc.emit('unhandledRejection', Object.create(null))).not.toThrow();
+    proc.emit('uncaughtException', new Error('later'));
+
+    expect(written).toHaveLength(1);
+    expect(written[0]).toMatch(/uncaught exception — kept running: Error: later/);
   });
 
   it('stops writing after a burst of reports, saying so once', () => {
@@ -67,7 +79,7 @@ describe('consoleToStderr', () => {
     sink.on('data', (chunk: Buffer) => {
       captured += chunk.toString('utf8');
     });
-    // A stand-in for the global console whose own stdout is a stream that must stay untouched.
+
     const stdout = new PassThrough();
     let leaked = '';
     stdout.on('data', (chunk: Buffer) => {

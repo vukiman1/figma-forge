@@ -11,9 +11,6 @@ import { describe, expect, it } from 'vitest';
 import { leaderLockPath } from '../../src/election/leader-lock.js';
 import { onText } from './_helpers.js';
 
-// The crash guard, end to end: a real built server, made to misbehave from inside its own process,
-// must keep serving its client and keep stdout pure JSON-RPC. Unit tests cover each part; this is
-// what proves the parts are installed, and installed before anything else runs.
 const DIST_ENTRY = join(import.meta.dirname, '..', '..', 'dist', 'index.mjs');
 const MISBEHAVE = pathToFileURL(join(import.meta.dirname, 'fixtures', 'misbehave.mjs')).href;
 
@@ -38,8 +35,7 @@ describe.skipIf(!existsSync(DIST_ENTRY))('process guard (built dist)', () => {
     let pendingLine = '';
     onText(child.stdout, text => {
       stdout += text;
-      // A large response (tools/list is ~160 KB) arrives in several chunks, so only a completed
-      // line is parsed — the same framing mcp-wire.test.ts reads.
+
       pendingLine += text;
       for (let nl = pendingLine.indexOf('\n'); nl !== -1; nl = pendingLine.indexOf('\n')) {
         const line = pendingLine.slice(0, nl).trim();
@@ -78,7 +74,6 @@ describe.skipIf(!existsSync(DIST_ENTRY))('process guard (built dist)', () => {
         `${JSON.stringify({ jsonrpc: '2.0', method: 'notifications/initialized' })}\n`,
       );
 
-      // Give the preload's misbehaviour time to happen, then use the server.
       for (
         let waited = 0;
         !stderr.includes('exception nobody caught') && waited < 5_000;
@@ -95,7 +90,7 @@ describe.skipIf(!existsSync(DIST_ENTRY))('process guard (built dist)', () => {
       expect(pinged.result).toBeDefined();
 
       expect(child.exitCode).toBeNull();
-      // Every line on stdout is protocol; the console write went to stderr.
+
       for (const line of stdout.split('\n').filter(l => l.trim() !== '')) {
         expect(() => JSON.parse(line)).not.toThrow();
       }
@@ -104,8 +99,7 @@ describe.skipIf(!existsSync(DIST_ENTRY))('process guard (built dist)', () => {
       expect(stderr).toMatch(/uncaught exception — kept running: Error: exception nobody caught/);
     } finally {
       rmSync(leaderLockPath(port), { force: true });
-      // A server that already died is reported by the assertions above; only a live one is asked
-      // to leave, and the guard must not have taken away its ordinary exit when the client goes.
+
       if (child.exitCode === null && child.signalCode === null) {
         const exited = once(child, 'exit');
         child.stdin.end();
