@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { createSandboxHandlers } from '../packages/plugin/src/features/sandbox-handlers.js';
-import { ALL_TOOL_SPECS, WRITE_TOOL_NAMES } from '../packages/server/src/tools/registry.js';
-import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire-schema.js';
+import {
+  ALL_TOOL_SPECS,
+  WRITE_TOOL_NAMES,
+} from '../packages/server/src/tools/registry/registry.js';
+import { WIRE_TOOL_SCHEMAS } from '../packages/server/src/tools/wire/wire-schema.js';
 
-// Only Figma's external library API is replaced. The real schemas, registry, idempotency and
-// binding/apply handlers consume the imported target-file references, never a guessed source id.
 const setup = () => {
   const variable = {
     id: 'VariableID:published-variable/12:34',
@@ -148,7 +149,6 @@ describe('library imports', () => {
         expect(spec!.inputSchema.safeParse(input).success).toBe(false);
         await expect(target.handlers[name]!(input)).rejects.toThrow(new RegExp(key));
       }
-      // Source ids and caller-owned retry ids are not alternative spellings of a published key.
       expect(spec!.inputSchema.safeParse({ [key]: 'key', variableId: 'source-id' }).success).toBe(
         false,
       );

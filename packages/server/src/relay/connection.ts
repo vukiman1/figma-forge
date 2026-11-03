@@ -1,7 +1,7 @@
 import { decodeEnvelope, type Envelope } from '@figma-forge/core';
 import type { RawData, WebSocket } from 'ws';
 
-import { errorMessage } from '../error-message.js';
+import { errorMessage } from '../common/error-message.js';
 import type { Session } from './session.js';
 
 export interface ConnectionHandlers {

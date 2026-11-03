@@ -1,6 +1,6 @@
 import type { Directive, ExportNamedDeclaration, ExportSpecifier, Statement } from 'oxc-parser';
 
-import { parseSource } from '../parse-source.js';
+import { parseSource } from '../repo/parse-source.js';
 import { identifierName } from './ast-names.js';
 import { isPascalCase, nameFromFile } from './component-name.js';
 import {

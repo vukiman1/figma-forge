@@ -2,7 +2,7 @@ import { createServer, type Server as HttpServer } from 'node:http';
 
 import { DEFAULT_PORT } from '@figma-forge/core';
 
-import { errorMessage } from '../error-message.js';
+import { errorMessage } from '../common/error-message.js';
 import { Relay } from '../relay/relay.js';
 import { bindPort, closeAllConnections } from './bind-port.js';
 import { NodeRole } from './node-role.js';

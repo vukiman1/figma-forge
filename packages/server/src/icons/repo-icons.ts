@@ -1,7 +1,7 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-import { walkRepoFiles } from '../repo-walk.js';
+import { walkRepoFiles } from '../repo/repo-walk.js';
 
 const COLOR_TOKEN = /(?:fill|stroke)\s*[:=]\s*["']?\s*([^"';\s/>]+)/gi;
 const GRADIENT_OR_IMAGE = /<(?:linear|radial)gradient|url\(#|<image\b/i;

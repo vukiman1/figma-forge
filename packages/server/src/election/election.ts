@@ -1,4 +1,4 @@
-import { errorMessage } from '../error-message.js';
+import { errorMessage } from '../common/error-message.js';
 import { isAddressInUse } from './bind-port.js';
 import { delay } from './delay.js';
 import {

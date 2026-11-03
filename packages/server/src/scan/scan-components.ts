@@ -1,7 +1,7 @@
 import { extname, join } from 'node:path';
 
-import { readTextIfPresent } from '../optional-file.js';
-import { walkRepoFiles } from '../repo-walk.js';
+import { readTextIfPresent } from '../repo/optional-file.js';
+import { walkRepoFiles } from '../repo/repo-walk.js';
 import { extractAngularComponents } from './angular-components.js';
 import { extractReactComponents } from './react-components.js';
 import type { ComponentFramework, ScannedComponent } from './scanned-component.js';

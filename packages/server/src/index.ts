@@ -1,13 +1,13 @@
-import './process-guard-install.js';
+import './process/process-guard-install.js';
 import { PROTOCOL_VERSION } from '@figma-forge/core';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 
-import { errorMessage } from './error-message.js';
-import { wireShutdown } from './lifecycle.js';
-import { createMcpServer } from './mcp-server.js';
-import { SelfReportingStdioTransport } from './self-reporting-stdio-transport.js';
-import { log, SERVER_PORT, SERVER_VERSION } from './server-config.js';
-import { createServerRuntime } from './server-runtime.js';
+import { errorMessage } from './common/error-message.js';
+import { createMcpServer } from './mcp/mcp-server.js';
+import { SelfReportingStdioTransport } from './mcp/self-reporting-stdio-transport.js';
+import { wireShutdown } from './process/lifecycle.js';
+import { log, SERVER_PORT, SERVER_VERSION } from './process/server-config.js';
+import { createServerRuntime } from './process/server-runtime.js';
 
 const runtime = await createServerRuntime();
 

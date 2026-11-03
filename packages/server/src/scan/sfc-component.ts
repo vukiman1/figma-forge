@@ -1,6 +1,6 @@
 import type { Program } from 'oxc-parser';
 
-import { parseSource } from '../parse-source.js';
+import { parseSource } from '../repo/parse-source.js';
 import { nameFromFile } from './component-name.js';
 import { mergeProps } from './props-result.js';
 import type { ComponentFramework, ScannedComponent } from './scanned-component.js';
